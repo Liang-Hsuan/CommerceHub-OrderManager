@@ -353,7 +353,7 @@ namespace CommerceHub_OrderManager.channel.sears
 
         #region XML Generation
         /* a method that generate xml order and upload to the sftp server */
-        public void generateXML(SearsValues value, int[] cancelIndex)
+        public void generateXML(SearsValues value, Dictionary<int, string> cancelList)
         {
             string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                          "<ConfirmMessageBatch>" +
@@ -365,12 +365,12 @@ namespace CommerceHub_OrderManager.channel.sears
                          "<poNumber>" + value.PoNumber + "</poNumber>";
 
             // the case if there is at least one order will be shipped -> add trx balance due
-            if (cancelIndex.Length < value.LineCount)
+            if (cancelList.Count < value.LineCount)
             {
                 // substract the amount that the orders are cancelled
                 for (int i = 0; i < value.LineCount; i++)
                 {
-                    foreach (int j in cancelIndex)
+                    foreach (int j in cancelList.Keys)
                     {
                         if (j == i)
                         {
@@ -391,14 +391,53 @@ namespace CommerceHub_OrderManager.channel.sears
                 bool isCancelled = false;
 
                 // check if the order is cancel
-                foreach (int j in cancelIndex)
+                foreach (int j in cancelList.Keys)
                 {
                     if (j == i - 1)
                     {
+                        string reason;
+
+                        switch (cancelList[j])
+                        {
+                            case "Incorrect Ship To Address":
+                                reason = "bad_address";
+                                break;
+                            case "Incorrect SKU":
+                                reason = "bad_sku​";
+                                break;
+                            case "Cancelled at Merchant's Request":
+                                reason = "merchant_request";
+                                break;
+                            case "Cannot fulfill the order in time":
+                                reason = "fulfill_time_expired";
+                                break;
+                            case "Cannot Ship as Ordered":
+                                reason = "cannot_meet_all_reqs";
+                                break;
+                            case "Invalid Item Cost":
+                                reason = "invalid_item_cost";
+                                break;
+                            case "Merchant detected fraud":
+                                reason = "merchant_detected_fraud";
+                                break;
+                            case "Order missing information":
+                                reason = "info_missing";
+                                break;
+                            case "Out of Stock":
+                                reason = "out_of_stock";
+                                break;
+                            case "Product Has Been Discontinued":
+                                reason = "discontinued";
+                                break;
+                            default:
+                                reason = "other";
+                                break;
+                        }
+
                         xml +=
                             "<hubAction>" +
                             "<action>v_cancel</action>" +
-                            "<actionCode>out_of_stock</actionCode>";
+                            "<actionCode>" + reason + "/actionCode>";
 
                         isCancelled = true;
                         break;
@@ -425,7 +464,7 @@ namespace CommerceHub_OrderManager.channel.sears
             }
 
             // the case if there is at least one order will be shipped
-            if (cancelIndex.Length < value.LineCount)
+            if (cancelList.Count < value.LineCount)
             {
                 xml +=
                     "<packageDetail packageDetailID=\"" + value.PackageDetailID + "\">" +
@@ -440,7 +479,7 @@ namespace CommerceHub_OrderManager.channel.sears
                 "</ConfirmMessageBatch>";
 
             // convert txt to xsd file
-            string path = @"C:\Users\Intern1001\Desktop\F15_Intern\Orders\SearsCompleteOrders\" + value.TransactionID + ".xsd";
+            string path = completeOrderDir + "//" + value.TransactionID + ".xsd";
             StreamWriter writer = new StreamWriter(path);
             writer.WriteLine(xml);
             writer.Close();

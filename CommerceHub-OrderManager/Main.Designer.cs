@@ -47,7 +47,7 @@
             this.qtyHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.recipientHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.createLabelButton = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.printButton = new System.Windows.Forms.Button();
             this.detailButton = new System.Windows.Forms.Button();
             this.selectionAllCheckbox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.chart)).BeginInit();
@@ -204,17 +204,18 @@
             this.createLabelButton.Text = "Create Lable(s)";
             this.createLabelButton.UseVisualStyleBackColor = false;
             // 
-            // button1
+            // printButton
             // 
-            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
-            this.button1.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Location = new System.Drawing.Point(178, 338);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(106, 34);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Print";
-            this.button1.UseVisualStyleBackColor = false;
+            this.printButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.printButton.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.printButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.printButton.Location = new System.Drawing.Point(178, 338);
+            this.printButton.Name = "printButton";
+            this.printButton.Size = new System.Drawing.Size(106, 34);
+            this.printButton.TabIndex = 4;
+            this.printButton.Text = "Print";
+            this.printButton.UseVisualStyleBackColor = false;
+            this.printButton.Click += new System.EventHandler(this.printButton_Click);
             // 
             // detailButton
             // 
@@ -250,7 +251,7 @@
             this.ClientSize = new System.Drawing.Size(1436, 873);
             this.Controls.Add(this.selectionAllCheckbox);
             this.Controls.Add(this.detailButton);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.printButton);
             this.Controls.Add(this.createLabelButton);
             this.Controls.Add(this.listview);
             this.Controls.Add(this.chart);
@@ -280,7 +281,7 @@
         private System.Windows.Forms.ColumnHeader qtyHeader;
         private System.Windows.Forms.ColumnHeader recipientHeader;
         private System.Windows.Forms.Button createLabelButton;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button printButton;
         private System.Windows.Forms.Button detailButton;
         private System.Windows.Forms.ColumnHeader selectionHeader;
         private System.Windows.Forms.CheckBox selectionAllCheckbox;

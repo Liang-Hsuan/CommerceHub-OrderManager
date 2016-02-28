@@ -80,6 +80,7 @@
             this.markCancelButton = new System.Windows.Forms.Button();
             this.reasonCombobox = new System.Windows.Forms.ComboBox();
             this.setReasonButton = new System.Windows.Forms.Button();
+            this.shipmentConfirmButton = new System.Windows.Forms.Button();
             this.orderSummaryPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.moneyPicturebox)).BeginInit();
             this.topPanel.SuspendLayout();
@@ -340,6 +341,7 @@
             this.printPackingSlipButton.TabIndex = 6;
             this.printPackingSlipButton.Text = "Print Packing Slip";
             this.printPackingSlipButton.UseVisualStyleBackColor = false;
+            this.printPackingSlipButton.Click += new System.EventHandler(this.printPackingSlipButton_Click);
             // 
             // topOrderNumberTextbox
             // 
@@ -659,7 +661,7 @@
             this.reasonCombobox.FormattingEnabled = true;
             this.reasonCombobox.Items.AddRange(new object[] {
             "Select Reason",
-            "Incoorect Ship To Address",
+            "Incorrect Ship To Address",
             "Incorrect SKU",
             "Cancelled at Merchant\'s Request",
             "Cannot fulfill the order in time",
@@ -694,12 +696,30 @@
             this.setReasonButton.Visible = false;
             this.setReasonButton.Click += new System.EventHandler(this.setReasonButton_Click);
             // 
+            // shipmentConfirmButton
+            // 
+            this.shipmentConfirmButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.shipmentConfirmButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(168)))), ((int)(((byte)(17)))));
+            this.shipmentConfirmButton.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.shipmentConfirmButton.FlatAppearance.BorderSize = 2;
+            this.shipmentConfirmButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.shipmentConfirmButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.shipmentConfirmButton.ForeColor = System.Drawing.Color.White;
+            this.shipmentConfirmButton.Location = new System.Drawing.Point(964, 774);
+            this.shipmentConfirmButton.Name = "shipmentConfirmButton";
+            this.shipmentConfirmButton.Size = new System.Drawing.Size(460, 67);
+            this.shipmentConfirmButton.TabIndex = 8;
+            this.shipmentConfirmButton.Text = "Shipment Confirm";
+            this.shipmentConfirmButton.UseVisualStyleBackColor = false;
+            this.shipmentConfirmButton.Click += new System.EventHandler(this.shipmentConfirmButton_Click);
+            // 
             // DetailPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(245)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(1436, 873);
+            this.Controls.Add(this.shipmentConfirmButton);
             this.Controls.Add(this.setReasonButton);
             this.Controls.Add(this.reasonCombobox);
             this.Controls.Add(this.markCancelButton);
@@ -779,5 +799,6 @@
         private System.Windows.Forms.ColumnHeader reasonHeader;
         private System.Windows.Forms.ComboBox reasonCombobox;
         private System.Windows.Forms.Button setReasonButton;
+        private System.Windows.Forms.Button shipmentConfirmButton;
     }
 }

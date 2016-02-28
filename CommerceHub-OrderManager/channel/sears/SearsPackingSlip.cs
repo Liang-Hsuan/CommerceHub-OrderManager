@@ -1,30 +1,38 @@
 ﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
+using System;
 using System.IO;
 
 namespace CommerceHub_OrderManager.channel.sears
 {
+    /*
+     * A class that generate the packing slip for sears order
+     */
     public class SearsPackingSlip
     {
         // field for pdf generation
-        Document doc;
+        private Document doc;
 
-        /* constructor that do nothing */
+        // field for saving the packing slips
+        private string savePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_PackingSlip";
+
+        /* constructor that create the path for saving pdf */
         public SearsPackingSlip()
         {
-            // just in case
+            if (!Directory.Exists(savePath))
+                Directory.CreateDirectory(savePath);
         }
 
-        /* a method that save the packing slip pdf to the given path */
-        public void createPackingSlip(SearsValues value, string path, int[] cancelIndex)
+        /* a method that save the packing slip pdf */
+        public void createPackingSlip(SearsValues value, int[] cancelIndex)
         {
             // the case if all of the items in the order are cancelled -> don't need to print the packing slip
             if (cancelIndex.Length >= value.LineCount)
                 return;
 
             // first check if the save directory exist -> if not create it
-            if (!File.Exists(@"C:\Users\Intern1001\Desktop\Sears_PackingSlip"))
-                Directory.CreateDirectory(@"C:\Users\Intern1001\Desktop\Sears_PackingSlip");
+            if (!File.Exists(savePath))
+                Directory.CreateDirectory(savePath);
 
             // print each item for packing slip
             for (int i = 0; i < value.LineCount; i++)
@@ -45,7 +53,8 @@ namespace CommerceHub_OrderManager.channel.sears
                 {
                     // initialize PdfWriter object
                     doc = new Document(PageSize.LETTER, 10, 10, 42, 35);
-                    PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(@"C:\Users\Intern1001\Desktop\Sears_PackingSlip\" + value.TransactionID + "_" + (i + 1) + ".pdf", FileMode.Create));
+                    string file = savePath + "\\" + value.TransactionID + "_" + (i + 1) + ".pdf";
+                    PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(file, FileMode.Create));
 
                     // open the document 
                     doc.Open();
@@ -738,8 +747,21 @@ namespace CommerceHub_OrderManager.channel.sears
                     ct.Go();
                     #endregion
 
+                    // start the pdf for previewing
+                    if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)
+                        System.Diagnostics.Process.Start(file);
+
                     doc.Close();
                 }
+            }
+        }
+
+        /* get the save path of the sears packing slip */
+        public string SavePath
+        {
+            get
+            {
+                return savePath;
             }
         }
     }

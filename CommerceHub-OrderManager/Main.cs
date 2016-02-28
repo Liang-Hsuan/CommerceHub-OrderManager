@@ -11,7 +11,6 @@ namespace CommerceHub_OrderManager
 
         // field for commerce hub order
         private Sears sears = new Sears();
-        private SearsValues[] searsValue;
 
         public Main()
         {
@@ -28,6 +27,42 @@ namespace CommerceHub_OrderManager
             Properties.Settings.Default.Iterator = iterator;
         }
 
+        #region Top Buttons
+        /* print button click that export the checked items' packing slip */
+        private void printButton_Click(object sender, EventArgs e)
+        {
+            // initialize printing objects
+            SearsPackingSlip searsPS = new SearsPackingSlip();
+
+            // check the user check item and get the selected transaction id for exportin packing slip
+            foreach (ListViewItem item in listview.CheckedItems)
+            {
+                // for sears order
+                if (item.SubItems[0].Text == "Sears")
+                {
+                    string transaction = item.SubItems[4].Text;
+                    SearsValues value = sears.generateValue(transaction);
+                    searsPS.createPackingSlip(value, new int[0]);
+                }
+            }
+        }
+
+        /* the event for detail button click that show the detail page for the selected item */
+        private void detailButton_Click(object sender, EventArgs e)
+        {
+            // the case if the user does not select any thing or select more than one
+            if (listview.CheckedItems.Count != 1)
+            {
+                MessageBox.Show("Please select one item to see more details", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            SearsValues value = sears.generateValue(listview.CheckedItems[0].SubItems[4].Text);
+
+            new DetailPage(value).ShowDialog(this);
+        }
+        #endregion
+
         /* the event for selection all checkbox check that select all the items in the list view */
         private void selectionAllCheckbox_CheckedChanged(object sender, EventArgs e)
         {
@@ -43,41 +78,12 @@ namespace CommerceHub_OrderManager
             }
         }
 
-        /* the event for detail button click that show the detail page for the selected item */
-        private void detailButton_Click(object sender, EventArgs e)
-        {
-            #region Error Checking
-            // check the user check item and get the selected transaction id
-            int count = 0;
-            string transaction = "";
-            foreach (ListViewItem item in listview.Items)
-            {
-                if (item.Checked)
-                {
-                    count++;
-                    transaction = item.SubItems[4].Text;
-                }
-            }
-
-            // the case if the user does not select any thing or select more than one
-            if (count != 1)
-            {
-                MessageBox.Show("Please select one item to see more details", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            #endregion
-
-            SearsValues value = sears.generateValue(transaction);
-
-            new DetailPage(value).ShowDialog(this);
-        }
-
         /* a supporting method that get new order from sears and show them on the list view */
         private void showSearsResult()
         {
             // get orders from sears
             sears.GetOrder();
-            searsValue = sears.GetAllNewOrder();
+            SearsValues[] searsValue = sears.GetAllNewOrder();
 
             // show new orders to the list view 
             DateTime timeNow = DateTime.Now;

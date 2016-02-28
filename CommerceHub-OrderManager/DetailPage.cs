@@ -1,6 +1,7 @@
 ﻿using CommerceHub_OrderManager.channel.sears;
 using CommerceHub_OrderManager.supportingClasses;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -18,6 +19,14 @@ namespace CommerceHub_OrderManager
 
             this.value = value;
             showResult(value);
+        }
+
+        private void printPackingSlipButton_Click(object sender, EventArgs e)
+        {
+            // get all cancel index and print the packing slip that are not cancelled
+            int[] cancelIndex = getCancelIndex();
+            SearsPackingSlip packingSlip = new SearsPackingSlip();
+            packingSlip.createPackingSlip(value, cancelIndex);
         }
 
         /* the event for verify button click that show the result of the address validity */
@@ -87,6 +96,12 @@ namespace CommerceHub_OrderManager
                 reasonCombobox.Visible = false;
                 setReasonButton.Visible = false;
             }
+
+            // check the number of the cancel items compare to those are not so that change the enability of the print button
+            if (count >= listview.Items.Count)
+                printPackingSlipButton.Enabled = false;
+            else
+                printPackingSlipButton.Enabled = true;
         }
 
         /* when clicked set the reason of cancelling to the checked items */
@@ -109,6 +124,7 @@ namespace CommerceHub_OrderManager
         }
         #endregion
 
+        #region Supporting Region
         /* a method that show the information of the given SearsValues object */
         private void showResult(SearsValues value)
         {
@@ -178,6 +194,36 @@ namespace CommerceHub_OrderManager
 
                 listview.Items.Add(item);
             }
+        }
+
+        /* a method that get the current cancel items' idexes */
+        private int[] getCancelIndex()
+        {
+            List<int> list = new List<int>();
+
+            foreach (ListViewItem item in listview.Items)
+            {
+                if (item.SubItems[5].Text == "Cancelled")
+                    list.Add(item.Index);
+            }
+
+            return list.ToArray();
+        }
+        #endregion
+
+        private void shipmentConfirmButton_Click(object sender, EventArgs e)
+        {
+            // generate cancel list
+            Dictionary<int, string> cancalList = new Dictionary<int, string>();
+
+            for (int i = 0; i < listview.Items.Count; i++)
+            {
+                if (listview.Items[i].SubItems[5].Text == "Cancel")
+                    cancalList.Add(i, listview.Items[i].SubItems[6].Text);
+            }
+
+            // export xml file
+            new Sears().generateXML(value, cancalList);
         }
     }
 }
