@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="channel\sears\Address.cs" />
     <Compile Include="channel\sears\Sears.cs" />
+    <Compile Include="channel\sears\SearsPackingSlip.cs" />
     <Compile Include="channel\sears\SearsValues.cs" />
     <Compile Include="DetailPage.cs">
       <SubType>Form</SubType>

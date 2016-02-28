@@ -92,9 +92,12 @@ namespace CommerceHub_OrderManager
         /* when clicked set the reason of cancelling to the checked items */
         private void setReasonButton_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in listview.CheckedItems)
+            if (reasonCombobox.SelectedIndex != 0)
             {
-                item.SubItems[6].Text = reasonCombobox.SelectedItem.ToString();
+                foreach (ListViewItem item in listview.CheckedItems)
+                {
+                    item.SubItems[6].Text = reasonCombobox.SelectedItem.ToString();
+                }
             }
         }
 

@@ -334,7 +334,7 @@
             this.printPackingSlipButton.FlatAppearance.BorderSize = 2;
             this.printPackingSlipButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.printPackingSlipButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.printPackingSlipButton.Location = new System.Drawing.Point(1302, 16);
+            this.printPackingSlipButton.Location = new System.Drawing.Point(1287, 17);
             this.printPackingSlipButton.Name = "printPackingSlipButton";
             this.printPackingSlipButton.Size = new System.Drawing.Size(137, 41);
             this.printPackingSlipButton.TabIndex = 6;

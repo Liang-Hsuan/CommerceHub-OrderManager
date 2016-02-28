@@ -38,7 +38,7 @@ namespace CommerceHub_OrderManager.supportingClasses
             request.Method = "GET";
 
             // get the response from the server
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            response = (HttpWebResponse)request.GetResponse();
             string result;
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
             {
