@@ -81,6 +81,8 @@
             this.reasonCombobox = new System.Windows.Forms.ComboBox();
             this.setReasonButton = new System.Windows.Forms.Button();
             this.shipmentConfirmButton = new System.Windows.Forms.Button();
+            this.backgroundWorkerConfirm = new System.ComponentModel.BackgroundWorker();
+            this.progressbar = new System.Windows.Forms.ProgressBar();
             this.orderSummaryPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.moneyPicturebox)).BeginInit();
             this.topPanel.SuspendLayout();
@@ -713,12 +715,30 @@
             this.shipmentConfirmButton.UseVisualStyleBackColor = false;
             this.shipmentConfirmButton.Click += new System.EventHandler(this.shipmentConfirmButton_Click);
             // 
+            // backgroundWorkerConfirm
+            // 
+            this.backgroundWorkerConfirm.WorkerReportsProgress = true;
+            this.backgroundWorkerConfirm.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorkerConfirm_DoWork);
+            this.backgroundWorkerConfirm.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorkerConfirm_ProgressChanged);
+            this.backgroundWorkerConfirm.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorkerConfirm_RunWorkerCompleted);
+            // 
+            // progressbar
+            // 
+            this.progressbar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressbar.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(168)))), ((int)(((byte)(17)))));
+            this.progressbar.Location = new System.Drawing.Point(964, 774);
+            this.progressbar.Name = "progressbar";
+            this.progressbar.Size = new System.Drawing.Size(460, 67);
+            this.progressbar.TabIndex = 9;
+            this.progressbar.Visible = false;
+            // 
             // DetailPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(245)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(1436, 873);
+            this.Controls.Add(this.progressbar);
             this.Controls.Add(this.shipmentConfirmButton);
             this.Controls.Add(this.setReasonButton);
             this.Controls.Add(this.reasonCombobox);
@@ -800,5 +820,7 @@
         private System.Windows.Forms.ComboBox reasonCombobox;
         private System.Windows.Forms.Button setReasonButton;
         private System.Windows.Forms.Button shipmentConfirmButton;
+        private System.ComponentModel.BackgroundWorker backgroundWorkerConfirm;
+        private System.Windows.Forms.ProgressBar progressbar;
     }
 }

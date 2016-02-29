@@ -3,6 +3,7 @@ using CommerceHub_OrderManager.supportingClasses;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace CommerceHub_OrderManager
@@ -11,6 +12,9 @@ namespace CommerceHub_OrderManager
     {
         // field for storing order details
         private SearsValues value;
+
+        // field for keeping track cancelled items
+        private Dictionary<int, string> cancalList;
 
         /* constructor that initializes graphic compents and order fields */
         public DetailPage(SearsValues value)
@@ -124,6 +128,66 @@ namespace CommerceHub_OrderManager
         }
         #endregion
 
+        #region Shipment Confirm
+        /* shipment confirm button clicks that send the confirm xml to sears */
+        private void shipmentConfirmButton_Click(object sender, EventArgs e)
+        {
+            // get user's confirmation
+            ConfirmPanel confirm = new ConfirmPanel("Are you sure you want to ship this order ?");
+            confirm.ShowDialog(this);
+
+            if (confirm.DialogResult == DialogResult.OK)
+            {
+                // generate cancel list
+                cancalList = new Dictionary<int, string>();
+                for (int i = 0; i < listview.Items.Count; i++)
+                {
+                    if (listview.Items[i].SubItems[5].Text == "Cancelled")
+                    {
+                        string reason = listview.Items[i].SubItems[6].Text;
+
+                        // the case if the user has not provide the reason for cancelling a item
+                        if (reason == "")
+                        {
+                            MessageBox.Show("Please provide the reason of cancellation", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+
+                        cancalList.Add(i, reason);
+                    }
+                }
+
+                progressbar.Visible = true;
+
+                // call background worker
+                if (!backgroundWorkerConfirm.IsBusy)
+                {
+                    backgroundWorkerConfirm.RunWorkerAsync();
+                }
+            }
+        }
+        private void backgroundWorkerConfirm_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            simulate(1, 50);
+
+            // export xml file
+            new Sears().generateXML(value, cancalList);
+
+            simulate(50, 100);
+        }
+        private void backgroundWorkerConfirm_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        {
+            progressbar.Value = e.ProgressPercentage;
+        }
+        private void backgroundWorkerConfirm_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        {
+            progressbar.Visible = false;
+            shipmentConfirmButton.Text = "Completed";
+            shipmentConfirmButton.BackColor = Color.Transparent;
+            shipmentConfirmButton.Enabled = false;
+        }
+        #endregion
+
         #region Supporting Region
         /* a method that show the information of the given SearsValues object */
         private void showResult(SearsValues value)
@@ -209,21 +273,17 @@ namespace CommerceHub_OrderManager
 
             return list.ToArray();
         }
-        #endregion
 
-        private void shipmentConfirmButton_Click(object sender, EventArgs e)
+        /* a method that report to progress bar value from the start to end */
+        private void simulate(int start, int end)
         {
-            // generate cancel list
-            Dictionary<int, string> cancalList = new Dictionary<int, string>();
-
-            for (int i = 0; i < listview.Items.Count; i++)
+            // simulate progress 1% ~ 30%
+            for (int i = start; i <= end; i++)
             {
-                if (listview.Items[i].SubItems[5].Text == "Cancel")
-                    cancalList.Add(i, listview.Items[i].SubItems[6].Text);
+                Thread.Sleep(30);
+                backgroundWorkerConfirm.ReportProgress(i);
             }
-
-            // export xml file
-            new Sears().generateXML(value, cancalList);
         }
+        #endregion
     }
 }

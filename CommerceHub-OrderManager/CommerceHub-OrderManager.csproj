@@ -90,6 +90,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="supportingClasses\AddressValidation.cs" />
+    <Compile Include="supportingClasses\ConfirmPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="supportingClasses\ConfirmPanel.Designer.cs">
+      <DependentUpon>ConfirmPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="supportingClasses\UPS.cs" />
     <EmbeddedResource Include="DetailPage.resx">
       <DependentUpon>DetailPage.cs</DependentUpon>
@@ -106,6 +112,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="supportingClasses\ConfirmPanel.resx">
+      <DependentUpon>ConfirmPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

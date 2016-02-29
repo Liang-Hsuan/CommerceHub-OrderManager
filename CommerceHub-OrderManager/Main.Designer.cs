@@ -46,7 +46,7 @@
             this.orderTotalHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.qtyHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.recipientHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.createLabelButton = new System.Windows.Forms.Button();
+            this.shipmentConfirmButton = new System.Windows.Forms.Button();
             this.printButton = new System.Windows.Forms.Button();
             this.detailButton = new System.Windows.Forms.Button();
             this.selectionAllCheckbox = new System.Windows.Forms.CheckBox();
@@ -190,19 +190,19 @@
             this.recipientHeader.Text = "Recipient";
             this.recipientHeader.Width = 235;
             // 
-            // createLabelButton
+            // shipmentConfirmButton
             // 
-            this.createLabelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(168)))), ((int)(((byte)(17)))));
-            this.createLabelButton.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.createLabelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.createLabelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.createLabelButton.ForeColor = System.Drawing.Color.White;
-            this.createLabelButton.Location = new System.Drawing.Point(12, 338);
-            this.createLabelButton.Name = "createLabelButton";
-            this.createLabelButton.Size = new System.Drawing.Size(160, 34);
-            this.createLabelButton.TabIndex = 3;
-            this.createLabelButton.Text = "Create Lable(s)";
-            this.createLabelButton.UseVisualStyleBackColor = false;
+            this.shipmentConfirmButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(168)))), ((int)(((byte)(17)))));
+            this.shipmentConfirmButton.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.shipmentConfirmButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.shipmentConfirmButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.shipmentConfirmButton.ForeColor = System.Drawing.Color.White;
+            this.shipmentConfirmButton.Location = new System.Drawing.Point(12, 338);
+            this.shipmentConfirmButton.Name = "shipmentConfirmButton";
+            this.shipmentConfirmButton.Size = new System.Drawing.Size(160, 34);
+            this.shipmentConfirmButton.TabIndex = 3;
+            this.shipmentConfirmButton.Text = "Confirm Shipment";
+            this.shipmentConfirmButton.UseVisualStyleBackColor = false;
             // 
             // printButton
             // 
@@ -252,7 +252,7 @@
             this.Controls.Add(this.selectionAllCheckbox);
             this.Controls.Add(this.detailButton);
             this.Controls.Add(this.printButton);
-            this.Controls.Add(this.createLabelButton);
+            this.Controls.Add(this.shipmentConfirmButton);
             this.Controls.Add(this.listview);
             this.Controls.Add(this.chart);
             this.Controls.Add(this.weeklyOverviewLabel);
@@ -280,7 +280,7 @@
         private System.Windows.Forms.ColumnHeader orderTotalHeader;
         private System.Windows.Forms.ColumnHeader qtyHeader;
         private System.Windows.Forms.ColumnHeader recipientHeader;
-        private System.Windows.Forms.Button createLabelButton;
+        private System.Windows.Forms.Button shipmentConfirmButton;
         private System.Windows.Forms.Button printButton;
         private System.Windows.Forms.Button detailButton;
         private System.Windows.Forms.ColumnHeader selectionHeader;

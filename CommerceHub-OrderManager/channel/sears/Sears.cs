@@ -437,7 +437,7 @@ namespace CommerceHub_OrderManager.channel.sears
                         xml +=
                             "<hubAction>" +
                             "<action>v_cancel</action>" +
-                            "<actionCode>" + reason + "/actionCode>";
+                            "<actionCode>" + reason + "</actionCode>";
 
                         isCancelled = true;
                         break;
