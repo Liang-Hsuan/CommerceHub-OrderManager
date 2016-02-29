@@ -54,5 +54,16 @@ namespace CommerceHub_OrderManager.Properties {
                 return ((string)(this["CHcs"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source = kpjvpp867r.database.windows.net; Initial Catalog = Design_Database;" +
+            " Integrated Security = False; User ID = database_admin; Password = AshlinData1; " +
+            "Connect Timeout = 60; Encrypt = False; TrustServerCertificate = False;")]
+        public string Designcs {
+            get {
+                return ((string)(this["Designcs"]));
+            }
+        }
     }
 }

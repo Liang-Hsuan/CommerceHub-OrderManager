@@ -83,12 +83,39 @@
             this.shipmentConfirmButton = new System.Windows.Forms.Button();
             this.backgroundWorkerConfirm = new System.ComponentModel.BackgroundWorker();
             this.progressbar = new System.Windows.Forms.ProgressBar();
+            this.shippingPanel = new System.Windows.Forms.Panel();
+            this.shippingPicturebox = new System.Windows.Forms.PictureBox();
+            this.createLabelButton = new System.Windows.Forms.Button();
+            this.heightUpdown = new System.Windows.Forms.NumericUpDown();
+            this.widthUpdown = new System.Windows.Forms.NumericUpDown();
+            this.lengthUpdown = new System.Windows.Forms.NumericUpDown();
+            this.sizeLabel = new System.Windows.Forms.Label();
+            this.packageCombobox = new System.Windows.Forms.ComboBox();
+            this.packageLabel = new System.Windows.Forms.Label();
+            this.serviceCombobox = new System.Windows.Forms.ComboBox();
+            this.serviceLabel = new System.Windows.Forms.Label();
+            this.weightLbUpdown = new System.Windows.Forms.NumericUpDown();
+            this.weightKgUpdown = new System.Windows.Forms.NumericUpDown();
+            this.weightLabel = new System.Windows.Forms.Label();
+            this.shipFromCombobox = new System.Windows.Forms.ComboBox();
+            this.shipFromLabel = new System.Windows.Forms.Label();
+            this.shippingInfoLabel = new System.Windows.Forms.Label();
+            this.weightUnitLabel = new System.Windows.Forms.Label();
+            this.sizeUnitLabel = new System.Windows.Forms.Label();
+            this.trackingNumberTextbox = new System.Windows.Forms.TextBox();
             this.orderSummaryPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.moneyPicturebox)).BeginInit();
             this.topPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.logoPicturebox)).BeginInit();
             this.recipientPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.housePicturebox)).BeginInit();
+            this.shippingPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.shippingPicturebox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.heightUpdown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.widthUpdown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lengthUpdown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.weightLbUpdown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.weightKgUpdown)).BeginInit();
             this.SuspendLayout();
             // 
             // orderSummaryPanel
@@ -594,12 +621,12 @@
             // selectionHeader
             // 
             this.selectionHeader.Text = "";
-            this.selectionHeader.Width = 24;
+            this.selectionHeader.Width = 43;
             // 
             // itemHeader
             // 
             this.itemHeader.Text = "Item";
-            this.itemHeader.Width = 347;
+            this.itemHeader.Width = 328;
             // 
             // unitHeader
             // 
@@ -614,12 +641,12 @@
             // totalHeader
             // 
             this.totalHeader.Text = "Total $";
-            this.totalHeader.Width = 87;
+            this.totalHeader.Width = 85;
             // 
             // cancelHeader
             // 
             this.cancelHeader.Text = "Status";
-            this.cancelHeader.Width = 82;
+            this.cancelHeader.Width = 76;
             // 
             // reasonHeader
             // 
@@ -707,9 +734,9 @@
             this.shipmentConfirmButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.shipmentConfirmButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.shipmentConfirmButton.ForeColor = System.Drawing.Color.White;
-            this.shipmentConfirmButton.Location = new System.Drawing.Point(964, 774);
+            this.shipmentConfirmButton.Location = new System.Drawing.Point(984, 774);
             this.shipmentConfirmButton.Name = "shipmentConfirmButton";
-            this.shipmentConfirmButton.Size = new System.Drawing.Size(460, 67);
+            this.shipmentConfirmButton.Size = new System.Drawing.Size(440, 67);
             this.shipmentConfirmButton.TabIndex = 8;
             this.shipmentConfirmButton.Text = "Shipment Confirm";
             this.shipmentConfirmButton.UseVisualStyleBackColor = false;
@@ -726,11 +753,285 @@
             // 
             this.progressbar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.progressbar.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(168)))), ((int)(((byte)(17)))));
-            this.progressbar.Location = new System.Drawing.Point(964, 774);
+            this.progressbar.Location = new System.Drawing.Point(984, 774);
             this.progressbar.Name = "progressbar";
-            this.progressbar.Size = new System.Drawing.Size(460, 67);
+            this.progressbar.Size = new System.Drawing.Size(440, 67);
+            this.progressbar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressbar.TabIndex = 9;
             this.progressbar.Visible = false;
+            // 
+            // shippingPanel
+            // 
+            this.shippingPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.shippingPanel.BackColor = System.Drawing.Color.White;
+            this.shippingPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.shippingPanel.Controls.Add(this.trackingNumberTextbox);
+            this.shippingPanel.Controls.Add(this.shippingPicturebox);
+            this.shippingPanel.Controls.Add(this.createLabelButton);
+            this.shippingPanel.Controls.Add(this.heightUpdown);
+            this.shippingPanel.Controls.Add(this.widthUpdown);
+            this.shippingPanel.Controls.Add(this.lengthUpdown);
+            this.shippingPanel.Controls.Add(this.sizeLabel);
+            this.shippingPanel.Controls.Add(this.packageCombobox);
+            this.shippingPanel.Controls.Add(this.packageLabel);
+            this.shippingPanel.Controls.Add(this.serviceCombobox);
+            this.shippingPanel.Controls.Add(this.serviceLabel);
+            this.shippingPanel.Controls.Add(this.weightLbUpdown);
+            this.shippingPanel.Controls.Add(this.weightKgUpdown);
+            this.shippingPanel.Controls.Add(this.weightLabel);
+            this.shippingPanel.Controls.Add(this.shipFromCombobox);
+            this.shippingPanel.Controls.Add(this.shipFromLabel);
+            this.shippingPanel.Controls.Add(this.shippingInfoLabel);
+            this.shippingPanel.Controls.Add(this.weightUnitLabel);
+            this.shippingPanel.Controls.Add(this.sizeUnitLabel);
+            this.shippingPanel.Location = new System.Drawing.Point(984, 103);
+            this.shippingPanel.Name = "shippingPanel";
+            this.shippingPanel.Size = new System.Drawing.Size(440, 648);
+            this.shippingPanel.TabIndex = 10;
+            // 
+            // shippingPicturebox
+            // 
+            this.shippingPicturebox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.shippingPicturebox.Image = ((System.Drawing.Image)(resources.GetObject("shippingPicturebox.Image")));
+            this.shippingPicturebox.Location = new System.Drawing.Point(68, 411);
+            this.shippingPicturebox.Name = "shippingPicturebox";
+            this.shippingPicturebox.Size = new System.Drawing.Size(305, 190);
+            this.shippingPicturebox.TabIndex = 25;
+            this.shippingPicturebox.TabStop = false;
+            // 
+            // createLabelButton
+            // 
+            this.createLabelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.createLabelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(168)))), ((int)(((byte)(17)))));
+            this.createLabelButton.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.createLabelButton.FlatAppearance.BorderSize = 2;
+            this.createLabelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.createLabelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.createLabelButton.ForeColor = System.Drawing.Color.White;
+            this.createLabelButton.Image = ((System.Drawing.Image)(resources.GetObject("createLabelButton.Image")));
+            this.createLabelButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.createLabelButton.Location = new System.Drawing.Point(120, 337);
+            this.createLabelButton.Name = "createLabelButton";
+            this.createLabelButton.Size = new System.Drawing.Size(207, 38);
+            this.createLabelButton.TabIndex = 24;
+            this.createLabelButton.Text = "Create Label";
+            this.createLabelButton.UseVisualStyleBackColor = false;
+            this.createLabelButton.Click += new System.EventHandler(this.createLabelButton_Click);
+            // 
+            // heightUpdown
+            // 
+            this.heightUpdown.DecimalPlaces = 2;
+            this.heightUpdown.Location = new System.Drawing.Point(269, 265);
+            this.heightUpdown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.heightUpdown.Name = "heightUpdown";
+            this.heightUpdown.Size = new System.Drawing.Size(54, 20);
+            this.heightUpdown.TabIndex = 22;
+            // 
+            // widthUpdown
+            // 
+            this.widthUpdown.DecimalPlaces = 2;
+            this.widthUpdown.Location = new System.Drawing.Point(200, 265);
+            this.widthUpdown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.widthUpdown.Name = "widthUpdown";
+            this.widthUpdown.Size = new System.Drawing.Size(54, 20);
+            this.widthUpdown.TabIndex = 21;
+            // 
+            // lengthUpdown
+            // 
+            this.lengthUpdown.DecimalPlaces = 2;
+            this.lengthUpdown.Location = new System.Drawing.Point(131, 265);
+            this.lengthUpdown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.lengthUpdown.Name = "lengthUpdown";
+            this.lengthUpdown.Size = new System.Drawing.Size(54, 20);
+            this.lengthUpdown.TabIndex = 20;
+            // 
+            // sizeLabel
+            // 
+            this.sizeLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.sizeLabel.AutoSize = true;
+            this.sizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.sizeLabel.Location = new System.Drawing.Point(94, 267);
+            this.sizeLabel.Name = "sizeLabel";
+            this.sizeLabel.Size = new System.Drawing.Size(31, 13);
+            this.sizeLabel.TabIndex = 19;
+            this.sizeLabel.Text = "Size";
+            // 
+            // packageCombobox
+            // 
+            this.packageCombobox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.packageCombobox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.packageCombobox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.packageCombobox.FormattingEnabled = true;
+            this.packageCombobox.Items.AddRange(new object[] {
+            "Letter",
+            "Customer Supplied Package",
+            "Express Box",
+            "First Class"});
+            this.packageCombobox.Location = new System.Drawing.Point(131, 216);
+            this.packageCombobox.Name = "packageCombobox";
+            this.packageCombobox.Size = new System.Drawing.Size(239, 21);
+            this.packageCombobox.TabIndex = 18;
+            this.packageCombobox.Text = "Customer Supplied Package";
+            // 
+            // packageLabel
+            // 
+            this.packageLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.packageLabel.AutoSize = true;
+            this.packageLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.packageLabel.Location = new System.Drawing.Point(68, 219);
+            this.packageLabel.Name = "packageLabel";
+            this.packageLabel.Size = new System.Drawing.Size(57, 13);
+            this.packageLabel.TabIndex = 17;
+            this.packageLabel.Text = "Package";
+            // 
+            // serviceCombobox
+            // 
+            this.serviceCombobox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.serviceCombobox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.serviceCombobox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.serviceCombobox.FormattingEnabled = true;
+            this.serviceCombobox.Items.AddRange(new object[] {
+            "UPS 2nd Day Air",
+            "UPS 3 Day Select",
+            "UPS Ground",
+            "UPS Next Day Air"});
+            this.serviceCombobox.Location = new System.Drawing.Point(131, 169);
+            this.serviceCombobox.Name = "serviceCombobox";
+            this.serviceCombobox.Size = new System.Drawing.Size(239, 21);
+            this.serviceCombobox.TabIndex = 16;
+            this.serviceCombobox.Text = "UPS Ground";
+            // 
+            // serviceLabel
+            // 
+            this.serviceLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.serviceLabel.AutoSize = true;
+            this.serviceLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.serviceLabel.Location = new System.Drawing.Point(68, 172);
+            this.serviceLabel.Name = "serviceLabel";
+            this.serviceLabel.Size = new System.Drawing.Size(57, 13);
+            this.serviceLabel.TabIndex = 15;
+            this.serviceLabel.Text = "Searvice";
+            // 
+            // weightLbUpdown
+            // 
+            this.weightLbUpdown.DecimalPlaces = 3;
+            this.weightLbUpdown.Location = new System.Drawing.Point(238, 120);
+            this.weightLbUpdown.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            this.weightLbUpdown.Name = "weightLbUpdown";
+            this.weightLbUpdown.Size = new System.Drawing.Size(66, 20);
+            this.weightLbUpdown.TabIndex = 13;
+            // 
+            // weightKgUpdown
+            // 
+            this.weightKgUpdown.DecimalPlaces = 3;
+            this.weightKgUpdown.Location = new System.Drawing.Point(131, 120);
+            this.weightKgUpdown.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.weightKgUpdown.Name = "weightKgUpdown";
+            this.weightKgUpdown.Size = new System.Drawing.Size(66, 20);
+            this.weightKgUpdown.TabIndex = 12;
+            // 
+            // weightLabel
+            // 
+            this.weightLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.weightLabel.AutoSize = true;
+            this.weightLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.weightLabel.Location = new System.Drawing.Point(78, 124);
+            this.weightLabel.Name = "weightLabel";
+            this.weightLabel.Size = new System.Drawing.Size(47, 13);
+            this.weightLabel.TabIndex = 11;
+            this.weightLabel.Text = "Weight";
+            // 
+            // shipFromCombobox
+            // 
+            this.shipFromCombobox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.shipFromCombobox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.shipFromCombobox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.shipFromCombobox.FormattingEnabled = true;
+            this.shipFromCombobox.Items.AddRange(new object[] {
+            "ASHLIN WAREHOUSE"});
+            this.shipFromCombobox.Location = new System.Drawing.Point(131, 73);
+            this.shipFromCombobox.Name = "shipFromCombobox";
+            this.shipFromCombobox.Size = new System.Drawing.Size(192, 21);
+            this.shipFromCombobox.TabIndex = 10;
+            this.shipFromCombobox.Text = "ASHLIN WAREHOUSE";
+            // 
+            // shipFromLabel
+            // 
+            this.shipFromLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.shipFromLabel.AutoSize = true;
+            this.shipFromLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.shipFromLabel.Location = new System.Drawing.Point(62, 76);
+            this.shipFromLabel.Name = "shipFromLabel";
+            this.shipFromLabel.Size = new System.Drawing.Size(63, 13);
+            this.shipFromLabel.TabIndex = 9;
+            this.shipFromLabel.Text = "Ship From";
+            // 
+            // shippingInfoLabel
+            // 
+            this.shippingInfoLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.shippingInfoLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(238)))), ((int)(((byte)(247)))));
+            this.shippingInfoLabel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.shippingInfoLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.shippingInfoLabel.Location = new System.Drawing.Point(0, 0);
+            this.shippingInfoLabel.Name = "shippingInfoLabel";
+            this.shippingInfoLabel.Size = new System.Drawing.Size(439, 35);
+            this.shippingInfoLabel.TabIndex = 2;
+            this.shippingInfoLabel.Text = "Shipping Info (overall package detail)";
+            this.shippingInfoLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // weightUnitLabel
+            // 
+            this.weightUnitLabel.AutoSize = true;
+            this.weightUnitLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.weightUnitLabel.Location = new System.Drawing.Point(203, 123);
+            this.weightUnitLabel.Name = "weightUnitLabel";
+            this.weightUnitLabel.Size = new System.Drawing.Size(120, 12);
+            this.weightUnitLabel.TabIndex = 14;
+            this.weightUnitLabel.Text = "kg                                                 lb";
+            // 
+            // sizeUnitLabel
+            // 
+            this.sizeUnitLabel.AutoSize = true;
+            this.sizeUnitLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.sizeUnitLabel.Location = new System.Drawing.Point(187, 268);
+            this.sizeUnitLabel.Name = "sizeUnitLabel";
+            this.sizeUnitLabel.Size = new System.Drawing.Size(160, 12);
+            this.sizeUnitLabel.TabIndex = 23;
+            this.sizeUnitLabel.Text = "x                                x                               (cm)";
+            // 
+            // trackingNumberTextbox
+            // 
+            this.trackingNumberTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.trackingNumberTextbox.BackColor = System.Drawing.Color.White;
+            this.trackingNumberTextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.trackingNumberTextbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.trackingNumberTextbox.ForeColor = System.Drawing.Color.DarkGray;
+            this.trackingNumberTextbox.Location = new System.Drawing.Point(174, 438);
+            this.trackingNumberTextbox.Multiline = true;
+            this.trackingNumberTextbox.Name = "trackingNumberTextbox";
+            this.trackingNumberTextbox.Size = new System.Drawing.Size(175, 87);
+            this.trackingNumberTextbox.TabIndex = 27;
+            this.trackingNumberTextbox.Text = "Not shipped";
             // 
             // DetailPage
             // 
@@ -738,6 +1039,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(245)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(1436, 873);
+            this.Controls.Add(this.shippingPanel);
             this.Controls.Add(this.progressbar);
             this.Controls.Add(this.shipmentConfirmButton);
             this.Controls.Add(this.setReasonButton);
@@ -761,6 +1063,14 @@
             this.recipientPanel.ResumeLayout(false);
             this.recipientPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.housePicturebox)).EndInit();
+            this.shippingPanel.ResumeLayout(false);
+            this.shippingPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.shippingPicturebox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.heightUpdown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.widthUpdown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lengthUpdown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.weightLbUpdown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.weightKgUpdown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -822,5 +1132,25 @@
         private System.Windows.Forms.Button shipmentConfirmButton;
         private System.ComponentModel.BackgroundWorker backgroundWorkerConfirm;
         private System.Windows.Forms.ProgressBar progressbar;
+        private System.Windows.Forms.Panel shippingPanel;
+        private System.Windows.Forms.Label shippingInfoLabel;
+        private System.Windows.Forms.Label shipFromLabel;
+        private System.Windows.Forms.ComboBox shipFromCombobox;
+        private System.Windows.Forms.NumericUpDown weightLbUpdown;
+        private System.Windows.Forms.NumericUpDown weightKgUpdown;
+        private System.Windows.Forms.Label weightLabel;
+        private System.Windows.Forms.Label weightUnitLabel;
+        private System.Windows.Forms.Label serviceLabel;
+        private System.Windows.Forms.ComboBox serviceCombobox;
+        private System.Windows.Forms.ComboBox packageCombobox;
+        private System.Windows.Forms.Label packageLabel;
+        private System.Windows.Forms.NumericUpDown heightUpdown;
+        private System.Windows.Forms.NumericUpDown widthUpdown;
+        private System.Windows.Forms.NumericUpDown lengthUpdown;
+        private System.Windows.Forms.Label sizeLabel;
+        private System.Windows.Forms.Label sizeUnitLabel;
+        private System.Windows.Forms.Button createLabelButton;
+        private System.Windows.Forms.PictureBox shippingPicturebox;
+        private System.Windows.Forms.TextBox trackingNumberTextbox;
     }
 }

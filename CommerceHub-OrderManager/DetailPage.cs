@@ -2,6 +2,7 @@
 using CommerceHub_OrderManager.supportingClasses;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
@@ -25,12 +26,13 @@ namespace CommerceHub_OrderManager
             showResult(value);
         }
 
+        /* print packing slip button clicks that print the packing slip for the order item(s) */
         private void printPackingSlipButton_Click(object sender, EventArgs e)
         {
             // get all cancel index and print the packing slip that are not cancelled
             int[] cancelIndex = getCancelIndex();
             SearsPackingSlip packingSlip = new SearsPackingSlip();
-            packingSlip.createPackingSlip(value, cancelIndex);
+            packingSlip.createPackingSlip(value, cancelIndex, true);
         }
 
         /* the event for verify button click that show the result of the address validity */
@@ -127,6 +129,22 @@ namespace CommerceHub_OrderManager
             e.NewWidth = listview.Columns[e.ColumnIndex].Width;
         }
         #endregion
+
+        private void createLabelButton_Click(object sender, EventArgs e)
+        {
+            // ask for user confirmaiton
+            ConfirmPanel confirm = new ConfirmPanel("Are you sure you want to ship the package ?");
+            confirm.ShowDialog(this);
+
+            if (confirm.DialogResult == DialogResult.OK)
+            {
+                // initialize fields for shipment
+                Package package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString());
+                UPS ups = new UPS();
+
+                string digest = ups.postShipmentConfirm(value, package);
+            }
+        }
 
         #region Shipment Confirm
         /* shipment confirm button clicks that send the confirm xml to sears */
@@ -245,9 +263,32 @@ namespace CommerceHub_OrderManager
             shipToPhoneTextbox.Text = value.ShipTo.DayPhone;
             #endregion
 
+            #region Listview and Shipping Info
+            // ups details
+            switch (value.ServiceLevel)
+            {
+                case "UPSN_SE":
+                    serviceCombobox.SelectedIndex = 0;
+                    break;
+                case "UPSN_3D":
+                    serviceCombobox.SelectedIndex = 1;
+                    break;
+                case "UPSN_ND":
+                    serviceCombobox.SelectedIndex = 3;
+                    break;
+                default:
+                    serviceCombobox.SelectedIndex = 2;
+                    break;
+            }
+
+            // initialize field for sku detail -> [0] weight, [1] length, [2] width, [3] height
+            decimal[] skuDetail = { 0, 0, 0, 0 };
+
+            // adding list to listview and getting sku detail
             for (int i = 0; i < value.LineCount; i++)
             {
-                ListViewItem item = new ListViewItem();
+                // add item to list
+                ListViewItem item = new ListViewItem(value.MerchantLineNumber[i].ToString());
 
                 item.SubItems.Add(value.Description[i] + "  SKU: " + value.TrxVendorSKU[i]);
                 item.SubItems.Add("$ " + value.UnitPrice[i]);
@@ -257,7 +298,54 @@ namespace CommerceHub_OrderManager
                 item.SubItems.Add("");
 
                 listview.Items.Add(item);
+
+                // generate sku detail
+                decimal[] detailList = getSkuDetail(value.TrxVendorSKU[i]);
+
+                // the case if bad sku
+                if (detailList == null)
+                    item.BackColor = Color.FromArgb(254, 126, 116);
+                else
+                {
+                    for (int j = 0; j < 4; j++)
+                        skuDetail[j] += detailList[j];
+                }
             }
+
+            // show result to shipping info
+            weightKgUpdown.Value = skuDetail[0] / 1000;
+            weightLbUpdown.Value = skuDetail[0] / 453.592m;
+            lengthUpdown.Value = skuDetail[1];
+            widthUpdown.Value = skuDetail[2];
+            heightUpdown.Value = skuDetail[3];
+            #endregion
+        }
+
+        /* a method that get the detail of the given sku */
+        private decimal[] getSkuDetail(string sku)
+        {
+            // local supporting fields
+            decimal[] list = new decimal[4];
+
+            // [0] weight, [1] length, [2] width, [3] height
+            using (SqlConnection conneciton = new SqlConnection(Properties.Settings.Default.Designcs))
+            {
+                SqlCommand command = new SqlCommand("SELECT Weight_grams, Shippable_Depth_cm, Shippable_Width_cm, Shippable_Height_cm " +
+                                                    "FROM master_Design_Attributes design JOIN master_SKU_Attributes sku ON (design.Design_Service_Code = sku.Design_Service_Code) " + 
+                                                    "WHERE SKU_Ashlin = \'" + sku + "\';", conneciton);
+                conneciton.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                reader.Read();
+
+                // check if there is result
+                if (!reader.HasRows)
+                    return null;
+
+                for (int i = 0; i < 4; i++)
+                    list[i] = Convert.ToDecimal(reader.GetValue(i));
+            }
+
+            return list;
         }
 
         /* a method that get the current cancel items' idexes */

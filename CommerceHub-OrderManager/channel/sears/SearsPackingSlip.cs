@@ -24,7 +24,7 @@ namespace CommerceHub_OrderManager.channel.sears
         }
 
         /* a method that save the packing slip pdf */
-        public void createPackingSlip(SearsValues value, int[] cancelIndex)
+        public void createPackingSlip(SearsValues value, int[] cancelIndex, bool preview)
         {
             // the case if all of the items in the order are cancelled -> don't need to print the packing slip
             if (cancelIndex.Length >= value.LineCount)
@@ -747,9 +747,12 @@ namespace CommerceHub_OrderManager.channel.sears
                     ct.Go();
                     #endregion
 
-                    // start the pdf for previewing
-                    if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)
-                        System.Diagnostics.Process.Start(file);
+                    if (preview)
+                    {
+                        // start the pdf for previewing
+                        if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)
+                            System.Diagnostics.Process.Start(file);
+                    }
 
                     doc.Close();
                 }

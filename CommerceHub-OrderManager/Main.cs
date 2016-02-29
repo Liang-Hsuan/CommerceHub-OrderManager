@@ -6,15 +6,14 @@ namespace CommerceHub_OrderManager
 {
     public partial class Main : Form
     {
-        // field for keeping track of invoice number
-        private static int iterator;
-
         // field for commerce hub order
-        private Sears sears = new Sears();
+        private Sears sears;
 
         public Main()
         {
             InitializeComponent();
+
+            sears = new Sears();
 
             // show new orders from sears
             showSearsResult();
@@ -23,11 +22,9 @@ namespace CommerceHub_OrderManager
             refreshGraph();
         }
 
-        /* save data when the form is closing */
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Properties.Settings.Default.Date = DateTime.Now;
-            Properties.Settings.Default.Iterator = iterator;
+            Properties.Settings.Default.Date = DateTime.Today;
         }
 
         #region Top Buttons
@@ -45,9 +42,16 @@ namespace CommerceHub_OrderManager
                 {
                     string transaction = item.SubItems[4].Text;
                     SearsValues value = sears.generateValue(transaction);
-                    searsPS.createPackingSlip(value, new int[0]);
+                    searsPS.createPackingSlip(value, new int[0], true);
                 }
             }
+        }
+
+        /* the event for refresh button clicks that refresh the order in listview and the chart */
+        private void refreshButton_Click(object sender, EventArgs e)
+        {
+            showSearsResult();
+            refreshGraph();
         }
 
         /* the event for detail button click that show the detail page for the selected item */
@@ -81,9 +85,13 @@ namespace CommerceHub_OrderManager
             }
         }
 
+        #region Supporting Methods
         /* a supporting method that get new order from sears and show them on the list view */
         private void showSearsResult()
         {
+            // first clear the listview
+            listview.Items.Clear();
+
             // get orders from sears
             sears.GetOrder();
             SearsValues[] searsValue = sears.GetAllNewOrder();
@@ -122,6 +130,7 @@ namespace CommerceHub_OrderManager
             }
         }
 
+        /* a supporting method that refresh the chart */
         private void refreshGraph()
         {
             // clear chart first
@@ -139,20 +148,21 @@ namespace CommerceHub_OrderManager
 
                 if (order < 1)
                 {
-                    chart.Series["orders"].Points.AddXY(from.ToString("yyyyMMdd"), 0);
-                    chart.Series["point"].Points.AddXY(from.ToString("yyyyMMdd"), 0);
-                    chart.Series["shipment"].Points.AddXY(from.ToString("yyyyMMdd"), 0);
+                    chart.Series["orders"].Points.AddXY(from.ToString("MM/dd/yyyy"), 0);
+                    chart.Series["point"].Points.AddXY(from.ToString("MM/dd/yyyy"), 0);
+                    chart.Series["shipment"].Points.AddXY(from.ToString("MM/dd/yyyy"), 0);
                 }
                 else
                 {
-                    chart.Series["orders"].Points.AddXY(from.ToString("yyyyMMdd"), order);
-                    chart.Series["point"].Points.AddXY(from.ToString("yyyyMMdd"), order);
-                    chart.Series["shipment"].Points.AddXY(from.ToString("yyyyMMdd"), shipped);
+                    chart.Series["orders"].Points.AddXY(from.ToString("MM/dd/yyyy"), order);
+                    chart.Series["point"].Points.AddXY(from.ToString("MM/dd/yyyy"), order);
+                    chart.Series["shipment"].Points.AddXY(from.ToString("MM/dd/yyyy"), shipped);
                 }
             }
 
             chart.Series["shipment"]["PointWidth"] = "0.1";
             chart.Series["point"].MarkerSize = 10;
         }
+        #endregion
     }
 }

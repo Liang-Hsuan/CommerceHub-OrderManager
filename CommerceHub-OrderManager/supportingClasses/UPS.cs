@@ -24,7 +24,7 @@ namespace CommerceHub_OrderManager.supportingClasses
 
         #region Posting Methods
         /* a method that post shipment confirm request and return shipment digest */
-        public string postShipmentConfirm(SearsValues value)
+        public string postShipmentConfirm(SearsValues value, Package package)
         {
             string shipmentConfirmUri = "https://wwwcie.ups.com/ups.app/xml/ShipConfirm";
 
@@ -85,26 +85,63 @@ namespace CommerceHub_OrderManager.supportingClasses
             "</BillThirdPartyShipper>" +
             "</BillThirdParty>" +
             "</PaymentInformation>" +
-            "<Service>" +
-            "<Code>01</Code>" +
+            "<Service>";
+
+            string code;
+            switch (value.ServiceLevel)
+            {
+                case "UPS 2nd Day Air":
+                    code = "02";
+                    break;
+                case "UPS 3 Day Select":
+                    code = "12";
+                    break;
+                case "UPS Next Day Air":
+                    code = "01";
+                    break;
+                default:
+                    code = "03";
+                    break;
+            }
+
+            textXML +=
+            "<Code>" + code + "</Code>" +
             "</Service>" +
-            "<Package>" +
+            "<Package>";
+
+            switch (package.PackageType)
+            {
+                case "Letter":
+                    code = "01";
+                    break;
+                case "Express Box":
+                    code = "21";
+                    break;
+                case "First Class":
+                    code = "59";
+                    break;
+                default:
+                    code = "02";
+                    break;
+            }
+
+            textXML +=
             "<PackagingType>" +
-            "<Code>02</Code>" +
+            "<Code>" + code + "</Code>" +
             "</PackagingType>" +
             "<Dimensions>" +
             "<UnitOfMeasurement>" +
             "<Code>CM</Code>" +
             "</UnitOfMeasurement>" +
-            "<Length>10</Length>" +
-            "<Width>10</Width>" +
-            "<Height>10</Height>" +
+            "<Length>" + package.Length + "</Length>" +
+            "<Width>" + package.Width + "</Width>" +
+            "<Height>" + package.Height + "</Height>" +
             "</Dimensions>" +
             "<PackageWeight>" +
             "<UnitOfMeasurement>" +
             "<Code>KGS</Code>" +
             "</UnitOfMeasurement>" +
-            "<Weight>1</Weight>" +
+            "<Weight>" + package.Weight + "</Weight>" +
             "</PackageWeight>" +
             "</Package>" +
             "</Shipment>" +
@@ -128,7 +165,17 @@ namespace CommerceHub_OrderManager.supportingClasses
             }
 
             // get the response from the server
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            HttpWebResponse response; 
+            try
+            {
+                response = (HttpWebResponse)request.GetResponse();
+            }
+            catch
+            {
+                // the case if server error
+                return null;
+            }
+
             string result;
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
             {
@@ -152,14 +199,15 @@ namespace CommerceHub_OrderManager.supportingClasses
             }
             else
             {
+                // the case if bad request
                 return "Error";
             }
 
             return digest;
         }
 
-        /* a method that post shipment accept request and return base64 image string */
-        public string postShipmentAccept(string shipmentDigest)
+        /* a method that post shipment accept request and return base64 image string and tracking number*/
+        public string[] postShipmentAccept(string shipmentDigest)
         {
             string shipmentAcceptmUri = "https://wwwcie.ups.com/ups.app/xml/ShipAccept";
 
@@ -204,22 +252,22 @@ namespace CommerceHub_OrderManager.supportingClasses
             string responseStatus = getTarget(result);
 
             // get tracking number and image
-            string trackingNumber = "";
-            string image = "";
+            string[] text = new string[2];
             if (responseStatus == "1")
             {
                 result = substringMethod(result, "TrackingNumber", 15);
-                trackingNumber = getTarget(result);
+                text[0] = getTarget(result);
 
                 result = substringMethod(result, "GraphicImage", 13);
-                image = getTarget(result);
+                text[1] = getTarget(result);
             }
             else
             {
-                return "Error";
+                // the case if bad request
+                return null;
             }
 
-            return image;
+            return text;
         }
         #endregion
 

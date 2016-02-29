@@ -50,6 +50,7 @@
             this.printButton = new System.Windows.Forms.Button();
             this.detailButton = new System.Windows.Forms.Button();
             this.selectionAllCheckbox = new System.Windows.Forms.CheckBox();
+            this.refreshButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.chart)).BeginInit();
             this.SuspendLayout();
             // 
@@ -243,12 +244,26 @@
             this.selectionAllCheckbox.UseVisualStyleBackColor = true;
             this.selectionAllCheckbox.CheckedChanged += new System.EventHandler(this.selectionAllCheckbox_CheckedChanged);
             // 
+            // refreshButton
+            // 
+            this.refreshButton.BackColor = System.Drawing.Color.Transparent;
+            this.refreshButton.FlatAppearance.BorderSize = 0;
+            this.refreshButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.refreshButton.Image = ((System.Drawing.Image)(resources.GetObject("refreshButton.Image")));
+            this.refreshButton.Location = new System.Drawing.Point(1211, 340);
+            this.refreshButton.Name = "refreshButton";
+            this.refreshButton.Size = new System.Drawing.Size(47, 34);
+            this.refreshButton.TabIndex = 7;
+            this.refreshButton.UseVisualStyleBackColor = false;
+            this.refreshButton.Click += new System.EventHandler(this.refreshButton_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(245)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(1436, 873);
+            this.Controls.Add(this.refreshButton);
             this.Controls.Add(this.selectionAllCheckbox);
             this.Controls.Add(this.detailButton);
             this.Controls.Add(this.printButton);
@@ -285,6 +300,7 @@
         private System.Windows.Forms.Button detailButton;
         private System.Windows.Forms.ColumnHeader selectionHeader;
         private System.Windows.Forms.CheckBox selectionAllCheckbox;
+        private System.Windows.Forms.Button refreshButton;
     }
 }
 

@@ -19,40 +19,29 @@ namespace CommerceHub_OrderManager.channel.sears
         public const string CONFIRM_DIR = "incoming/confirms/searscanada";
 
         // field for directory on local
-        private string rootDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "//SearsOrders";
+        private string rootDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SearsOrders";
         private string newOrderDir;
         private string completeOrderDir;
 
         // field for sftp connection
         private Sftp sftp = new Sftp("ashlinbpg.sftp-test.commercehub.com", "ashlinbpg", "Pay4Examine9Rather$");
 
-        // supporting field for generating invoice number
-        private int iterator;
+        // field for storing tracking number -> default set to nothing
+        private string trackingNumber = "";
 
         /* constructor that restore the data and initialize folders for xml feed */
         public Sears()
         {
-            #region Restore Data
-            // get iterator
-            if (Properties.Settings.Default.Iterator == null)
-                iterator = 1;
-            else
-                if (!Properties.Settings.Default.Date.Equals(DateTime.Now))
-                iterator = 1;
-            else
-                iterator = Properties.Settings.Default.Iterator;
-            #endregion
-
             #region Folder Check
             // check and generate folders
             if (!Directory.Exists(rootDir))
                 Directory.CreateDirectory(rootDir);
 
-            newOrderDir = rootDir + "//SearsNewOrders";
+            newOrderDir = rootDir + "\\SearsNewOrders";
             if (!Directory.Exists(newOrderDir))
                 Directory.CreateDirectory(newOrderDir);
 
-            completeOrderDir = rootDir + "//SearsCompleteOrders";
+            completeOrderDir = rootDir + "\\SearsCompleteOrders";
             if (!Directory.Exists(completeOrderDir))
                 Directory.CreateDirectory(completeOrderDir);
             #endregion
@@ -385,9 +374,20 @@ namespace CommerceHub_OrderManager.channel.sears
         #endregion
 
         #region XML Generation
-        /* a method that generate xml order and upload to the sftp server */
+        /* a method that generate xml order and upload to the sftp server and update database */
         public void generateXML(SearsValues value, Dictionary<int, string> cancelList)
         {
+            // get other necessary values
+            value.VendorInvoiceNumber = getInvoiceNumber();
+            value.PackageDetailID = getPackageId();
+            value.TrackingNumber = trackingNumber;
+
+            // fields for database update
+            SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs);
+            SqlCommand command;
+            connection.Open();
+
+            #region XML Generation and Item Database Update
             string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                          "<ConfirmMessageBatch>" +
                          "<partnerID roleType=\"vendor\" name=\"Ashlin BPG Marketing, Inc.\">ashlinbpg</partnerID>" +
@@ -472,6 +472,11 @@ namespace CommerceHub_OrderManager.channel.sears
                             "<action>v_cancel</action>" +
                             "<actionCode>" + reason + "</actionCode>";
 
+                        // update item to cancelled to database
+                        command = new SqlCommand("UPDATE Sears_Order_Item SET Cancelled = 'True' WHERE TransactionId = \'" + value.TransactionID +
+                                                 "\' AND MerchantLineNumber = \'" + value.MerchantLineNumber[j] + "\';", connection);
+                        command.ExecuteNonQuery();
+
                         isCancelled = true;
                         break;
                     }
@@ -482,6 +487,10 @@ namespace CommerceHub_OrderManager.channel.sears
                     xml +=
                     "<hubAction>" +
                     "<action>v_ship</action>";
+
+                    command = new SqlCommand("UPDATE Sears_Order_Item SET Shipped = 'True' WHERE TransactionId = \'" + value.TransactionID +
+                                             "\' AND MerchantLineNumber = \'" + value.MerchantLineNumber[i - 1] + "\';", connection);
+                    command.ExecuteNonQuery();
                 }
                 xml +=
                 "<merchantLineNumber>" + value.MerchantLineNumber[i - 1] + "</merchantLineNumber>" +
@@ -516,6 +525,13 @@ namespace CommerceHub_OrderManager.channel.sears
             StreamWriter writer = new StreamWriter(path);
             writer.WriteLine(xml);
             writer.Close();
+            #endregion
+
+            // master database update
+            command = new SqlCommand("UPDATE Sears_Order SET VendorInvoiceNumber = \'" + value.VendorInvoiceNumber + "\', PakageDetailId = \'" + value.PackageDetailID +
+                                     "\', TrackingNumber = \'" + value.TrackingNumber + "\', Complete = 'True' WHERE TransactionId = \'" + value.TransactionID + "\';", connection);
+            command.ExecuteNonQuery();
+            connection.Close();
 
             // upload file to sftp server
             // sftp.Connect();
@@ -911,11 +927,18 @@ namespace CommerceHub_OrderManager.channel.sears
 
         #region Supporting Methods
         /* a method that get invoice number */
-        private static string getInvoiceNumber(int iterator)
+        private static string getInvoiceNumber()
         {
-            string invoice = "100";
+            // get iterator
+            int iterator;
+            if (!Properties.Settings.Default.Date.Equals(DateTime.Today))
+                iterator = 1;
+            else
+                iterator = Properties.Settings.Default.Iterator;
 
-            invoice += DateTime.Now.ToString("yyyyMMdd");
+            // create invoice number
+            string invoice = "100";
+            invoice += DateTime.Today.ToString("yyyyMMdd");
 
             for (int i = 0; i < 3 - iterator.ToString().Length; i++)
             {
@@ -924,7 +947,24 @@ namespace CommerceHub_OrderManager.channel.sears
 
             invoice += iterator.ToString();
 
+            // save iterator
+            iterator++;
+            Properties.Settings.Default.Iterator = iterator;
+
             return invoice;
+        }
+
+        /* a method that get package id */
+        private static string getPackageId()
+        {
+            // get iterator
+            int iterator;
+            if (!Properties.Settings.Default.Date.Equals(DateTime.Today))
+                iterator = 1;
+            else
+                iterator = Properties.Settings.Default.Iterator;
+
+            return "SearsPack" + DateTime.Today.ToString("ddMMyy") + iterator;
         }
 
         /* a method that substring the given string */

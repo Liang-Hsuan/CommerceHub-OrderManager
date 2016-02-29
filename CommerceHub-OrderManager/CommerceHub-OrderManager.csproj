@@ -96,6 +96,7 @@
     <Compile Include="supportingClasses\ConfirmPanel.Designer.cs">
       <DependentUpon>ConfirmPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="supportingClasses\Package.cs" />
     <Compile Include="supportingClasses\UPS.cs" />
     <EmbeddedResource Include="DetailPage.resx">
       <DependentUpon>DetailPage.cs</DependentUpon>
@@ -128,11 +129,10 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="image\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="commercehub.ico" />
+    <Content Include="image\refresh.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
