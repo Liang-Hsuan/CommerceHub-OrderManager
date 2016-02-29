@@ -111,7 +111,7 @@
             series3.Color = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(100)))), ((int)(((byte)(158)))));
             series3.IsVisibleInLegend = false;
             series3.Legend = "Legend";
-            series3.Name = "dataPoint";
+            series3.Name = "point";
             this.chart.Series.Add(series1);
             this.chart.Series.Add(series2);
             this.chart.Series.Add(series3);

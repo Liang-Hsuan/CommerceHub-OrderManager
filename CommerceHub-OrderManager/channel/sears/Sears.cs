@@ -170,6 +170,39 @@ namespace CommerceHub_OrderManager.channel.sears
             return list.ToArray();
         }
 
+        #region Number of Orders and Shipments
+        /* methods that return the number of order and shipment from the given date */
+        public int GetNumberOfOrder(DateTime time)
+        {
+            int count = 0;
+
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            {
+                SqlCommand command = new SqlCommand("SELECT COUNT(*) FROM Sears_Order WHERE CustOrderDate = \'" + time.ToString("yyyy-MM-dd") + "\';", connection);
+                connection.Open();
+
+                count = (int) command.ExecuteScalar();
+            }
+
+
+            return count;
+        }
+        public int GetNumberOfShipped(DateTime time)
+        {
+            int count = 0;
+
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            {
+                SqlCommand command = new SqlCommand("SELECT COUNT(*) FROM Sears_Order WHERE Complete = 'True' AND CustOrderDate = \'" + time.ToString("yyyy-MM-dd") + "\';", connection);
+                connection.Open();
+
+                count = (int)command.ExecuteScalar();
+            }
+
+            return count;
+        }
+        #endregion
+
         #region Get Order Information
         /* method that get the new order from sftp server */
         private void getOrder(string filePath, string[] fileList)

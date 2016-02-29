@@ -18,6 +18,9 @@ namespace CommerceHub_OrderManager
 
             // show new orders from sears
             showSearsResult();
+
+            // show result on the chart
+            refreshGraph();
         }
 
         /* save data when the form is closing */
@@ -117,6 +120,39 @@ namespace CommerceHub_OrderManager
                 item.SubItems.Add(value.Recipient.Name);
                 listview.Items.Add(item);
             }
+        }
+
+        private void refreshGraph()
+        {
+            // clear chart first
+            foreach (var series in chart.Series)
+                series.Points.Clear();
+
+            // creating chart
+            DateTime from = DateTime.Today;
+            for (int i = -6; i <= 0; i++)
+            {
+                from = DateTime.Today.AddDays(i);
+
+                int order = sears.GetNumberOfOrder(from);
+                int shipped = sears.GetNumberOfShipped(from);
+
+                if (order < 1)
+                {
+                    chart.Series["orders"].Points.AddXY(from.ToString("yyyyMMdd"), 0);
+                    chart.Series["point"].Points.AddXY(from.ToString("yyyyMMdd"), 0);
+                    chart.Series["shipment"].Points.AddXY(from.ToString("yyyyMMdd"), 0);
+                }
+                else
+                {
+                    chart.Series["orders"].Points.AddXY(from.ToString("yyyyMMdd"), order);
+                    chart.Series["point"].Points.AddXY(from.ToString("yyyyMMdd"), order);
+                    chart.Series["shipment"].Points.AddXY(from.ToString("yyyyMMdd"), shipped);
+                }
+            }
+
+            chart.Series["shipment"]["PointWidth"] = "0.1";
+            chart.Series["point"].MarkerSize = 10;
         }
     }
 }
