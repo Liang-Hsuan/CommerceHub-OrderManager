@@ -1,4 +1,5 @@
 ﻿using CommerceHub_OrderManager.channel.sears;
+using CommerceHub_OrderManager.supportingClasses;
 using System;
 using System.Windows.Forms;
 
@@ -25,14 +26,95 @@ namespace CommerceHub_OrderManager
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.Date = DateTime.Today;
+            Properties.Settings.Default.Save();
         }
 
         #region Top Buttons
+        /* ship and confirm the selected items */
+        private void shipmentConfirmButton_Click(object sender, EventArgs e)
+        {
+            // error check -> the case if the user has not select any of the order to confirm
+            if (listview.CheckedItems.Count < 1)
+            {
+                MessageBox.Show("Please select the order you want to ship", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // get user confirmation
+            ConfirmPanel confirm = new ConfirmPanel("Are you sure you want to ship the order you selected ?");
+            confirm.ShowDialog(this);
+
+            // fields for message
+            string message = "Shipping label have successfully exported to\n";
+            bool channel = false;
+
+            if (confirm.DialogResult == DialogResult.OK)
+            {
+                UPS ups = new UPS();
+
+                foreach (ListViewItem item in listview.CheckedItems)
+                {
+                    #region Sears Order
+                    // for sears order
+                    if (item.SubItems[0].Text == "Sears")
+                    {
+                        // first get the detail for the order
+                        SearsValues value = sears.generateValue(item.SubItems[4].Text);
+
+                        // second ship it
+                        string digest = ups.postShipmentConfirm(value, new Package(value));
+                        if (digest == null)
+                        {
+                            MessageBox.Show("Error occur while requesting shipment, please refresh and try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                        else if (digest.Contains("Error:"))
+                        {
+                            MessageBox.Show(digest, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        string[] result = ups.postShipmentAccept(digest);
+                        if (result == null)
+                        {
+                            MessageBox.Show("Error occur while requesting shipment, please refresh and try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // get tracking, label and shipment confirm with no cancellation of item
+                        value.TrackingNumber = result[0];
+                        ups.exportLabel(result[1], value.TransactionID, false);
+                        sears.generateXML(value, new System.Collections.Generic.Dictionary<int, string>());
+
+                        channel = true;
+                    }
+                    #endregion
+                }
+
+                // create message
+                if (channel)
+                    message += ups.SavePathSears;
+
+                MessageBox.Show(message, "Congratulation");
+            }
+        }
+
         /* print button click that export the checked items' packing slip */
         private void printButton_Click(object sender, EventArgs e)
         {
+            // error check -> the case if the user has not select any of the order to print
+            if (listview.CheckedItems.Count < 1)
+            {
+                MessageBox.Show("Please select the order you want to export the packing slip", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             // initialize printing objects
             SearsPackingSlip searsPS = new SearsPackingSlip();
+
+            // fields for message
+            string message = "Packing Slip have successfully exported to\n";
+            bool channel = false;
 
             // check the user check item and get the selected transaction id for exportin packing slip
             foreach (ListViewItem item in listview.CheckedItems)
@@ -42,9 +124,17 @@ namespace CommerceHub_OrderManager
                 {
                     string transaction = item.SubItems[4].Text;
                     SearsValues value = sears.generateValue(transaction);
-                    searsPS.createPackingSlip(value, new int[0], true);
+                    searsPS.createPackingSlip(value, new int[0], false);
+
+                    channel = true;
                 }
             }
+
+            // create message
+            if (channel)
+                message += searsPS.SavePath;
+
+            MessageBox.Show(message, "Congratulation");
         }
 
         /* the event for refresh button clicks that refresh the order in listview and the chart */

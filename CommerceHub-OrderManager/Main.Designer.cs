@@ -204,6 +204,7 @@
             this.shipmentConfirmButton.TabIndex = 3;
             this.shipmentConfirmButton.Text = "Confirm Shipment";
             this.shipmentConfirmButton.UseVisualStyleBackColor = false;
+            this.shipmentConfirmButton.Click += new System.EventHandler(this.shipmentConfirmButton_Click);
             // 
             // printButton
             // 
@@ -246,6 +247,7 @@
             // 
             // refreshButton
             // 
+            this.refreshButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.refreshButton.BackColor = System.Drawing.Color.Transparent;
             this.refreshButton.FlatAppearance.BorderSize = 0;
             this.refreshButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;

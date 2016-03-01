@@ -14,8 +14,10 @@ namespace CommerceHub_OrderManager
         // field for storing order details
         private SearsValues value;
 
-        // field for keeping track cancelled items
+        // supporting field for keeping track cancelled items, package details, and time for loading prompt
         private Dictionary<int, string> cancalList;
+        private Package package;
+        private int timeLeft = 4;   // default set to 4
 
         /* constructor that initializes graphic compents and order fields */
         public DetailPage(SearsValues value)
@@ -54,7 +56,7 @@ namespace CommerceHub_OrderManager
             verifyTextbox.Visible = true;
         }
 
-        #region ListView
+        #region ListView Events
         /* the event for select all checkbox check change that select all checkbox all deselect all */
         private void selectAllCheckbox_CheckedChanged(object sender, EventArgs e)
         {
@@ -75,6 +77,7 @@ namespace CommerceHub_OrderManager
         {
             int count = 0;
 
+            #region Listview and Buttons
             foreach (ListViewItem item in listview.Items)
             {
                 if (item.Checked)
@@ -103,11 +106,45 @@ namespace CommerceHub_OrderManager
                 setReasonButton.Visible = false;
             }
 
-            // check the number of the cancel items compare to those are not so that change the enability of the print button
+            // check the number of the cancel items compare to those are not so that change the enability of the print button and create label button
             if (count >= listview.Items.Count)
+            {
                 printPackingSlipButton.Enabled = false;
+                createLabelButton.Enabled = false;
+            }
             else
+            {
                 printPackingSlipButton.Enabled = true;
+                createLabelButton.Enabled = true;
+            }
+            #endregion
+
+            #region Package Detail
+            // initialize field for sku detail -> [0] weight, [1] length, [2] width, [3] height
+            decimal[] skuDetail = { 0, 0, 0, 0 };
+
+            // change the details of package
+            for (int i = 0; i < value.LineCount; i++)
+            {
+                if (listview.Items[i].SubItems[5].Text == "")
+                {
+                    decimal[] detailList = getSkuDetail(value.TrxVendorSKU[i]);
+
+                    if (detailList != null)
+                    {
+                        for (int j = 0; j < 4; j++)
+                            skuDetail[j] += detailList[j];
+                    }
+                }
+            }
+
+            // show result to shipping info
+            weightKgUpdown.Value = skuDetail[0] / 1000;
+            weightLbUpdown.Value = skuDetail[0] / 453.592m;
+            lengthUpdown.Value = skuDetail[1];
+            widthUpdown.Value = skuDetail[2];
+            heightUpdown.Value = skuDetail[3];
+            #endregion
         }
 
         /* when clicked set the reason of cancelling to the checked items */
@@ -130,6 +167,8 @@ namespace CommerceHub_OrderManager
         }
         #endregion
 
+        #region Shipment and Package
+        /* create label button clicks that create shipment and retrieve the label and tracking number */
         private void createLabelButton_Click(object sender, EventArgs e)
         {
             // ask for user confirmaiton
@@ -138,13 +177,78 @@ namespace CommerceHub_OrderManager
 
             if (confirm.DialogResult == DialogResult.OK)
             {
-                // initialize fields for shipment
-                Package package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString());
-                UPS ups = new UPS();
+                trackingNumberTextbox.Text = "Shipping";
 
-                string digest = ups.postShipmentConfirm(value, package);
+                // start timer
+                timer.Start();
+
+                // initialize field for shipment package
+                package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString());
+
+                if (!backgroundWorkerShip.IsBusy)
+                    backgroundWorkerShip.RunWorkerAsync();
             }
         }
+        private void backgroundWorkerShip_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            // initialize field for shipment
+            UPS ups = new UPS();
+
+            // post shipment confirm and get the digest string from response
+            string digest = ups.postShipmentConfirm(value, package);
+
+            // error checking
+            if (digest == null)
+            {
+                MessageBox.Show("Error occur while requesting shipment, please try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            else if (digest.Contains("Error:"))
+            {
+                MessageBox.Show(digest, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // post shipment accept and get tracking number and image 
+            string[] acceptResult = ups.postShipmentAccept(digest);
+
+            // error checking
+            if (acceptResult == null)
+            {
+                MessageBox.Show("Error occur while requesting shipment, please try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // retrieve tracking number
+            value.TrackingNumber = acceptResult[0];
+
+            // get the shipment label and show it
+            ups.exportLabel(acceptResult[1], value.TransactionID, true);
+        }
+        private void backgroundWorkerShip_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        {
+            // stop the timer and show the tracking number
+            timer.Stop();
+            trackingNumberTextbox.Text = value.TrackingNumber;
+
+            createLabelButton.Enabled = false;
+        }
+
+        /* shipment loading promopt */
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            timeLeft--;
+
+            if (timeLeft <= 0)
+            {
+                trackingNumberTextbox.Text = "Shipping";
+                timeLeft = 4;
+                timer.Start();
+            }
+            else
+                trackingNumberTextbox.Text += ".";
+        }
+        #endregion
 
         #region Shipment Confirm
         /* shipment confirm button clicks that send the confirm xml to sears */
@@ -267,17 +371,17 @@ namespace CommerceHub_OrderManager
             // ups details
             switch (value.ServiceLevel)
             {
-                case "UPSN_SE":
-                    serviceCombobox.SelectedIndex = 0;
-                    break;
                 case "UPSN_3D":
-                    serviceCombobox.SelectedIndex = 1;
+                    serviceCombobox.SelectedIndex = 2;
                     break;
-                case "UPSN_ND":
+                case "UPSN_IX":
                     serviceCombobox.SelectedIndex = 3;
                     break;
+                case "UPS":
+                    serviceCombobox.SelectedIndex = 1;
+                    break;
                 default:
-                    serviceCombobox.SelectedIndex = 2;
+                    serviceCombobox.SelectedIndex = 0;
                     break;
             }
 

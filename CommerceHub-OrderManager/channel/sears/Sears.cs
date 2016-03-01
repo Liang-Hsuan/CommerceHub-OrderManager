@@ -26,9 +26,6 @@ namespace CommerceHub_OrderManager.channel.sears
         // field for sftp connection
         private Sftp sftp = new Sftp("ashlinbpg.sftp-test.commercehub.com", "ashlinbpg", "Pay4Examine9Rather$");
 
-        // field for storing tracking number -> default set to nothing
-        private string trackingNumber = "";
-
         /* constructor that restore the data and initialize folders for xml feed */
         public Sears()
         {
@@ -380,7 +377,6 @@ namespace CommerceHub_OrderManager.channel.sears
             // get other necessary values
             value.VendorInvoiceNumber = getInvoiceNumber();
             value.PackageDetailID = getPackageId();
-            value.TrackingNumber = trackingNumber;
 
             // fields for database update
             SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs);
@@ -392,9 +388,9 @@ namespace CommerceHub_OrderManager.channel.sears
                          "<ConfirmMessageBatch>" +
                          "<partnerID roleType=\"vendor\" name=\"Ashlin BPG Marketing, Inc.\">ashlinbpg</partnerID>" +
                          "<hubConfirm transactionID=\"" + value.TransactionID + "\">" +
-                         "<participatingParty roleType=\"merchent\" name=\"Sears Canada\" participationCode=\"To:\">searscanada</participatingParty>" +
+                         "<participatingParty roleType=\"merchant\" name=\"Sears Canada\" participationCode=\"To:\">searscanada</participatingParty>" +
                          "<partnerTrxID>" + value.PartnerTrxID + "</partnerTrxID>" +
-                         "<partnerTrxDate>" + DateTime.Now.ToString("yyyyMMdd") + "</partnerTrxDate>" +
+                         "<partnerTrxDate>" + DateTime.Today.ToString("yyyyMMdd") + "</partnerTrxDate>" +
                          "<poNumber>" + value.PoNumber + "</poNumber>";
 
             // the case if there is at least one order will be shipped -> add trx balance due
@@ -510,7 +506,7 @@ namespace CommerceHub_OrderManager.channel.sears
             {
                 xml +=
                     "<packageDetail packageDetailID=\"" + value.PackageDetailID + "\">" +
-                    "<shipDate>" + value.ExpectedShipDate[0].ToString("yyyyMMdd") + "</shipDate>" +
+                    "<shipDate>" + DateTime.Today.ToString("yyyyMMdd") /*value.ExpectedShipDate[0].ToString("yyyyMMdd")*/ + "</shipDate>" +
                     "<serviceLevel1>" + value.ServiceLevel + "</serviceLevel1>" +
                     "<trackingNumber>" + value.TrackingNumber + "</trackingNumber>" +
                     "</packageDetail>";

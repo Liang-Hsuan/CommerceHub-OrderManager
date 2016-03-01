@@ -7,6 +7,9 @@ using System.Text;
 
 namespace CommerceHub_OrderManager.supportingClasses
 {
+    /* 
+     * A class that post shipment to UPS
+     */
     public class UPS
     {
         // field for credentials
@@ -15,6 +18,9 @@ namespace CommerceHub_OrderManager.supportingClasses
         private const string PASSWORD = "Whatthefuck630";
         private const string ACCOUNT_NUMBER = "15XR35";
         private const string SEARS_ACCOUNT_NUMBER = "A9725A";
+
+        // field for save image path
+        private string savePathSears = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_ShippingLabel";
 
         /* a constructor that do nothing */
         public UPS()
@@ -88,19 +94,19 @@ namespace CommerceHub_OrderManager.supportingClasses
             "<Service>";
 
             string code;
-            switch (value.ServiceLevel)
+            switch (package.Service)
             {
-                case "UPS 2nd Day Air":
-                    code = "02";
+                case "UPS Standard":
+                    code = "11";
                     break;
                 case "UPS 3 Day Select":
                     code = "12";
                     break;
-                case "UPS Next Day Air":
-                    code = "01";
+                case "UPS Worldwide Express":
+                    code = "07";
                     break;
                 default:
-                    code = "03";
+                    code = "01";
                     break;
             }
 
@@ -165,7 +171,8 @@ namespace CommerceHub_OrderManager.supportingClasses
             }
 
             // get the response from the server
-            HttpWebResponse response; 
+            HttpWebResponse response;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             try
             {
                 response = (HttpWebResponse)request.GetResponse();
@@ -186,21 +193,18 @@ namespace CommerceHub_OrderManager.supportingClasses
             result = substringMethod(result, "ResponseStatusCode", 19);
             string responseStatus = getTarget(result);
 
-            // get shipment identification number and shipment digest
-            string identificationNumber = "";
+            // get shipment digest
             string digest = "";
             if (responseStatus == "1")
             {
-                result = substringMethod(result, "ShipmentIdentificationNumber", 29);
-                identificationNumber = getTarget(result);
-
                 result = substringMethod(result, "ShipmentDigest", 15);
                 digest = getTarget(result);
             }
             else
             {
                 // the case if bad request
-                return "Error";
+                result = substringMethod(result, "ErrorDescription", 17);
+                return "Error: " + getTarget(result);
             }
 
             return digest;
@@ -240,6 +244,7 @@ namespace CommerceHub_OrderManager.supportingClasses
             }
 
             // get the response from the server
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             string result;
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
@@ -272,7 +277,7 @@ namespace CommerceHub_OrderManager.supportingClasses
         #endregion
 
         /* a method that turn base64 string into GIF format image */
-        public void exportLabel(string base64String, string transactionId)
+        public void exportLabel(string base64String, string transactionId, bool preview)
         {
             // Convert Base64 String to byte[]
             byte[] imageBytes = Convert.FromBase64String(base64String);
@@ -284,17 +289,28 @@ namespace CommerceHub_OrderManager.supportingClasses
             image.RotateFlip(RotateFlipType.Rotate90FlipNone);
 
             // save image
-            try
-            {
-                // check if the save directory exist -> if not create it
-                if (!File.Exists(@"C:\Users\Intern1001\Desktop\Sears_ShippingLabel"))
-                    Directory.CreateDirectory(@"C:\Users\Intern1001\Desktop\Sears_ShippingLabel");
+            // check if the save directory exist -> if not create it
+            if (!File.Exists(savePathSears))
+                Directory.CreateDirectory(savePathSears);
 
-                image.Save(@"C:\Users\Intern1001\Desktop\Sears_ShippingLabel\" + transactionId + ".gif", System.Drawing.Imaging.ImageFormat.Gif);
-            }
-            catch (Exception e)
+            // save the image
+            string file = savePathSears + "\\" + transactionId + ".gif";
+            image.Save(file, System.Drawing.Imaging.ImageFormat.Gif);
+
+            // show the image if user want to preview
+            if (preview)
             {
-                Console.WriteLine(e.Message);
+                if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)
+                    System.Diagnostics.Process.Start(file);
+            }
+        }
+
+        /*  a Get for savepath for shipment label */
+        public string SavePathSears
+        {
+            get
+            {
+                return savePathSears;
             }
         }
 

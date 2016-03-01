@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DetailPage));
             this.orderSummaryPanel = new System.Windows.Forms.Panel();
             this.moneyPicturebox = new System.Windows.Forms.PictureBox();
@@ -84,6 +85,7 @@
             this.backgroundWorkerConfirm = new System.ComponentModel.BackgroundWorker();
             this.progressbar = new System.Windows.Forms.ProgressBar();
             this.shippingPanel = new System.Windows.Forms.Panel();
+            this.trackingNumberTextbox = new System.Windows.Forms.TextBox();
             this.shippingPicturebox = new System.Windows.Forms.PictureBox();
             this.createLabelButton = new System.Windows.Forms.Button();
             this.heightUpdown = new System.Windows.Forms.NumericUpDown();
@@ -102,7 +104,8 @@
             this.shippingInfoLabel = new System.Windows.Forms.Label();
             this.weightUnitLabel = new System.Windows.Forms.Label();
             this.sizeUnitLabel = new System.Windows.Forms.Label();
-            this.trackingNumberTextbox = new System.Windows.Forms.TextBox();
+            this.backgroundWorkerShip = new System.ComponentModel.BackgroundWorker();
+            this.timer = new System.Windows.Forms.Timer(this.components);
             this.orderSummaryPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.moneyPicturebox)).BeginInit();
             this.topPanel.SuspendLayout();
@@ -789,6 +792,21 @@
             this.shippingPanel.Size = new System.Drawing.Size(440, 648);
             this.shippingPanel.TabIndex = 10;
             // 
+            // trackingNumberTextbox
+            // 
+            this.trackingNumberTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.trackingNumberTextbox.BackColor = System.Drawing.Color.White;
+            this.trackingNumberTextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.trackingNumberTextbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.trackingNumberTextbox.ForeColor = System.Drawing.Color.DarkGray;
+            this.trackingNumberTextbox.Location = new System.Drawing.Point(174, 438);
+            this.trackingNumberTextbox.Multiline = true;
+            this.trackingNumberTextbox.Name = "trackingNumberTextbox";
+            this.trackingNumberTextbox.ReadOnly = true;
+            this.trackingNumberTextbox.Size = new System.Drawing.Size(175, 87);
+            this.trackingNumberTextbox.TabIndex = 27;
+            this.trackingNumberTextbox.Text = "Not shipped";
+            // 
             // shippingPicturebox
             // 
             this.shippingPicturebox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -903,10 +921,10 @@
             this.serviceCombobox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.serviceCombobox.FormattingEnabled = true;
             this.serviceCombobox.Items.AddRange(new object[] {
-            "UPS 2nd Day Air",
+            "UPS Express",
+            "UPS Standard",
             "UPS 3 Day Select",
-            "UPS Ground",
-            "UPS Next Day Air"});
+            "UPS Worldwide Express"});
             this.serviceCombobox.Location = new System.Drawing.Point(131, 169);
             this.serviceCombobox.Name = "serviceCombobox";
             this.serviceCombobox.Size = new System.Drawing.Size(239, 21);
@@ -1019,19 +1037,15 @@
             this.sizeUnitLabel.TabIndex = 23;
             this.sizeUnitLabel.Text = "x                                x                               (cm)";
             // 
-            // trackingNumberTextbox
+            // backgroundWorkerShip
             // 
-            this.trackingNumberTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackingNumberTextbox.BackColor = System.Drawing.Color.White;
-            this.trackingNumberTextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.trackingNumberTextbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.trackingNumberTextbox.ForeColor = System.Drawing.Color.DarkGray;
-            this.trackingNumberTextbox.Location = new System.Drawing.Point(174, 438);
-            this.trackingNumberTextbox.Multiline = true;
-            this.trackingNumberTextbox.Name = "trackingNumberTextbox";
-            this.trackingNumberTextbox.Size = new System.Drawing.Size(175, 87);
-            this.trackingNumberTextbox.TabIndex = 27;
-            this.trackingNumberTextbox.Text = "Not shipped";
+            this.backgroundWorkerShip.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorkerShip_DoWork);
+            this.backgroundWorkerShip.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorkerShip_RunWorkerCompleted);
+            // 
+            // timer
+            // 
+            this.timer.Interval = 600;
+            this.timer.Tick += new System.EventHandler(this.timer_Tick);
             // 
             // DetailPage
             // 
@@ -1152,5 +1166,7 @@
         private System.Windows.Forms.Button createLabelButton;
         private System.Windows.Forms.PictureBox shippingPicturebox;
         private System.Windows.Forms.TextBox trackingNumberTextbox;
+        private System.ComponentModel.BackgroundWorker backgroundWorkerShip;
+        private System.Windows.Forms.Timer timer;
     }
 }
