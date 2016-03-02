@@ -71,7 +71,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="channel\sears\Address.cs" />
+    <Compile Include="channel\brightpearl\BPconnect.cs" />
+    <Compile Include="channel\brightpearl\BPvalues.cs" />
+    <Compile Include="supportingClasses\Address.cs" />
     <Compile Include="channel\sears\Sears.cs" />
     <Compile Include="channel\sears\SearsPackingSlip.cs" />
     <Compile Include="channel\sears\SearsValues.cs" />

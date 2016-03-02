@@ -960,6 +960,7 @@ namespace CommerceHub_OrderManager.channel.sears
             else
                 iterator = Properties.Settings.Default.Iterator;
 
+            iterator++;
             return "SearsPack" + DateTime.Today.ToString("ddMMyy") + iterator;
         }
 

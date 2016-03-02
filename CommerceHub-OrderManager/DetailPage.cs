@@ -1,4 +1,5 @@
-﻿using CommerceHub_OrderManager.channel.sears;
+﻿using CommerceHub_OrderManager.channel.brightpearl;
+using CommerceHub_OrderManager.channel.sears;
 using CommerceHub_OrderManager.supportingClasses;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace CommerceHub_OrderManager
         private SearsValues value;
 
         // supporting field for keeping track cancelled items, package details, and time for loading prompt
-        private Dictionary<int, string> cancalList;
+        private Dictionary<int, string> cancelList;
         private Package package;
         private int timeLeft = 4;   // default set to 4
 
@@ -261,7 +262,7 @@ namespace CommerceHub_OrderManager
             if (confirm.DialogResult == DialogResult.OK)
             {
                 // generate cancel list
-                cancalList = new Dictionary<int, string>();
+                cancelList = new Dictionary<int, string>();
                 for (int i = 0; i < listview.Items.Count; i++)
                 {
                     if (listview.Items[i].SubItems[5].Text == "Cancelled")
@@ -275,7 +276,7 @@ namespace CommerceHub_OrderManager
                             return;
                         }
 
-                        cancalList.Add(i, reason);
+                        cancelList.Add(i, reason);
                     }
                 }
 
@@ -290,12 +291,17 @@ namespace CommerceHub_OrderManager
         }
         private void backgroundWorkerConfirm_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            simulate(1, 50);
+            simulate(1, 40);
 
             // export xml file
-            new Sears().generateXML(value, cancalList);
+            new Sears().generateXML(value, cancelList);
 
-            simulate(50, 100);
+            simulate(40, 70);
+
+            // post order to brightpearl
+            new BPconnect().postOrder(value, new List<int>(cancelList.Keys).ToArray());
+
+            simulate(70, 100);
         }
         private void backgroundWorkerConfirm_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
         {
