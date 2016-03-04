@@ -78,7 +78,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                     } while (orderId == "Error");
                 }
 
-                // post order row and reservation
+                // calculate the total amount when excluding the cancelled items
                 for (int i = 0; i < value.LineCount; i++)
                 {
                     // boolean flag to see if the item is cancelled
@@ -122,14 +122,14 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                         // post reservation
                         string reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
                         Status = "Posting reservation request " + i;
-                        if (post.HasError && reservation == "503")
+                        if (reservation == "503")
                         {
                             Status = "Error occur during reservation post " + i;
                             do
                             {
                                 Thread.Sleep(5000);
                                 post.postReservationRequest(orderId, orderRowId, itemValue);
-                            } while (post.HasError && reservation == "503");
+                            } while (reservation == "503");
                         }
                     }
                 }
@@ -222,14 +222,14 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                         // post reservation
                         string reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
                         Status = "Posting reservation request " + i;
-                        if (post.HasError && reservation == "503")
+                        if (reservation == "503")
                         {
                             Status = "Error occur during reservation post " + i;
                             do
                             {
                                 Thread.Sleep(5000);
                                 post.postReservationRequest(orderId, orderRowId, itemValue);
-                            } while (post.HasError);
+                            } while (reservation == "503");
                         }
                     }
                 }
@@ -524,15 +524,9 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                     result = streamReader.ReadToEnd();
                 }
 
-                int index = result.IndexOf(":") + 1;
-                int length = index;
-                while (Char.IsNumber(result[length]))
-                {
-                    length++;
-                }
-                string contactID = result.Substring(index, length - index);
+                result = substringMethod(result, ":", 1);
 
-                return contactID;  //return the contact ID
+                return getTarget(result);  //return the contact ID
             }
 
             /* post new order to API */
@@ -639,9 +633,6 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             /* post reservation request to API return the message*/
             public string postReservationRequest(string orderID, string orderRowID, BPvalues value)
             {
-                // reset boolean flag to false 
-                HasError = false;
-
                 // get product id
                 GetRequest get = new GetRequest(appRef, appToken);
                 string productId = get.getProductId(value.SKU);
@@ -656,13 +647,9 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 // generate JSON file for order row post
                 string textJSON;
                 if (productId != null)
-                {
                     textJSON = "{\"products\": [{\"productId\": \"" + productId + "\",\"salesOrderRowId\": \"" + orderRowID + "\",\"quantity\":\"" + value.Quantity + "\"}]}";
-                }
                 else
-                {
                     return null;
-                }
 
                 // turn request string into a byte stream
                 byte[] postBytes = Encoding.UTF8.GetBytes(textJSON);
@@ -680,19 +667,15 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 }
                 catch (WebException e)
                 {
-                    HasError = true;
                     if (e.Status == WebExceptionStatus.ProtocolError)
                     {
                         response = e.Response as HttpWebResponse;
                         if ((int)response.StatusCode == 503)
-                        {
                             return "503";    // web server 404 not found
-                        }
+                        else
+                            return null;
                     }
                 }
-
-                // reset has error to false just in case
-                HasError = false;
 
                 return null;
             }

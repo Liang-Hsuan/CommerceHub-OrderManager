@@ -9,7 +9,7 @@ namespace CommerceHub_OrderManager
     public partial class Main : Form
     {
         // field for commerce hub order
-        private Sears sears;
+        private Sears sears = new Sears();
 
         // field for brightpearl connection
         BPconnect bp = new BPconnect();
@@ -25,8 +25,6 @@ namespace CommerceHub_OrderManager
         public Main()
         {
             InitializeComponent();
-
-            sears = new Sears();
 
             // show new orders from sears
             showSearsResult();
