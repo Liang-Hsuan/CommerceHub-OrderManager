@@ -15,6 +15,9 @@ namespace CommerceHub_OrderManager
         // field for storing order details
         private SearsValues value;
 
+        // field for brightpearl connection
+        BPconnect bp = new BPconnect();
+
         // supporting field for keeping track cancelled items, package details, and time for loading prompt
         private Dictionary<int, string> cancelList;
         private Package package;
@@ -179,9 +182,10 @@ namespace CommerceHub_OrderManager
             if (confirm.DialogResult == DialogResult.OK)
             {
                 trackingNumberTextbox.Text = "Shipping";
+                shipmentConfirmButton.Enabled = false;
 
                 // start timer
-                timer.Start();
+                timerShip.Start();
 
                 // initialize field for shipment package
                 package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString());
@@ -202,11 +206,13 @@ namespace CommerceHub_OrderManager
             if (digest == null)
             {
                 MessageBox.Show("Error occur while requesting shipment, please try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                createLabelButton.Enabled = true;
                 return;
             }
             else if (digest.Contains("Error:"))
             {
                 MessageBox.Show(digest, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                createLabelButton.Enabled = true;
                 return;
             }
 
@@ -217,6 +223,7 @@ namespace CommerceHub_OrderManager
             if (acceptResult == null)
             {
                 MessageBox.Show("Error occur while requesting shipment, please try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                createLabelButton.Enabled = true;
                 return;
             }
 
@@ -229,14 +236,15 @@ namespace CommerceHub_OrderManager
         private void backgroundWorkerShip_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             // stop the timer and show the tracking number
-            timer.Stop();
+            timerShip.Stop();
             trackingNumberTextbox.Text = value.TrackingNumber;
 
+            shipmentConfirmButton.Enabled = true;
             createLabelButton.Enabled = false;
         }
 
         /* shipment loading promopt */
-        private void timer_Tick(object sender, EventArgs e)
+        private void timerShip_Tick(object sender, EventArgs e)
         {
             timeLeft--;
 
@@ -244,7 +252,7 @@ namespace CommerceHub_OrderManager
             {
                 trackingNumberTextbox.Text = "Shipping";
                 timeLeft = 4;
-                timer.Start();
+                timerShip.Start();
             }
             else
                 trackingNumberTextbox.Text += ".";
@@ -261,6 +269,9 @@ namespace CommerceHub_OrderManager
 
             if (confirm.DialogResult == DialogResult.OK)
             {
+                // start timer
+                timerConfirm.Start();
+
                 // generate cancel list
                 cancelList = new Dictionary<int, string>();
                 for (int i = 0; i < listview.Items.Count; i++)
@@ -299,7 +310,7 @@ namespace CommerceHub_OrderManager
             simulate(40, 70);
 
             // post order to brightpearl
-            new BPconnect().postOrder(value, new List<int>(cancelList.Keys).ToArray());
+            bp.postOrder(value, new List<int>(cancelList.Keys).ToArray());
 
             simulate(70, 100);
         }
@@ -309,10 +320,18 @@ namespace CommerceHub_OrderManager
         }
         private void backgroundWorkerConfirm_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
+            // final work
             progressbar.Visible = false;
             shipmentConfirmButton.Text = "Completed";
             shipmentConfirmButton.BackColor = Color.Transparent;
             shipmentConfirmButton.Enabled = false;
+            timerConfirm.Stop();
+        }
+
+        /* shipment confirm promopt */
+        private void timerConfirm_Tick(object sender, EventArgs e)
+        {
+            statusLabel.Text = bp.Status;
         }
         #endregion
 

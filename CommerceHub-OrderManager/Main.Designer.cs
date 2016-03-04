@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
@@ -51,6 +52,9 @@
             this.detailButton = new System.Windows.Forms.Button();
             this.selectionAllCheckbox = new System.Windows.Forms.CheckBox();
             this.refreshButton = new System.Windows.Forms.Button();
+            this.statusLabel = new System.Windows.Forms.Label();
+            this.timer = new System.Windows.Forms.Timer(this.components);
+            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.chart)).BeginInit();
             this.SuspendLayout();
             // 
@@ -259,12 +263,30 @@
             this.refreshButton.UseVisualStyleBackColor = false;
             this.refreshButton.Click += new System.EventHandler(this.refreshButton_Click);
             // 
+            // statusLabel
+            // 
+            this.statusLabel.Location = new System.Drawing.Point(9, 322);
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(275, 13);
+            this.statusLabel.TabIndex = 8;
+            // 
+            // timer
+            // 
+            this.timer.Interval = 600;
+            this.timer.Tick += new System.EventHandler(this.timer_Tick);
+            // 
+            // backgroundWorker
+            // 
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
+            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(245)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(1436, 873);
+            this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.refreshButton);
             this.Controls.Add(this.selectionAllCheckbox);
             this.Controls.Add(this.detailButton);
@@ -303,6 +325,9 @@
         private System.Windows.Forms.ColumnHeader selectionHeader;
         private System.Windows.Forms.CheckBox selectionAllCheckbox;
         private System.Windows.Forms.Button refreshButton;
+        private System.Windows.Forms.Label statusLabel;
+        private System.Windows.Forms.Timer timer;
+        private System.ComponentModel.BackgroundWorker backgroundWorker;
     }
 }
 

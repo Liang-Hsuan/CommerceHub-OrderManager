@@ -1,4 +1,5 @@
-﻿using CommerceHub_OrderManager.channel.sears;
+﻿using CommerceHub_OrderManager.channel.brightpearl;
+using CommerceHub_OrderManager.channel.sears;
 using CommerceHub_OrderManager.supportingClasses;
 using System;
 using System.Windows.Forms;
@@ -9,6 +10,17 @@ namespace CommerceHub_OrderManager
     {
         // field for commerce hub order
         private Sears sears;
+
+        // field for brightpearl connection
+        BPconnect bp = new BPconnect();
+
+        // field for storing data
+        private struct Order
+        {
+            public string source;
+            public string transactionId;
+        }
+        private Order[] orderList;
 
         public Main()
         {
@@ -44,58 +56,35 @@ namespace CommerceHub_OrderManager
             ConfirmPanel confirm = new ConfirmPanel("Are you sure you want to ship the order you selected ?");
             confirm.ShowDialog(this);
 
-            // fields for message
-            string message = "Shipping label have successfully exported to\n";
-            bool channel = false;
-
+            // if user select to confirm, process the orders that have been checked
             if (confirm.DialogResult == DialogResult.OK)
             {
-                UPS ups = new UPS();
+                // start the timer 
+                timer.Start();
 
-                foreach (ListViewItem item in listview.CheckedItems)
+                // set confirm button to enable
+                shipmentConfirmButton.Enabled = false;
+
+                // initialize orderList for further shipment confirm use
+                int length = listview.CheckedItems.Count;
+                orderList = new Order[length];
+
+                // adding each order to the list with source and transaction id
+                for (int i = 0; i < length; i++)
                 {
-                    #region Sears Order
-                    // for sears order
-                    if (item.SubItems[0].Text == "Sears")
-                    {
-                        // first get the detail for the order
-                        SearsValues value = sears.generateValue(item.SubItems[4].Text);
+                    Order order = new Order();
 
-                        // second ship it
-                        string digest = ups.postShipmentConfirm(value, new Package(value));
-                        if (digest == null)
-                        {
-                            MessageBox.Show("Error occur while requesting shipment, please refresh and try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-                        else if (digest.Contains("Error:"))
-                        {
-                            MessageBox.Show(digest, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
+                    order.source = listview.CheckedItems[i].SubItems[0].Text;
+                    order.transactionId = listview.CheckedItems[i].SubItems[4].Text;
 
-                        string[] result = ups.postShipmentAccept(digest);
-                        if (result == null)
-                        {
-                            MessageBox.Show("Error occur while requesting shipment, please refresh and try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-
-                        // get tracking, label and shipment confirm with no cancellation of item
-                        value.TrackingNumber = result[0];
-                        ups.exportLabel(result[1], value.TransactionID, false);
-                        sears.generateXML(value, new System.Collections.Generic.Dictionary<int, string>());
-
-                        channel = true;
-                    }
-                    #endregion
+                    orderList[i] = order;
                 }
 
-                // create message
-                if (channel)
-                    message += ups.SavePathSears;
-
-                MessageBox.Show(message, "Congratulation");
+                // call backgorund worker
+                if (!backgroundWorker.IsBusy)
+                {
+                    backgroundWorker.RunWorkerAsync();
+                }
             }
         }
 
@@ -157,6 +146,74 @@ namespace CommerceHub_OrderManager
             SearsValues value = sears.generateValue(listview.CheckedItems[0].SubItems[4].Text);
 
             new DetailPage(value).ShowDialog(this);
+        }
+        #endregion
+
+        #region Shipment Confirm Event
+        /* background worker that processing each order from the orderList */
+        private void backgroundWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            // initialize UPS field in case there is order require UPS shipment
+            UPS ups = new UPS();
+
+            // start processing orders
+            foreach (Order order in orderList)
+            {
+                #region Sears Order
+                // for sears order
+                if (order.source == "Sears")
+                {
+                    // first get the detail for the order
+                    SearsValues value = sears.generateValue(order.transactionId);
+
+                    // second ship it
+                    string digest = ups.postShipmentConfirm(value, new Package(value));
+                    if (digest == null)
+                    {
+                        MessageBox.Show("Error occur while requesting shipment, please refresh and try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    else if (digest.Contains("Error:"))
+                    {
+                        MessageBox.Show(digest, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    string[] result = ups.postShipmentAccept(digest);
+                    if (result == null)
+                    {
+                        MessageBox.Show("Error occur while requesting shipment, please refresh and try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // get tracking, label and shipment confirm with no cancellation of item
+                    value.TrackingNumber = result[0];
+                    ups.exportLabel(result[1], value.TransactionID, false);
+                    sears.generateXML(value, new System.Collections.Generic.Dictionary<int, string>());
+
+                    // post order to brightpearl with no cancellation
+                    bp.postOrder(value, new int[0]);
+                }
+                #endregion
+            }
+        }
+        private void backgroundWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        {
+            // stop the timer
+            timer.Stop();
+
+            // set confirm button to enable and status label to nothing
+            statusLabel.Text = "";
+            shipmentConfirmButton.Enabled = true;
+
+            // show user that the orders have completed
+            MessageBox.Show("Order have been processed successfully.\nPacking slip have been exported to Desktop.", "Congratulation", MessageBoxButtons.OK);
+        }
+
+        /* timer that displaying status change */
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            statusLabel.Text = bp.Status;
         }
         #endregion
 

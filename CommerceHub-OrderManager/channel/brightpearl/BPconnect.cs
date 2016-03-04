@@ -17,6 +17,9 @@ namespace CommerceHub_OrderManager.channel.brightpearl
         private GetRequest get;
         private PostRequest post;
 
+        // public field for accessing the status of the current progress
+        public string Status { get; set; }
+
         /* constructor that initialize request objects*/
         public BPconnect()
         {
@@ -33,6 +36,9 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             // initializes request fields
             get = new GetRequest(appRef, appToken);
             post = new PostRequest(appRef, appToken);
+
+            // set status to default -> nothing
+            Status = "";
         }
 
         /* a method that post sears order to brightpearl */
@@ -44,7 +50,8 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
             // get contact id first
             string name = value.Recipient.Name;
-            string contactId = get.getCustomerId(name.Remove(name.IndexOf(' ')), name.Substring(name.IndexOf(' ') + 1));
+            string contactId = get.getCustomerId(name.Remove(name.IndexOf(' ')), name.Substring(name.IndexOf(' ') + 1), value.Recipient.PostalCode);
+            Status = "Geting contact ID";
 
             // field for receipt
             double total = value.TrxBalanceDue;
@@ -52,14 +59,18 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             // if customer exists, add the current order under this customer
             if (contactId != null)
             {
+                Status = "Customer exist";
+
                 #region Cusomter Exist Case
                 // initialize order BPvalues object
                 BPvalues orderValue = new BPvalues(null, value.TransactionID, value.CustOrderDate, 7, 7, null, null, 0, 0, 0, 0);
 
                 // post order
                 string orderId = post.postOrderRequest(contactId, orderValue);
+                Status = "Getting order ID";
                 if (orderId == "Error")
                 {
+                    Status = "Error occur during order post";
                     do
                     {
                         Thread.Sleep(5000);
@@ -97,8 +108,10 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                         // post order row
                         string orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                        Status = "Getting order row ID";
                         if (orderRowId == "Error")
                         {
+                            Status = "Error occur during order row post " + i;
                             do
                             {
                                 Thread.Sleep(5000);
@@ -107,14 +120,16 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                         }
 
                         // post reservation
-                        post.postReservationRequest(orderId, orderRowId, itemValue);
-                        if (post.HasError)
+                        string reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
+                        Status = "Posting reservation request " + i;
+                        if (post.HasError && reservation == "503")
                         {
+                            Status = "Error occur during reservation post " + i;
                             do
                             {
                                 Thread.Sleep(5000);
                                 post.postReservationRequest(orderId, orderRowId, itemValue);
-                            } while (post.HasError);
+                            } while (post.HasError && reservation == "503");
                         }
                     }
                 }
@@ -124,8 +139,10 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 // post receipt
                 post.postReceipt(orderId, contactId, orderValue);
+                Status = "Posting receipt";
                 if (post.HasError)
                 {
+                    Status = "Error occur during receipt post";
                     do
                     {
                         Thread.Sleep(5000);
@@ -136,18 +153,24 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             }
             else
             {
+                Status = "Customer does not exist";
+
                 #region Customer Not Exist Case
                 // initialize order BPvalues object
                 BPvalues orderValue = new BPvalues(value.Recipient, value.TransactionID, value.CustOrderDate, 7, 7, null, null, 0, 0, 0, 0);
 
                 // post new order with new customer
                 string addressId = post.postAddressRequest(orderValue.Address);
+                Status = "Getting address ID";
                 contactId = post.postContactRequest(addressId, orderValue);
+                Status = "Getting new contact ID";
 
                 // post order
                 string orderId = post.postOrderRequest(contactId, orderValue);
+                Status = "Getting order ID";
                 if (orderId == "Error")
                 {
+                    Status = "Error occur during order post";
                     do
                     {
                         Thread.Sleep(5000);
@@ -185,8 +208,10 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                         // post order row
                         string orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                        Status = "Getting order row ID";
                         if (orderRowId == "Error")
                         {
+                            Status = "Error occur during order row post " + i;
                             do
                             {
                                 Thread.Sleep(5000);
@@ -195,9 +220,11 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                         }
 
                         // post reservation
-                        post.postReservationRequest(orderId, orderRowId, itemValue);
-                        if (post.HasError)
+                        string reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
+                        Status = "Posting reservation request " + i;
+                        if (post.HasError && reservation == "503")
                         {
+                            Status = "Error occur during reservation post " + i;
                             do
                             {
                                 Thread.Sleep(5000);
@@ -212,8 +239,10 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 // post receipt
                 post.postReceipt(orderId, contactId, orderValue);
+                Status = "Posting Receipt";
                 if (post.HasError)
                 {
+                    Status = "Error occur during receipt post";
                     do
                     {
                         Thread.Sleep(5000);
@@ -268,8 +297,9 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             }
 
             /* a method that return customer id from given firstname and lastname*/
-            public string getCustomerId(string firstName, string lastName)
+            public string getCustomerId(string firstName, string lastName, string postalCode)
             {
+                #region Contact ID Get
                 string uri = "https://ws-use.brightpearl.com/2.0.0/ashlintest/contact-service/contact-search?firstName=" + firstName + "&lastName=" + lastName;
 
                 // post request to uri
@@ -290,13 +320,82 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 // check if there is result return or not
                 textJSON = substringMethod(textJSON, "resultsReturned", 17);
-                if (Convert.ToInt32(getTarget(textJSON)) < 1)
+                int number = Convert.ToInt32(getTarget(textJSON));
+
+                // the case if there is no result found, just return 
+                if (number < 1)
                     return null;
 
-                // getting customer id
-                textJSON = substringMethod(textJSON, "\"results\":", 12);
+                // start getting customer id
+                // this is for the first id
+                string[] list = new string[number];
+                textJSON = substringMethod(textJSON, "results\":", 11);
+                list[0] = getTarget(textJSON);
+                textJSON = substringMethod(textJSON, "],[", 3);
 
-                return getTarget(textJSON);
+                // proceed to next token and get the id (if have more than 1)
+                for (int i = 1; i < number; i++)
+                {
+                    list[i] = getTarget(textJSON);
+
+                    // proceed to next token
+                    textJSON = substringMethod(textJSON, "],[", 3);
+                }
+                #endregion
+
+                #region Postal Code Compare
+                // generate uri for getting more information on the customer id found to compare result
+                uri = "https://ws-use.brightpearl.com/public-api/ashlintest/contact-service/contact/";
+
+                for (int i = 0; i < number; i++)
+                    uri += list[i] + ',';
+
+                uri = uri.Remove(uri.LastIndexOf(',')) + "?includeOptional=customFields,postalAddresses";
+                Console.WriteLine(uri);
+                Console.ReadLine();
+
+                request = WebRequest.Create(uri);
+                request.Headers.Add("brightpearl-app-ref", "ashlintest_intern-1002");
+                request.Headers.Add("brightpearl-account-token", "aZroyMTQ7Lf3EygEbyvXYTsYnDB7S4HjgHjuxjbMA00=");
+                request.Method = "GET";
+
+                // get the response from the server
+                response = (HttpWebResponse)request.GetResponse();
+
+                // read all the text from JSON response
+                using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
+                {
+                    textJSON = streamReader.ReadToEnd();
+                }
+
+                // looping through each customer's postal code to see if the cutomer exist in these IDs
+                for (int i = 0; i < number; i++)
+                {
+                    // cut the string to the cloest id 
+                    textJSON = substringMethod(textJSON, "\"contactId\":", 11);
+
+                    // get the text only for the current contact id
+                    string copy;
+                    if (textJSON.Contains("contactId"))
+                        copy = textJSON.Remove(textJSON.IndexOf("contactId"));
+                    else
+                        copy = textJSON;
+
+                    // postal code get
+                    if (copy.Contains("postalCode"))
+                    {
+                        copy = substringMethod(copy, "postalCode", 13);
+                        copy = getTarget(copy);
+                    }
+                    else
+                        copy = "";
+
+                    if (postalCode.Replace(" ", string.Empty) == copy.Replace(" ", string.Empty))
+                        return list[i];
+                }
+                #endregion
+
+                return null;
             }
 
             /* a method that return product id from given sku */
@@ -537,9 +636,12 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 return getTarget(result);  //return the order row ID
             }
 
-            /* post reservation request to API */
-            public void postReservationRequest(string orderID, string orderRowID, BPvalues value)
+            /* post reservation request to API return the message*/
+            public string postReservationRequest(string orderID, string orderRowID, BPvalues value)
             {
+                // reset boolean flag to false 
+                HasError = false;
+
                 // get product id
                 GetRequest get = new GetRequest(appRef, appToken);
                 string productId = get.getProductId(value.SKU);
@@ -559,7 +661,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 }
                 else
                 {
-                    return;
+                    return null;
                 }
 
                 // turn request string into a byte stream
@@ -576,19 +678,31 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 {
                     response = (HttpWebResponse)request.GetResponse();
                 }
-                catch
+                catch (WebException e)
                 {
                     HasError = true;
-                    return;
+                    if (e.Status == WebExceptionStatus.ProtocolError)
+                    {
+                        response = e.Response as HttpWebResponse;
+                        if ((int)response.StatusCode == 503)
+                        {
+                            return "503";    // web server 404 not found
+                        }
+                    }
                 }
 
-                // reset has error to false
+                // reset has error to false just in case
                 HasError = false;
+
+                return null;
             }
 
             /* post receipt to API */
             public void postReceipt(string orderID, string contactID, BPvalues value)
             {
+                // reset boolean flag to false 
+                HasError = false;
+
                 string uri = "https://ws-use.brightpearl.com/2.0.0/ashlintest/accounting-service/sales-receipt";
                 request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Method = "POST";
@@ -618,7 +732,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                     return;
                 }
 
-                // reset has error to false
+                // reset has error to false just in case
                 HasError = false;
             }
         }

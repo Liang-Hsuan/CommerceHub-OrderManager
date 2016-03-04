@@ -105,7 +105,9 @@
             this.weightUnitLabel = new System.Windows.Forms.Label();
             this.sizeUnitLabel = new System.Windows.Forms.Label();
             this.backgroundWorkerShip = new System.ComponentModel.BackgroundWorker();
-            this.timer = new System.Windows.Forms.Timer(this.components);
+            this.timerShip = new System.Windows.Forms.Timer(this.components);
+            this.statusLabel = new System.Windows.Forms.Label();
+            this.timerConfirm = new System.Windows.Forms.Timer(this.components);
             this.orderSummaryPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.moneyPicturebox)).BeginInit();
             this.topPanel.SuspendLayout();
@@ -1042,10 +1044,24 @@
             this.backgroundWorkerShip.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorkerShip_DoWork);
             this.backgroundWorkerShip.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorkerShip_RunWorkerCompleted);
             // 
-            // timer
+            // timerShip
             // 
-            this.timer.Interval = 600;
-            this.timer.Tick += new System.EventHandler(this.timer_Tick);
+            this.timerShip.Interval = 600;
+            this.timerShip.Tick += new System.EventHandler(this.timerShip_Tick);
+            // 
+            // statusLabel
+            // 
+            this.statusLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.statusLabel.Location = new System.Drawing.Point(984, 754);
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(440, 17);
+            this.statusLabel.TabIndex = 11;
+            this.statusLabel.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+            // 
+            // timerConfirm
+            // 
+            this.timerConfirm.Interval = 600;
+            this.timerConfirm.Tick += new System.EventHandler(this.timerConfirm_Tick);
             // 
             // DetailPage
             // 
@@ -1053,6 +1069,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(245)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(1436, 873);
+            this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.shippingPanel);
             this.Controls.Add(this.progressbar);
             this.Controls.Add(this.shipmentConfirmButton);
@@ -1167,6 +1184,8 @@
         private System.Windows.Forms.PictureBox shippingPicturebox;
         private System.Windows.Forms.TextBox trackingNumberTextbox;
         private System.ComponentModel.BackgroundWorker backgroundWorkerShip;
-        private System.Windows.Forms.Timer timer;
+        private System.Windows.Forms.Timer timerShip;
+        private System.Windows.Forms.Label statusLabel;
+        private System.Windows.Forms.Timer timerConfirm;
     }
 }
