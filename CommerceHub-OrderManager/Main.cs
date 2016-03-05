@@ -190,7 +190,7 @@ namespace CommerceHub_OrderManager
                     sears.generateXML(value, new System.Collections.Generic.Dictionary<int, string>());
 
                     // post order to brightpearl with no cancellation
-                    bp.postOrder(value, new int[0]);
+                    bp.postOrder(value, new int[0]); 
                 }
                 #endregion
             }

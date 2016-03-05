@@ -222,14 +222,14 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                         // post reservation
                         string reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
                         Status = "Posting reservation request " + i;
-                        if (reservation == "503")
+                        if (reservation == "Error")
                         {
                             Status = "Error occur during reservation post " + i;
                             do
                             {
                                 Thread.Sleep(5000);
                                 post.postReservationRequest(orderId, orderRowId, itemValue);
-                            } while (reservation == "503");
+                            } while (reservation == "Error");
                         }
                     }
                 }
@@ -542,7 +542,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 // generate JSON file for order post
                 string textJSON = "{\"orderTypeCode\":\"SO\",\"reference\":\"" + value.Reference + "\",\"placeOn\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\",\"orderStatus\":{\"orderStatusId\":2}," + 
-                                  "\"delivery\":{\"deliveryDate\":\"" + DateTime.Today.ToString("yyyy-MM-dd") + "T00:00:00+00:00\",\"shippingMethodId\":7},\"currency\":{\"orderCurrencyCode\":\"CAD\"},\"parties\":{\"customer\":{\"contactId\":" + contactID + "}},\"assignment\":{\"current\":{\"channelId\":" + value.ChannelId + "}}}";
+                                  "\"delivery\":{\"deliveryDate\":\"" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ', 'T') + "+00:00\",\"shippingMethodId\":7},\"currency\":{\"orderCurrencyCode\":\"CAD\"},\"parties\":{\"customer\":{\"contactId\":" + contactID + "}},\"assignment\":{\"current\":{\"channelId\":" + value.ChannelId + "}}}";
 
 
                 // turn request string into a byte stream
@@ -555,14 +555,14 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 }
 
                 // get the response from the server
-                try    // might have server internal error, so do it in try and catch
-                {
+               // try    // might have server internal error, so do it in try and catch
+              //  {
                     response = (HttpWebResponse)request.GetResponse();
-                }
-                catch    // HTTP response 500
-                {
-                    return "Error";    // cannot post order, return error instead
-                }
+              //  }
+               // catch    // HTTP response 500
+              //  {
+                //    return "Error";    // cannot post order, return error instead
+               // }
 
                 string result;
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
@@ -593,11 +593,11 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 string textJSON;
                 if (productId != null)
                 {
-                    textJSON = "{\"productId\":\"" + productId + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"T\",\"rowNet\":{\"value\":\"" + value.RowNet + "\"},\"rowTax\":{\"value\":\"" + value.RowTax + "\"}}}";
+                    textJSON = "{\"productId\":\"" + productId + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"T\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 2) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax) + "\"}}}";
                 }
                 else
                 {
-                    textJSON = "{\"productName\":\"" + value.ProductName + " " + value.SKU  + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"T\",\"rowNet\":{\"value\":\"" + value.RowNet + "\"},\"rowTax\":{\"value\":\"" + value.RowTax + "\"}}}";
+                    textJSON = "{\"productName\":\"" + value.ProductName + " " + value.SKU  + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"T\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 2) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax) + "\"}}}";
                 }
 
 
@@ -611,14 +611,14 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 }
 
                 // get the response from server
-                try
-                {
+            //    try
+            //    {
                     response = (HttpWebResponse)request.GetResponse();
-                }
-                catch
-                {
-                    return "Error";     // 503 Server Unabailable
-                }
+             //   }
+             //   catch
+             //   {
+              //      return "Error";     // 503 Server Unabailable
+              //  }
                 string result;
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 {
@@ -671,7 +671,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                     {
                         response = e.Response as HttpWebResponse;
                         if ((int)response.StatusCode == 503)
-                            return "503";    // web server 404 not found
+                            return "Error";    // web server 503 server unavailable
                         else
                             return null;
                     }
@@ -693,7 +693,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 request.Headers.Add("brightpearl-app-ref", appRef);
                 request.Headers.Add("brightpearl-account-token", appToken);
 
-                string textJSON = "{\"orderId\":\"" + orderID + "\",\"customerId\":\"" + contactID + "\",\"received\":{\"currency\":\"CAD\",\"value\":\"" + value.TotalPaid + "\"},\"bankAccountNominalCode\":\"1001\",\"channelId\":1,\"taxDate\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\"}";
+                string textJSON = "{\"orderId\":\"" + orderID + "\",\"customerId\":\"" + contactID + "\",\"received\":{\"currency\":\"CAD\",\"value\":\"" + Math.Round(value.TotalPaid, 2) + "\"},\"bankAccountNominalCode\":\"1001\",\"channelId\":" + value.ChannelId + ",\"taxDate\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\"}";
 
                 // turn request string into a byte stream
                 byte[] postBytes = Encoding.UTF8.GetBytes(textJSON);
@@ -705,15 +705,15 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 }
 
                 // get response from server to see if there is error or not
-                try
-                {
+            //    try
+              //  {
                     response = (HttpWebResponse)request.GetResponse();
-                }
-                catch
-                {
-                    HasError = true;
-                    return;
-                }
+             //   }
+              //  catch
+              //  {
+               //     HasError = true;
+               //     return;
+            //    }
 
                 // reset has error to false just in case
                 HasError = false;
