@@ -2,6 +2,7 @@
 using CommerceHub_OrderManager.channel.sears;
 using CommerceHub_OrderManager.supportingClasses;
 using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace CommerceHub_OrderManager
@@ -12,7 +13,7 @@ namespace CommerceHub_OrderManager
         private Sears sears = new Sears();
 
         // field for brightpearl connection
-        BPconnect bp = new BPconnect();
+        private BPconnect bp = new BPconnect();
 
         // field for storing data
         private struct Order
@@ -33,6 +34,7 @@ namespace CommerceHub_OrderManager
             refreshGraph();
         }
 
+        /* save data when form close */
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.Date = DateTime.Today;
@@ -265,9 +267,7 @@ namespace CommerceHub_OrderManager
                 item.SubItems.Add(value.CustOrderDate.ToString("yyyy-MM-dd"));
                 item.SubItems.Add(value.TrxBalanceDue.ToString());
 
-                int total = 0;
-                foreach (int qty in value.TrxQty)
-                    total += qty;
+                int total = value.TrxQty.Sum();
                 item.SubItems.Add(total.ToString());
 
                 item.SubItems.Add(value.Recipient.Name);

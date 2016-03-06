@@ -2,9 +2,11 @@
 using System;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using CommerceHub_OrderManager.supportingClasses;
 
 namespace CommerceHub_OrderManager.channel.brightpearl
 {
@@ -85,52 +87,47 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                     bool cancelled = false;
 
                     // check if the item is cancelled or not
-                    foreach (int j in cancelList)
+                    foreach (int j in cancelList.Where(j => j == i))
                     {
-                        if (j == i)
-                        {
-                            // substract the item's price
-                            total -= value.LineBalanceDue[j];
+                        // substract the item's price
+                        total -= value.LineBalanceDue[j];
 
-                            cancelled = true;
-                            break;
-                        }
+                        cancelled = true;
+                        break;
                     }
 
                     // the case if not cancel post it to brightpearl
-                    if (!cancelled)
+                    if (cancelled) continue;
+                    // GST, HST, PST
+                    double tax = value.GST_HST_Extended[i] + value.PST_Extended[i] + value.GST_HST_Total[i] + value.PST_Total[i];
+
+                    // initialize item BPvalues object
+                    BPvalues itemValue = new BPvalues(null, null, DateTime.Today, 7, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], value.UnitPrice[i], tax, value.LineBalanceDue[i]);
+
+                    // post order row
+                    string orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                    Status = "Getting order row ID";
+                    if (orderRowId == "Error")
                     {
-                        // GST, HST, PST
-                        double tax = value.GST_HST_Extended[i] + value.PST_Extended[i] + value.GST_HST_Total[i] + value.PST_Total[i];
-
-                        // initialize item BPvalues object
-                        BPvalues itemValue = new BPvalues(null, null, DateTime.Today, 7, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], value.UnitPrice[i], tax, value.LineBalanceDue[i]);
-
-                        // post order row
-                        string orderRowId = post.postOrderRowRequest(orderId, itemValue);
-                        Status = "Getting order row ID";
-                        if (orderRowId == "Error")
+                        Status = "Error occur during order row post " + i;
+                        do
                         {
-                            Status = "Error occur during order row post " + i;
-                            do
-                            {
-                                Thread.Sleep(5000);
-                                orderRowId = post.postOrderRowRequest(orderId, itemValue);
-                            } while (orderRowId == "Error");
-                        }
+                            Thread.Sleep(5000);
+                            orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                        } while (orderRowId == "Error");
+                    }
 
-                        // post reservation
-                        string reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
-                        Status = "Posting reservation request " + i;
-                        if (reservation == "503")
+                    // post reservation
+                    string reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
+                    Status = "Posting reservation request " + i;
+                    if (reservation == "503")
+                    {
+                        Status = "Error occur during reservation post " + i;
+                        do
                         {
-                            Status = "Error occur during reservation post " + i;
-                            do
-                            {
-                                Thread.Sleep(5000);
-                                post.postReservationRequest(orderId, orderRowId, itemValue);
-                            } while (reservation == "503");
-                        }
+                            Thread.Sleep(5000);
+                            reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
+                        } while (reservation == "503");
                     }
                 }
 
@@ -185,52 +182,47 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                     bool cancelled = false;
 
                     // check if the item is cancelled or not
-                    foreach (int j in cancelList)
+                    foreach (int j in cancelList.Where(j => j == i))
                     {
-                        if (j == i)
-                        {
-                            // substract the item's price
-                            total -= value.LineBalanceDue[j];
+                        // substract the item's price
+                        total -= value.LineBalanceDue[j];
 
-                            cancelled = true;
-                            break;
-                        }
+                        cancelled = true;
+                        break;
                     }
 
                     // the case if not cancel post it to brightpearl
-                    if (!cancelled)
+                    if (cancelled) continue;
+                    // GST, HST, PST
+                    double tax = value.GST_HST_Extended[i] + value.PST_Extended[i] + value.GST_HST_Total[i] + value.PST_Total[i];
+
+                    // initialize item BPvalues object
+                    BPvalues itemValue = new BPvalues(null, null, DateTime.Today, 7, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], value.UnitPrice[i], tax, value.LineBalanceDue[i]);
+
+                    // post order row
+                    string orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                    Status = "Getting order row ID";
+                    if (orderRowId == "Error")
                     {
-                        // GST, HST, PST
-                        double tax = value.GST_HST_Extended[i] + value.PST_Extended[i] + value.GST_HST_Total[i] + value.PST_Total[i];
-
-                        // initialize item BPvalues object
-                        BPvalues itemValue = new BPvalues(null, null, DateTime.Today, 7, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], value.UnitPrice[i], tax, value.LineBalanceDue[i]);
-
-                        // post order row
-                        string orderRowId = post.postOrderRowRequest(orderId, itemValue);
-                        Status = "Getting order row ID";
-                        if (orderRowId == "Error")
+                        Status = "Error occur during order row post " + i;
+                        do
                         {
-                            Status = "Error occur during order row post " + i;
-                            do
-                            {
-                                Thread.Sleep(5000);
-                                orderRowId = post.postOrderRowRequest(orderId, itemValue);
-                            } while (orderRowId == "Error");
-                        }
+                            Thread.Sleep(5000);
+                            orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                        } while (orderRowId == "Error");
+                    }
 
-                        // post reservation
-                        string reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
-                        Status = "Posting reservation request " + i;
-                        if (reservation == "Error")
+                    // post reservation
+                    string reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
+                    Status = "Posting reservation request " + i;
+                    if (reservation == "Error")
+                    {
+                        Status = "Error occur during reservation post " + i;
+                        do
                         {
-                            Status = "Error occur during reservation post " + i;
-                            do
-                            {
-                                Thread.Sleep(5000);
-                                post.postReservationRequest(orderId, orderRowId, itemValue);
-                            } while (reservation == "Error");
-                        }
+                            Thread.Sleep(5000);
+                            reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
+                        } while (reservation == "Error");
                     }
                 }
 
@@ -257,10 +249,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
         /* a method that substring the given string */
         private static string substringMethod(string original, string startingString, int additionIndex)
         {
-            string copy = original;
-            copy = original.Substring(original.IndexOf(startingString) + additionIndex);
-
-            return copy;
+            return original.Substring(original.IndexOf(startingString) + additionIndex);
         }
 
         /* a method that get the next target token */
@@ -268,9 +257,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
         {
             int i = 0;
             while (text[i] != '"' && text[i] != ',' && text[i] != '}')
-            {
                 i++;
-            }
 
             return text.Substring(0, i);
         }
@@ -488,7 +475,6 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 }
 
                 result = substringMethod(result, ":", 1);
-
                 return getTarget(result);  //return the addresss ID
             }
 
@@ -525,7 +511,6 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 }
 
                 result = substringMethod(result, ":", 1);
-
                 return getTarget(result);  //return the contact ID
             }
 
@@ -555,14 +540,14 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 }
 
                 // get the response from the server
-               // try    // might have server internal error, so do it in try and catch
-              //  {
+                try    // might have server internal error, so do it in try and catch
+                {
                     response = (HttpWebResponse)request.GetResponse();
-              //  }
-               // catch    // HTTP response 500
-              //  {
-                //    return "Error";    // cannot post order, return error instead
-               // }
+                }
+                catch    // HTTP response 500
+                {
+                    return "Error";    // cannot post order, return error instead
+                }
 
                 string result;
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
@@ -571,7 +556,6 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 }
 
                 result = substringMethod(result, ":", 1);
-
                 return getTarget(result);  //return the order ID
             }
 
@@ -611,14 +595,14 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 }
 
                 // get the response from server
-            //    try
-            //    {
+                try
+                {
                     response = (HttpWebResponse)request.GetResponse();
-             //   }
-             //   catch
-             //   {
-              //      return "Error";     // 503 Server Unabailable
-              //  }
+                }
+                catch
+                {
+                    return "Error";     // 503 Server Unabailable
+                }
                 string result;
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 {
@@ -626,7 +610,6 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 }
 
                 result = substringMethod(result, ":", 1);
-
                 return getTarget(result);  //return the order row ID
             }
 
@@ -672,8 +655,6 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                         response = e.Response as HttpWebResponse;
                         if ((int)response.StatusCode == 503)
                             return "Error";    // web server 503 server unavailable
-                        else
-                            return null;
                     }
                 }
 
@@ -705,15 +686,15 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 }
 
                 // get response from server to see if there is error or not
-            //    try
-              //  {
+                try
+                {
                     response = (HttpWebResponse)request.GetResponse();
-             //   }
-              //  catch
-              //  {
-               //     HasError = true;
-               //     return;
-            //    }
+                }
+                catch
+                {
+                    HasError = true;
+                    return;
+                }
 
                 // reset has error to false just in case
                 HasError = false;

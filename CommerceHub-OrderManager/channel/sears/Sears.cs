@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using Tamir.SharpSsh;
 
 namespace CommerceHub_OrderManager.channel.sears
@@ -19,9 +20,9 @@ namespace CommerceHub_OrderManager.channel.sears
         public const string CONFIRM_DIR = "incoming/confirms/searscanada";
 
         // field for directory on local
-        private string rootDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SearsOrders";
-        private string newOrderDir;
-        private string completeOrderDir;
+        private readonly string rootDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SearsOrders";
+        private readonly string newOrderDir;
+        private readonly string completeOrderDir;
 
         // field for sftp connection
         private Sftp sftp = new Sftp("ashlinbpg.sftp-test.commercehub.com", "ashlinbpg", "Pay4Examine9Rather$");
@@ -198,12 +199,10 @@ namespace CommerceHub_OrderManager.channel.sears
 
             foreach (string file in fileList)
             {
-                if (file != "." && file != "..")
-                {
-                    // change file to txt 
-                    string fileNameTxt = file.Replace("neworders", "txt");
-                    sftp.Get(SHIPMENT_DIR + "/" + file, filePath + "//" + fileNameTxt);
-                }
+                if (file == "." || file == "..") continue;
+                // change file to txt 
+                string fileNameTxt = file.Replace("neworders", "txt");
+                sftp.Get(SHIPMENT_DIR + "/" + file, filePath + "//" + fileNameTxt);
             }
 
             sftp.Close();
@@ -225,9 +224,7 @@ namespace CommerceHub_OrderManager.channel.sears
                 string itemName = item.ToString();
 
                 if (itemName != "." && itemName != "..")
-                {
                     bactch.Add(itemName);
-                }
             }
 
             sftp.Close();
@@ -267,29 +264,13 @@ namespace CommerceHub_OrderManager.channel.sears
             int fileCount = filesLocal.Length;
             string[] textXML = new string[fileCount];      // xml text for each file
             for (int i = 0; i < fileCount; i++)
-            {
                 textXML[i] = File.ReadAllText(newOrderDir + filesLocal[i]);
-            }
 
             return textXML;
         }
         #endregion
 
         #region Checking Order Methods
-        /* check the completed confirm on the local */
-        private string[] checkLocalConfirm()
-        {
-            // get all the confirm file on local
-            DirectoryInfo dirInfo = new DirectoryInfo(@"C:\Users\Intern1001\Desktop\F15_Intern\Orders\SearsCompleteOrders");
-            FileInfo[] filesLocal = dirInfo.GetFiles("*.xsd");       // getting all file that have been on local
-            List<string> list = new List<string>();
-
-            foreach (FileInfo file in filesLocal)
-                list.Add(file.ToString());
-
-            return list.ToArray();
-        }
-
         /* give the information about the new orders and also return all the new order files on server */
         private string[] checkOrderFile()
         {
@@ -304,25 +285,12 @@ namespace CommerceHub_OrderManager.channel.sears
             // check the number of new order on the server compare to ones on the computer
             foreach (string file1 in fileOnServer)
             {
-                // local bool flag to indicate if new order has beed found or not
-                bool found = false;
-
-                // starting checking if there is duplicate
-                foreach (FileInfo file2 in filesLocal)
-                {
-                    string file2Copy = file2.ToString();
-                    if (file1.Remove(file1.LastIndexOf('.')) == file2Copy.Remove(file2Copy.LastIndexOf('.')))
-                    {
-                        found = true;
-                        break;
-                    }
-                }
+                // checking if there is duplicate
+                bool found = filesLocal.Select(file2 => file2.ToString()).Any(file2Copy => file1.Remove(file1.LastIndexOf('.')) == file2Copy.Remove(file2Copy.LastIndexOf('.')));
 
                 // if there is no duplicate write the new file and increment the number
                 if (!found)
-                {
                     neworderList.Add(file1);
-                }
             }
 
             return neworderList.ToArray();
@@ -348,18 +316,8 @@ namespace CommerceHub_OrderManager.channel.sears
             // check the number of new order on the server compare to ones on the computer
             foreach (string transaction in allTransactionList)
             {
-                // local bool flag to indicate if new order has beed found or not
-                bool found = false;
-
-                // starting checking if there is duplicate
-                foreach (string complete in completeTransactionList)
-                {
-                    if (complete.Contains(transaction))
-                    {
-                        found = true;
-                        break;
-                    }
-                }
+                // checking if ther is duplication
+                bool found = completeTransactionList.Any(complete => complete.Contains(transaction));
 
                 // if there is no duplicate write the new file and increment the number
                 if (!found)
@@ -798,7 +756,7 @@ namespace CommerceHub_OrderManager.channel.sears
                             string attention = getTarget(copyCopy);
 
                             int index = 0;
-                            while ((Char.IsLetter(attention[index]) || Char.IsNumber(attention[index])) && attention[index] != ' ' && attention[index] != '_')
+                            while ((char.IsLetter(attention[index]) || char.IsNumber(attention[index])) && attention[index] != ' ' && attention[index] != '_')
                                 index++;
                             value.FreightLane = attention.Substring(0, index);
                             while (!Char.IsNumber(attention[index]))
@@ -926,20 +884,14 @@ namespace CommerceHub_OrderManager.channel.sears
         private static string getInvoiceNumber()
         {
             // get iterator
-            int iterator;
-            if (!Properties.Settings.Default.Date.Equals(DateTime.Today))
-                iterator = 1;
-            else
-                iterator = Properties.Settings.Default.Iterator;
+            int iterator = !Properties.Settings.Default.Date.Equals(DateTime.Today) ? 1 : Properties.Settings.Default.Iterator;
 
             // create invoice number
             string invoice = "100";
             invoice += DateTime.Today.ToString("yyyyMMdd");
 
             for (int i = 0; i < 3 - iterator.ToString().Length; i++)
-            {
                 invoice += "0";
-            }
 
             invoice += iterator.ToString();
 
@@ -954,11 +906,7 @@ namespace CommerceHub_OrderManager.channel.sears
         private static string getPackageId()
         {
             // get iterator
-            int iterator;
-            if (!Properties.Settings.Default.Date.Equals(DateTime.Today))
-                iterator = 1;
-            else
-                iterator = Properties.Settings.Default.Iterator;
+            int iterator = !Properties.Settings.Default.Date.Equals(DateTime.Today) ? 1 : Properties.Settings.Default.Iterator;
 
             iterator++;
             return "SearsPack" + DateTime.Today.ToString("ddMMyy") + iterator;
@@ -967,10 +915,7 @@ namespace CommerceHub_OrderManager.channel.sears
         /* a method that substring the given string */
         private static string substringMethod(string original, string startingString, int additionIndex)
         {
-            string copy = original;
-            copy = original.Substring(original.IndexOf(startingString) + additionIndex);
-
-            return copy;
+            return original.Substring(original.IndexOf(startingString) + additionIndex);
         }
 
         /* a method that get the next target token */
@@ -978,9 +923,7 @@ namespace CommerceHub_OrderManager.channel.sears
         {
             int i = 0;
             while (text[i] != '<' && text[i] != '>' && text[i] != '"')
-            {
                 i++;
-            }
 
             return text.Substring(0, i);
         }

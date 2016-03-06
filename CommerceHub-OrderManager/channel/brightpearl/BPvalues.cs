@@ -1,5 +1,5 @@
-﻿using CommerceHub_OrderManager.channel.sears;
-using System;
+﻿using System;
+using CommerceHub_OrderManager.supportingClasses;
 
 namespace CommerceHub_OrderManager.channel.brightpearl
 {

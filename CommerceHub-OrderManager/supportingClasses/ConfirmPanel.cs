@@ -34,11 +34,11 @@ namespace CommerceHub_OrderManager.supportingClasses
         /* yes and no button clicks event */
         private void yesButton_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.OK;
+            DialogResult = DialogResult.OK;
         }
         private void noButton_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
+            DialogResult = DialogResult.Cancel;
         }
         #endregion
     }

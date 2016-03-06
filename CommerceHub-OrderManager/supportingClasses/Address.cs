@@ -1,4 +1,4 @@
-﻿namespace CommerceHub_OrderManager.channel.sears
+﻿namespace CommerceHub_OrderManager.supportingClasses
 {
     /* 
      * A class that store address value

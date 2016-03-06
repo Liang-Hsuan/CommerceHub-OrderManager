@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CommerceHub_OrderManager.supportingClasses;
 
 namespace CommerceHub_OrderManager.channel.sears
 {

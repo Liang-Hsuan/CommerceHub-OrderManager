@@ -1,6 +1,7 @@
 ﻿using CommerceHub_OrderManager.channel.sears;
 using System;
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace CommerceHub_OrderManager.supportingClasses
 {
@@ -37,15 +38,10 @@ namespace CommerceHub_OrderManager.supportingClasses
             // generate package detail -> weight and dimensions
             decimal[] skuDetail = { 0, 0, 0, 0 };
 
-            foreach (string sku in value.TrxVendorSKU)
+            foreach (decimal[] detailList in value.TrxVendorSKU.Select(getSkuDetail).Where(detailList => !detailList.Equals(null)))
             {
-                decimal[] detailList = getSkuDetail(sku);
-
-                if (!detailList.Equals(null))
-                {
-                    for (int i = 0; i < 4; i++)
-                        skuDetail[i] += detailList[i];
-                }
+                for (int i = 0; i < 4; i++)
+                    skuDetail[i] += detailList[i];
             }
 
             // allocate data

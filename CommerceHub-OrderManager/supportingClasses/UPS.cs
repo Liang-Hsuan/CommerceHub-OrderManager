@@ -22,12 +22,6 @@ namespace CommerceHub_OrderManager.supportingClasses
         // field for save image path
         private string savePathSears = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_ShippingLabel";
 
-        /* a constructor that do nothing */
-        public UPS()
-        {
-            // just in case
-        }
-
         #region Posting Methods
         /* a method that post shipment confirm request and return shipment digest */
         public string postShipmentConfirm(SearsValues value, Package package)
@@ -318,10 +312,7 @@ namespace CommerceHub_OrderManager.supportingClasses
         /* a method that substring the given string */
         private string substringMethod(string original, string startingString, int additionIndex)
         {
-            string copy = original;
-            copy = original.Substring(original.IndexOf(startingString) + additionIndex);
-
-            return copy;
+            return original.Substring(original.IndexOf(startingString) + additionIndex);
         }
 
         /* a method that get the next target token */
@@ -329,9 +320,7 @@ namespace CommerceHub_OrderManager.supportingClasses
         {
             int i = 0;
             while (text[i] != '<' && text[i] != '>' && text[i] != '"')
-            {
                 i++;
-            }
 
             return text.Substring(0, i);
         }

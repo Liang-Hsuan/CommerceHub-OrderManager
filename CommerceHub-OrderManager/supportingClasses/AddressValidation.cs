@@ -1,6 +1,5 @@
-﻿using CommerceHub_OrderManager.channel.sears;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
+using System.Linq;
 using System.Net;
 
 namespace CommerceHub_OrderManager.supportingClasses
@@ -13,12 +12,6 @@ namespace CommerceHub_OrderManager.supportingClasses
         // local fields for web request
         private WebRequest request;
         private HttpWebResponse response;
-
-        /* a constuctor that do nothing */
-        public AddressValidation()
-        {
-            // just in case
-        }
 
         /* the main method of the object that return if the address is valid or not */
         public bool validate(Address address)
@@ -64,27 +57,14 @@ namespace CommerceHub_OrderManager.supportingClasses
         /* a method that replace space with '+' character */
         private static string replaceSpace(string original)
         {
-            List<char> list = new List<char>();
-
             // replace space with '+'
-            foreach (char ch in original)
-            {
-                if (ch == ' ')
-                    list.Add('+');
-                else
-                    list.Add(ch);
-            }
-
-            return new string(list.ToArray());
+            return new string(original.Select(ch => ch == ' ' ? '+' : ch).ToArray());
         }
 
         /* a method that substring the given string */
         private static string substringMethod(string original, string startingString, int additionIndex)
         {
-            string copy = original;
-            copy = original.Substring(original.IndexOf(startingString) + additionIndex);
-
-            return copy;
+            return  original.Substring(original.IndexOf(startingString) + additionIndex);
         }
         #endregion
     }

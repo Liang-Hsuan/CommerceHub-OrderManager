@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -16,7 +17,7 @@ namespace CommerceHub_OrderManager
         private SearsValues value;
 
         // field for brightpearl connection
-        BPconnect bp = new BPconnect();
+        private BPconnect bp = new BPconnect();
 
         // supporting field for keeping track cancelled items, package details, and time for loading prompt
         private Dictionary<int, string> cancelList;
@@ -130,15 +131,13 @@ namespace CommerceHub_OrderManager
             // change the details of package
             for (int i = 0; i < value.LineCount; i++)
             {
-                if (listview.Items[i].SubItems[5].Text == "")
-                {
-                    decimal[] detailList = getSkuDetail(value.TrxVendorSKU[i]);
+                if (listview.Items[i].SubItems[5].Text != "") continue;
+                decimal[] detailList = getSkuDetail(value.TrxVendorSKU[i]);
 
-                    if (detailList != null)
-                    {
-                        for (int j = 0; j < 4; j++)
-                            skuDetail[j] += detailList[j];
-                    }
+                if (detailList != null)
+                {
+                    for (int j = 0; j < 4; j++)
+                        skuDetail[j] += detailList[j];
                 }
             }
 
@@ -154,13 +153,9 @@ namespace CommerceHub_OrderManager
         /* when clicked set the reason of cancelling to the checked items */
         private void setReasonButton_Click(object sender, EventArgs e)
         {
-            if (reasonCombobox.SelectedIndex != 0)
-            {
-                foreach (ListViewItem item in listview.CheckedItems)
-                {
-                    item.SubItems[6].Text = reasonCombobox.SelectedItem.ToString();
-                }
-            }
+            if (reasonCombobox.SelectedIndex == 0) return;
+            foreach (ListViewItem item in listview.CheckedItems)
+                item.SubItems[6].Text = reasonCombobox.SelectedItem.ToString();
         }
 
         /* prevent user from changing header size */
@@ -209,7 +204,7 @@ namespace CommerceHub_OrderManager
                 createLabelButton.Enabled = true;
                 return;
             }
-            else if (digest.Contains("Error:"))
+            if (digest.Contains("Error:"))
             {
                 MessageBox.Show(digest, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 createLabelButton.Enabled = true;
@@ -276,19 +271,17 @@ namespace CommerceHub_OrderManager
                 cancelList = new Dictionary<int, string>();
                 for (int i = 0; i < listview.Items.Count; i++)
                 {
-                    if (listview.Items[i].SubItems[5].Text == "Cancelled")
+                    if (listview.Items[i].SubItems[5].Text != "Cancelled") continue;
+                    string reason = listview.Items[i].SubItems[6].Text;
+
+                    // the case if the user has not provide the reason for cancelling a item
+                    if (reason == "")
                     {
-                        string reason = listview.Items[i].SubItems[6].Text;
-
-                        // the case if the user has not provide the reason for cancelling a item
-                        if (reason == "")
-                        {
-                            MessageBox.Show("Please provide the reason of cancellation", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            return;
-                        }
-
-                        cancelList.Add(i, reason);
+                        MessageBox.Show("Please provide the reason of cancellation", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
                     }
+
+                    cancelList.Add(i, reason);
                 }
 
                 progressbar.Visible = true;
@@ -348,31 +341,19 @@ namespace CommerceHub_OrderManager
             shipByDateTextbox.Text = value.ExpectedShipDate[0].ToString("MM/dd/yyyy");
 
             // unit price
-            double price = 0;
-            foreach (double unitPrice in value.UnitPrice)
-                price += unitPrice;
+            double price = value.UnitPrice.Sum();
             unitPriceTotalTextbox.Text = price.ToString();
 
             // GST and HST
-            price = 0;
-            foreach (double gstHst in value.GST_HST_Extended)
-                price += gstHst;
-            foreach (double gstHst in value.GST_HST_Total)
-                price += gstHst;
+            price = value.GST_HST_Extended.Sum() + value.GST_HST_Total.Sum();
             gsthstTextbox.Text = price.ToString();
 
             // PST
-            price = 0;
-            foreach (double pst in value.PST_Extended)
-                price += pst;
-            foreach (double pst in value.PST_Total)
-                price += pst;
+            price = value.PST_Extended.Sum() + value.PST_Total.Sum();
             pstTextbox.Text = price.ToString();
 
             // other fee
-            price = 0;
-            foreach (double fee in value.LineHandling)
-                price += fee;
+            price = value.LineHandling.Sum();
             otherFeeTextbox.Text = price.ToString();
 
             // total 
@@ -480,15 +461,7 @@ namespace CommerceHub_OrderManager
         /* a method that get the current cancel items' idexes */
         private int[] getCancelIndex()
         {
-            List<int> list = new List<int>();
-
-            foreach (ListViewItem item in listview.Items)
-            {
-                if (item.SubItems[5].Text == "Cancelled")
-                    list.Add(item.Index);
-            }
-
-            return list.ToArray();
+            return (from ListViewItem item in listview.Items where item.SubItems[5].Text == "Cancelled" select item.Index).ToArray();
         }
 
         /* a method that report to progress bar value from the start to end */

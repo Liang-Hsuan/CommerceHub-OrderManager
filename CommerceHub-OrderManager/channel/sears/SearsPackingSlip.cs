@@ -2,6 +2,7 @@
 using iTextSharp.text.pdf;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace CommerceHub_OrderManager.channel.sears
 {
@@ -13,14 +14,14 @@ namespace CommerceHub_OrderManager.channel.sears
         // field for pdf generation
         private Document doc;
 
-        // field for saving the packing slips
-        private string savePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_PackingSlip";
+        /* get the save path of the sears packing slip */
+        public string SavePath { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_PackingSlip";
 
         /* constructor that create the path for saving pdf */
         public SearsPackingSlip()
         {
-            if (!Directory.Exists(savePath))
-                Directory.CreateDirectory(savePath);
+            if (!Directory.Exists(SavePath))
+                Directory.CreateDirectory(SavePath);
         }
 
         /* a method that save the packing slip pdf */
@@ -31,29 +32,21 @@ namespace CommerceHub_OrderManager.channel.sears
                 return;
 
             // first check if the save directory exist -> if not create it
-            if (!File.Exists(savePath))
-                Directory.CreateDirectory(savePath);
+            if (!File.Exists(SavePath))
+                Directory.CreateDirectory(SavePath);
 
             // print each item for packing slip
             for (int i = 0; i < value.LineCount; i++)
             {
                 // check if the item is in cancel list
-                bool cancelled = false;
-                foreach (int j in cancelIndex)
-                {
-                    if (i == j)
-                    {
-                        cancelled = true;
-                        break;
-                    }
-                }
+                bool cancelled = cancelIndex.Any(j => i == j);
 
                 // the case if the item is not cancelled -> generate and export it
                 if (!cancelled)
                 {
                     // initialize PdfWriter object
                     doc = new Document(PageSize.LETTER, 10, 10, 42, 35);
-                    string file = savePath + "\\" + value.TransactionID + "_" + (i + 1) + ".pdf";
+                    string file = SavePath + "\\" + value.TransactionID + "_" + (i + 1) + ".pdf";
                     PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(file, FileMode.Create));
 
                     // open the document 
@@ -756,15 +749,6 @@ namespace CommerceHub_OrderManager.channel.sears
 
                     doc.Close();
                 }
-            }
-        }
-
-        /* get the save path of the sears packing slip */
-        public string SavePath
-        {
-            get
-            {
-                return savePath;
             }
         }
     }
