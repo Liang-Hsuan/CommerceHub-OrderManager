@@ -157,6 +157,57 @@ namespace CommerceHub_OrderManager.channel.sears
             return list.ToArray();
         }
 
+        /* a method that return all shipped order */
+        public SearsValues[] GetAllShippedOrder()
+        {
+            // local field for storing shipment value 
+            List<SearsValues> list = new List<SearsValues>();
+
+            // grab all shipped 
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            {
+                SqlCommand command = new SqlCommand("SELECT TransactionId, TrackingNumber, ShipmentIdentificationNumber FROM Sears_Order WHERE TrackingNumber != '' AND CompleteDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\';", connection);
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                
+                while (reader.Read())
+                {
+                    SearsValues value = new SearsValues();
+                    value.TransactionID = reader.GetString(0);
+                    value.Package.TrackingNumber = reader.GetString(1);
+                    value.Package.IdentificationNumber = reader.GetString(2);
+
+                    list.Add(value);
+                }
+            }
+
+            return list.ToArray();
+        }
+
+        /* a method that mark the order as cancelled but not really posting a cancel order to sears only for local reference */
+        public void PostCancel(string[] transactionId)
+        {
+            // generate the range 
+            string candidate = "(";
+            foreach (string id in transactionId)
+                candidate += '\'' + id + "\',";
+            candidate = candidate.Remove(candidate.Length - 1) + ')';
+
+            // update to cancelled 
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            {
+                // for entire order cancellation
+                SqlCommand command = new SqlCommand("UPDATE Sears_Order SET VendorInvoiceNumber = '', PakageDetailId = '', TrackingNumber = '', ShipmentIdentificationNumber = '' "  
+                                                  + "WHERE TransactionId IN " + candidate, connection);
+                connection.Open();
+                command.ExecuteNonQuery();
+
+                // for items cancellation
+                command = new SqlCommand("UPDATE Sears_Order_Item SET Shipped = 'False', Cancelled = 'True' WHERE TransactionId in " + candidate, connection);
+                command.ExecuteNonQuery();
+            }
+        }
+
         #region Number of Orders and Shipments
         /* methods that return the number of order and shipment from the given date */
         public int GetNumberOfOrder(DateTime time)
@@ -466,7 +517,7 @@ namespace CommerceHub_OrderManager.channel.sears
                     "<packageDetail packageDetailID=\"" + value.PackageDetailID + "\">" +
                     "<shipDate>" + DateTime.Today.ToString("yyyyMMdd") /*value.ExpectedShipDate[0].ToString("yyyyMMdd")*/ + "</shipDate>" +
                     "<serviceLevel1>" + value.ServiceLevel + "</serviceLevel1>" +
-                    "<trackingNumber>" + value.TrackingNumber + "</trackingNumber>" +
+                    "<trackingNumber>" + value.Package.TrackingNumber + "</trackingNumber>" +
                     "</packageDetail>";
             }
             xml +=
@@ -482,8 +533,8 @@ namespace CommerceHub_OrderManager.channel.sears
             #endregion
 
             // master database update
-            command = new SqlCommand("UPDATE Sears_Order SET VendorInvoiceNumber = \'" + value.VendorInvoiceNumber + "\', PakageDetailId = \'" + value.PackageDetailID +
-                                     "\', TrackingNumber = \'" + value.TrackingNumber + "\', Complete = 'True' WHERE TransactionId = \'" + value.TransactionID + "\';", connection);
+            command = new SqlCommand("UPDATE Sears_Order SET VendorInvoiceNumber = \'" + value.VendorInvoiceNumber + "\', PakageDetailId = \'" + value.PackageDetailID + "\', TrackingNumber = \'" + value.Package.TrackingNumber + "\', CompleteDate = \'" +
+                                     DateTime.Today.ToString("yyyy-MM-dd HH:mm:ss") + "\', ShipmentIdentificationNumber = \'" + value.Package.IdentificationNumber + "\', Complete = 'True' WHERE TransactionId = \'" + value.TransactionID + "\';", connection);
             command.ExecuteNonQuery();
             connection.Close();
 
@@ -759,7 +810,7 @@ namespace CommerceHub_OrderManager.channel.sears
                             while ((char.IsLetter(attention[index]) || char.IsNumber(attention[index])) && attention[index] != ' ' && attention[index] != '_')
                                 index++;
                             value.FreightLane = attention.Substring(0, index);
-                            while (!Char.IsNumber(attention[index]))
+                            while (!char.IsNumber(attention[index]))
                                 index++;
                             value.Spur = attention.Substring(index);
                         }
@@ -860,8 +911,8 @@ namespace CommerceHub_OrderManager.channel.sears
             {
                 // add new transaction to order
                 SqlCommand command = new SqlCommand("INSERT INTO Sears_Order " +
-                                                    "(TransactionId, LineCount, PoNumber, TrxBalanceDue, VendorInvoiceNumber, PakageDetailId, ServiceLevel, TrackingNumber, OrderDate, PaymentMethod, CustOrderNumber, CustOrderDate, PackSlipMessage, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, RecipientName, RecipientAddress1, RecipientAddress2, RecipientCity, RecipientState, RecipientPostalCode, RecipientPhone, ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, FreightLane, Spur, Complete) Values " +
-                                                    "(\'" + value.TransactionID + "\'," + value.LineCount + ",\'" + value.PoNumber + "\'," + value.TrxBalanceDue + ",\'" + value.VendorInvoiceNumber + "\',\'" + value.PackageDetailID + "\',\'" + value.ServiceLevel + "\',\'" + value.TrackingNumber + "\',\'" + value.OrderDate.ToString("yyyy-MM-dd") + "\',\'" + value.PaymentMethod + "\',\'" + value.CustOrderNumber + "\',\'" + value.CustOrderDate.ToString("yyyy-MM-dd") + "\',\'" + value.PackSlipMessage + "\',\'" +
+                                                    "(TransactionId, LineCount, PoNumber, TrxBalanceDue, VendorInvoiceNumber, PakageDetailId, ServiceLevel, TrackingNumber, ShipmentIdentificationNumber, OrderDate, PaymentMethod, CustOrderNumber, CustOrderDate, PackSlipMessage, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, RecipientName, RecipientAddress1, RecipientAddress2, RecipientCity, RecipientState, RecipientPostalCode, RecipientPhone, ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, FreightLane, Spur, Complete) Values " +
+                                                    "(\'" + value.TransactionID + "\'," + value.LineCount + ",\'" + value.PoNumber + "\'," + value.TrxBalanceDue + ",\'" + value.VendorInvoiceNumber + "\',\'" + value.PackageDetailID + "\',\'" + value.ServiceLevel + "\',\'" + value.Package.TrackingNumber + "\',\'" + value.Package.IdentificationNumber + "\', \'" + value.OrderDate.ToString("yyyy-MM-dd") + "\',\'" + value.PaymentMethod + "\',\'" + value.CustOrderNumber + "\',\'" + value.CustOrderDate.ToString("yyyy-MM-dd") + "\',\'" + value.PackSlipMessage + "\',\'" +
                                                     value.BillTo.Name + "\',\'" + value.BillTo.Address1 + "\',\'" + value.BillTo.Address2 + "\',\'" + value.BillTo.City + "\',\'" + value.BillTo.State + "\',\'" + value.BillTo.PostalCode + "\',\'" + value.BillTo.DayPhone + "\',\'" + value.Recipient.Name + "\',\'" + value.Recipient.Address1 + "\',\'" + value.Recipient.Address2 + "\',\'" + value.Recipient.City + "\',\'" + value.Recipient.State + "\',\'" + value.Recipient.PostalCode + "\',\'" + value.Recipient.DayPhone + "\',\'" + value.ShipTo.Name + "\',\'" + value.ShipTo.Address1 + "\',\'" + value.ShipTo.Address2 + "\',\'" + value.ShipTo.City + "\',\'" + value.ShipTo.State + "\',\'" + value.ShipTo.PostalCode + "\',\'" + value.ShipTo.DayPhone +
                                                     "\',\'" + value.FreightLane + "\',\'" + value.Spur + "\',\'False\')", connection);
                 connection.Open();

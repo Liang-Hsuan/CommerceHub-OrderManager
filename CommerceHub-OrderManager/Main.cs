@@ -133,6 +133,12 @@ namespace CommerceHub_OrderManager
             refreshGraph();
         }
 
+        /* tje evemt fpr shipment button click that show the shipment page */
+        private void shipmentButton_Click(object sender, EventArgs e)
+        {
+            new ShipmentPage().ShowDialog(this);
+        }
+
         /* the event for detail button click that show the detail page for the selected item */
         private void detailButton_Click(object sender, EventArgs e)
         {
@@ -167,7 +173,7 @@ namespace CommerceHub_OrderManager
                     SearsValues value = sears.generateValue(order.transactionId);
 
                     // second ship it
-                    string digest = ups.postShipmentConfirm(value, new Package(value));
+                    string[] digest = ups.postShipmentConfirm(value, new Package(value));
                     if (digest == null)
                     {
                         MessageBox.Show("Error occur while requesting shipment, please refresh and try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -175,19 +181,20 @@ namespace CommerceHub_OrderManager
                     }
                     else if (digest.Contains("Error:"))
                     {
-                        MessageBox.Show(digest, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(digest[0], "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
 
-                    string[] result = ups.postShipmentAccept(digest);
+                    string[] result = ups.postShipmentAccept(digest[1]);
                     if (result == null)
                     {
                         MessageBox.Show("Error occur while requesting shipment, please refresh and try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
 
-                    // get tracking, label and shipment confirm with no cancellation of item
-                    value.TrackingNumber = result[0];
+                    // get identification, tracking, label and shipment confirm with no cancellation of item
+                    value.Package.IdentificationNumber = digest[0];
+                    value.Package.TrackingNumber = result[0];
                     ups.exportLabel(result[1], value.TransactionID, false);
                     sears.generateXML(value, new System.Collections.Generic.Dictionary<int, string>());
 
@@ -309,5 +316,6 @@ namespace CommerceHub_OrderManager
             chart.Series["point"].MarkerSize = 10;
         }
         #endregion
+
     }
 }

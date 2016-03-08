@@ -20,6 +20,10 @@ namespace CommerceHub_OrderManager.supportingClasses
         public string PackageType { get; set; }
         public string Service { get; set; }
 
+        // field for identification
+        public string TrackingNumber { get; set; }
+        public string IdentificationNumber { get; set; }
+
         /* first constructor that take no argument */
         public Package()
         {
@@ -30,6 +34,9 @@ namespace CommerceHub_OrderManager.supportingClasses
 
             PackageType = "Customer Supplied Package";
             Service = "UPS Express";
+
+            TrackingNumber = "";
+            IdentificationNumber = "";
         }
 
         /* second constructor that take SearsValues object as parameter */
@@ -56,7 +63,7 @@ namespace CommerceHub_OrderManager.supportingClasses
         }
 
         /* third constructor that take all parameters */
-        public Package(decimal weight, decimal length, decimal width, decimal height, string packageType, string service)
+        public Package(decimal weight, decimal length, decimal width, decimal height, string packageType, string service, string trackingNumber, string identificationNumber)
         {
             Weight = weight;
             Length = length;
@@ -65,6 +72,9 @@ namespace CommerceHub_OrderManager.supportingClasses
 
             PackageType = packageType;
             Service = service;
+
+            TrackingNumber = trackingNumber;
+            IdentificationNumber = identificationNumber;
         }
 
         /* a method that get the detail of the given sku */

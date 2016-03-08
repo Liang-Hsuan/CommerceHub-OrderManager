@@ -19,10 +19,10 @@ namespace CommerceHub_OrderManager
         // field for brightpearl connection
         private BPconnect bp = new BPconnect();
 
-        // supporting field for keeping track cancelled items, package details, and time for loading prompt
+        // supporting field for keeping track cancelled items and time for loading prompt
         private Dictionary<int, string> cancelList;
-        private Package package;
         private int timeLeft = 4;   // default set to 4
+        private bool error = false;
 
         /* constructor that initializes graphic compents and order fields */
         public DetailPage(SearsValues value)
@@ -183,7 +183,7 @@ namespace CommerceHub_OrderManager
                 timerShip.Start();
 
                 // initialize field for shipment package
-                package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString());
+                value.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null);
 
                 if (!backgroundWorkerShip.IsBusy)
                     backgroundWorkerShip.RunWorkerAsync();
@@ -195,47 +195,55 @@ namespace CommerceHub_OrderManager
             UPS ups = new UPS();
 
             // post shipment confirm and get the digest string from response
-            string digest = ups.postShipmentConfirm(value, package);
+            string[] digest = ups.postShipmentConfirm(value, value.Package);
 
             // error checking
             if (digest == null)
             {
                 MessageBox.Show("Error occur while requesting shipment, please try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                createLabelButton.Enabled = true;
+                error = true;
                 return;
             }
-            if (digest.Contains("Error:"))
+            if (digest[0].Contains("Error:"))
             {
-                MessageBox.Show(digest, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                createLabelButton.Enabled = true;
+                MessageBox.Show(digest[0], "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                error = true;
                 return;
             }
 
             // post shipment accept and get tracking number and image 
-            string[] acceptResult = ups.postShipmentAccept(digest);
+            string[] acceptResult = ups.postShipmentAccept(digest[1]);
 
             // error checking
             if (acceptResult == null)
             {
                 MessageBox.Show("Error occur while requesting shipment, please try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                createLabelButton.Enabled = true;
+                error = true;
                 return;
             }
 
-            // retrieve tracking number
-            value.TrackingNumber = acceptResult[0];
+            // retrieve identification number and tracking number
+            value.Package.IdentificationNumber = digest[0];
+            value.Package.TrackingNumber = acceptResult[0];
 
             // get the shipment label and show it
             ups.exportLabel(acceptResult[1], value.TransactionID, true);
+
+            // set bool flag to false
+            error = false;
         }
         private void backgroundWorkerShip_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             // stop the timer and show the tracking number
             timerShip.Stop();
-            trackingNumberTextbox.Text = value.TrackingNumber;
+            trackingNumberTextbox.Text = value.Package.TrackingNumber;
 
             shipmentConfirmButton.Enabled = true;
-            createLabelButton.Enabled = false;
+
+            if (error)
+                createLabelButton.Enabled = true;
+            else
+                createLabelButton.Enabled = false;
         }
 
         /* shipment loading promopt */

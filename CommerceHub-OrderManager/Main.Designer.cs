@@ -55,6 +55,7 @@
             this.statusLabel = new System.Windows.Forms.Label();
             this.timer = new System.Windows.Forms.Timer(this.components);
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.shipmentButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.chart)).BeginInit();
             this.SuspendLayout();
             // 
@@ -256,7 +257,7 @@
             this.refreshButton.FlatAppearance.BorderSize = 0;
             this.refreshButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.refreshButton.Image = ((System.Drawing.Image)(resources.GetObject("refreshButton.Image")));
-            this.refreshButton.Location = new System.Drawing.Point(1211, 340);
+            this.refreshButton.Location = new System.Drawing.Point(1159, 339);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(47, 34);
             this.refreshButton.TabIndex = 7;
@@ -280,12 +281,26 @@
             this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
             this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
             // 
+            // shipmentButton
+            // 
+            this.shipmentButton.BackColor = System.Drawing.Color.Transparent;
+            this.shipmentButton.FlatAppearance.BorderSize = 0;
+            this.shipmentButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.shipmentButton.Image = ((System.Drawing.Image)(resources.GetObject("shipmentButton.Image")));
+            this.shipmentButton.Location = new System.Drawing.Point(1207, 339);
+            this.shipmentButton.Name = "shipmentButton";
+            this.shipmentButton.Size = new System.Drawing.Size(47, 34);
+            this.shipmentButton.TabIndex = 9;
+            this.shipmentButton.UseVisualStyleBackColor = false;
+            this.shipmentButton.Click += new System.EventHandler(this.shipmentButton_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(245)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(1436, 873);
+            this.Controls.Add(this.shipmentButton);
             this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.refreshButton);
             this.Controls.Add(this.selectionAllCheckbox);
@@ -328,6 +343,7 @@
         private System.Windows.Forms.Label statusLabel;
         private System.Windows.Forms.Timer timer;
         private System.ComponentModel.BackgroundWorker backgroundWorker;
+        private System.Windows.Forms.Button shipmentButton;
     }
 }
 

@@ -25,7 +25,8 @@ namespace CommerceHub_OrderManager.channel.sears
         public List<double> TrxUnitCost { get; set; }
         public string PackageDetailID { get; set; }
         public string ServiceLevel { get; set; }
-        public string TrackingNumber { get; set; }
+        public Package Package { get; set; }
+        //public string TrackingNumber { get; set; }
 
         // other fields for packing slip
         public DateTime OrderDate { get; set; }
@@ -69,7 +70,7 @@ namespace CommerceHub_OrderManager.channel.sears
             TrxUnitCost = new List<double>();
             PackageDetailID = "";
             ServiceLevel = "";
-            TrackingNumber = "";
+            Package = new Package();
 
             OrderDate = DateTime.Now;
             PaymentMethod = "";
@@ -96,7 +97,7 @@ namespace CommerceHub_OrderManager.channel.sears
 
         /* second constructor that take all the parametoers */
         public SearsValues(string transactionId, int lineCount, string poNumber, double trxBalanceDue, List<double> lineBalanceDue, string vendorInvoiceNumber, List<int> merchantLineNumber, List<string> trxVendorSku,
-                           List<string> trxMerchantSku, List<string> upc, List<int> trxQty, List<double> trxUnitCost, string packageDetailId, string serviceLevel1, string trackingNumber, DateTime orderDate, string paymentMethod, string custOrderNumber, DateTime custOrderDate, string packslipMessage,
+                           List<string> trxMerchantSku, List<string> upc, List<int> trxQty, List<double> trxUnitCost, string packageDetailId, string serviceLevel1, Package package, DateTime orderDate, string paymentMethod, string custOrderNumber, DateTime custOrderDate, string packslipMessage,
                            List<string> description, List<string> description2, List<double> unitPrice, List<double> lineHandling, List<DateTime> expectedShipDate, List<double> gstHstExtended, List<double> pstExtended, List<double> gstHstTotal, List<double> pstTotal, List<string> encodedPrice,
                            List<string> receivingInstructions, Address billTo, Address recipient, Address shipTo, string freightLane, string spur)
         {
@@ -116,7 +117,7 @@ namespace CommerceHub_OrderManager.channel.sears
             TrxUnitCost = TrxUnitCost;
             PackageDetailID = packageDetailId;
             ServiceLevel = serviceLevel1;
-            TrackingNumber = trackingNumber;
+            Package = package;
 
             OrderDate = orderDate;
             PaymentMethod = paymentMethod;

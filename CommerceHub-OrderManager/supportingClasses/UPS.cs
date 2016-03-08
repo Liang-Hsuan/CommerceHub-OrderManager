@@ -23,8 +23,8 @@ namespace CommerceHub_OrderManager.supportingClasses
         private string savePathSears = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_ShippingLabel";
 
         #region Posting Methods
-        /* a method that post shipment confirm request and return shipment digest */
-        public string postShipmentConfirm(SearsValues value, Package package)
+        /* a method that post shipment confirm request and return shipment digest and identification number*/
+        public string[] postShipmentConfirm(SearsValues value, Package package)
         {
             string shipmentConfirmUri = "https://wwwcie.ups.com/ups.app/xml/ShipConfirm";
 
@@ -187,21 +187,24 @@ namespace CommerceHub_OrderManager.supportingClasses
             result = substringMethod(result, "ResponseStatusCode", 19);
             string responseStatus = getTarget(result);
 
-            // get shipment digest
-            string digest = "";
+            // get identification number and shipment digest
+            string[] returnString = new string[2];
             if (responseStatus == "1")
             {
+                result = substringMethod(result, "ShipmentIdentificationNumber", 29);
+                returnString[0] = getTarget(result);
+
                 result = substringMethod(result, "ShipmentDigest", 15);
-                digest = getTarget(result);
+                returnString[1] = getTarget(result);
             }
             else
             {
                 // the case if bad request
-                result = substringMethod(result, "ErrorDescription", 17);
-                return "Error: " + getTarget(result);
+                string[] error = { "Error: " + getTarget(substringMethod(result, "ErrorDescription", 17)) };
+                return error;
             }
 
-            return digest;
+            return returnString;
         }
 
         /* a method that post shipment accept request and return base64 image string and tracking number*/
@@ -267,6 +270,59 @@ namespace CommerceHub_OrderManager.supportingClasses
             }
 
             return text;
+        }
+
+        /* a method that post shipment void request and check if the void request is success */
+        public string postShipmentVoid(string identificationNumber)
+        {
+            string shipmentAcceptmUri = "https://wwwcie.ups.com/ups.app/xml/Void";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentAcceptmUri);
+            request.Method = "POST";
+            request.ContentType = "application/xml";
+
+            string textXML =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<AccessRequest xml:lang=\"en-US\">" +
+                "<AccessLicenseNumber>" + ACCESS_LISCENSE_NUMBER + "</AccessLicenseNumber>" +
+                "<UserId>" + USER_ID + "</UserId>" +
+                "<Password>" + PASSWORD + "</Password>" +
+                "</AccessRequest>" +
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<VoidShipmentRequest>" +
+                "<Request>" +
+                "<RequestAction>1</RequestAction>" +
+                "</Request>" +
+                "<ShipmentIdentificationNumber>" + "1ZISDE016691676846" + "</ShipmentIdentificationNumber>" +
+                "</VoidShipmentRequest>";
+
+            // turn request string into a byte stream
+            byte[] postBytes = Encoding.UTF8.GetBytes(textXML);
+
+            // send request
+            using (Stream requestStream = request.GetRequestStream())
+            {
+                requestStream.Write(postBytes, 0, postBytes.Length);
+            }
+
+            // get the response from the server
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            string result;
+            using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
+            {
+                result = streamReader.ReadToEnd();
+            }
+
+            // get the response stattus
+            result = substringMethod(result, "ResponseStatusCode", 19);
+            string responseStatus = getTarget(result);
+
+            // the case is bad request
+            if (responseStatus != "1")
+                return "Error: " + getTarget(substringMethod(result, "ErrorDescription", 17));
+
+            return null;
         }
         #endregion
 
