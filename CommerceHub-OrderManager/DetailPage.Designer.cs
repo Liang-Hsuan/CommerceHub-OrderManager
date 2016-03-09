@@ -108,6 +108,7 @@
             this.timerShip = new System.Windows.Forms.Timer(this.components);
             this.statusLabel = new System.Windows.Forms.Label();
             this.timerConfirm = new System.Windows.Forms.Timer(this.components);
+            this.voidShipmentButton = new System.Windows.Forms.Button();
             this.orderSummaryPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.moneyPicturebox)).BeginInit();
             this.topPanel.SuspendLayout();
@@ -364,6 +365,7 @@
             // 
             // printPackingSlipButton
             // 
+            this.printPackingSlipButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.printPackingSlipButton.BackColor = System.Drawing.Color.WhiteSmoke;
             this.printPackingSlipButton.FlatAppearance.BorderColor = System.Drawing.Color.Silver;
             this.printPackingSlipButton.FlatAppearance.BorderSize = 2;
@@ -767,9 +769,11 @@
             // 
             // shippingPanel
             // 
-            this.shippingPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.shippingPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.shippingPanel.BackColor = System.Drawing.Color.White;
             this.shippingPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.shippingPanel.Controls.Add(this.voidShipmentButton);
             this.shippingPanel.Controls.Add(this.trackingNumberTextbox);
             this.shippingPanel.Controls.Add(this.shippingPicturebox);
             this.shippingPanel.Controls.Add(this.createLabelButton);
@@ -796,7 +800,7 @@
             // 
             // trackingNumberTextbox
             // 
-            this.trackingNumberTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.trackingNumberTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.trackingNumberTextbox.BackColor = System.Drawing.Color.White;
             this.trackingNumberTextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.trackingNumberTextbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -805,13 +809,13 @@
             this.trackingNumberTextbox.Multiline = true;
             this.trackingNumberTextbox.Name = "trackingNumberTextbox";
             this.trackingNumberTextbox.ReadOnly = true;
-            this.trackingNumberTextbox.Size = new System.Drawing.Size(175, 87);
+            this.trackingNumberTextbox.Size = new System.Drawing.Size(175, 64);
             this.trackingNumberTextbox.TabIndex = 27;
             this.trackingNumberTextbox.Text = "Not shipped";
             // 
             // shippingPicturebox
             // 
-            this.shippingPicturebox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.shippingPicturebox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.shippingPicturebox.Image = ((System.Drawing.Image)(resources.GetObject("shippingPicturebox.Image")));
             this.shippingPicturebox.Location = new System.Drawing.Point(68, 411);
             this.shippingPicturebox.Name = "shippingPicturebox";
@@ -1063,6 +1067,23 @@
             this.timerConfirm.Interval = 600;
             this.timerConfirm.Tick += new System.EventHandler(this.timerConfirm_Tick);
             // 
+            // voidShipmentButton
+            // 
+            this.voidShipmentButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.voidShipmentButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(254)))), ((int)(((byte)(126)))), ((int)(((byte)(116)))));
+            this.voidShipmentButton.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.voidShipmentButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.voidShipmentButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.voidShipmentButton.ForeColor = System.Drawing.Color.White;
+            this.voidShipmentButton.Location = new System.Drawing.Point(174, 509);
+            this.voidShipmentButton.Name = "voidShipmentButton";
+            this.voidShipmentButton.Size = new System.Drawing.Size(174, 23);
+            this.voidShipmentButton.TabIndex = 28;
+            this.voidShipmentButton.Text = "Void Shipment";
+            this.voidShipmentButton.UseVisualStyleBackColor = false;
+            this.voidShipmentButton.Visible = false;
+            this.voidShipmentButton.Click += new System.EventHandler(this.voidShipmentButton_Click);
+            // 
             // DetailPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1187,5 +1208,6 @@
         private System.Windows.Forms.Timer timerShip;
         private System.Windows.Forms.Label statusLabel;
         private System.Windows.Forms.Timer timerConfirm;
+        private System.Windows.Forms.Button voidShipmentButton;
     }
 }

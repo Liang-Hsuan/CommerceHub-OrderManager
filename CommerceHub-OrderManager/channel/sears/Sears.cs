@@ -166,7 +166,8 @@ namespace CommerceHub_OrderManager.channel.sears
             // grab all shipped 
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("SELECT TransactionId, TrackingNumber, ShipmentIdentificationNumber FROM Sears_Order WHERE TrackingNumber != '' AND CompleteDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\';", connection);
+                SqlCommand command = new SqlCommand("SELECT TransactionId, TrackingNumber, ShipmentIdentificationNumber FROM Sears_Order " +
+                                                    "WHERE TrackingNumber != '' AND CompleteDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\';", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 
@@ -193,17 +194,12 @@ namespace CommerceHub_OrderManager.channel.sears
                 candidate += '\'' + id + "\',";
             candidate = candidate.Remove(candidate.Length - 1) + ')';
 
-            // update to cancelled 
+            // update to not shipped 
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 // for entire order cancellation
-                SqlCommand command = new SqlCommand("UPDATE Sears_Order SET VendorInvoiceNumber = '', PakageDetailId = '', TrackingNumber = '', ShipmentIdentificationNumber = '' "  
-                                                  + "WHERE TransactionId IN " + candidate, connection);
+                SqlCommand command = new SqlCommand("UPDATE Sears_Order SET TrackingNumber = '' WHERE TransactionId IN " + candidate, connection);
                 connection.Open();
-                command.ExecuteNonQuery();
-
-                // for items cancellation
-                command = new SqlCommand("UPDATE Sears_Order_Item SET Shipped = 'False', Cancelled = 'True' WHERE TransactionId in " + candidate, connection);
                 command.ExecuteNonQuery();
             }
         }

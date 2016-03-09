@@ -43,40 +43,30 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             Status = "";
         }
 
-        /* a method that post sears order to brightpearl */
+        /* a method that post sears order to brightpearl on sears account */
         public void postOrder(SearsValues value, int[] cancelList)
         {
             // check if the order is cancelled entirely -> if it is just return no need to post it
             if (cancelList.Length >= value.LineCount)
                 return;
 
-            // get contact id first
-            string name = value.Recipient.Name;
-            string contactId = get.getCustomerId(name.Remove(name.IndexOf(' ')), name.Substring(name.IndexOf(' ') + 1), value.Recipient.PostalCode);
-            Status = "Geting contact ID";
-
+            #region Posting Order to Sears Account on BP
             // field for receipt
             double total = value.TrxBalanceDue;
 
-            // if customer exists, add the current order under this customer
-            if (contactId != null)
-            {
-                Status = "Customer exist";
+            // initialize order BPvalues object
+            BPvalues orderValue = new BPvalues(value.Recipient, value.TransactionID, value.CustOrderDate, 7, 7, null, null, 0, 0, 0, 0);
 
-                #region Cusomter Exist Case
-                // initialize order BPvalues object
-                BPvalues orderValue = new BPvalues(null, value.TransactionID, value.CustOrderDate, 7, 7, null, null, 0, 0, 0, 0);
-
-                // post order
-                string orderId = post.postOrderRequest(contactId, orderValue);
-                Status = "Getting order ID";
+            // post order
+            string orderId = post.postOrderRequest("2854", orderValue);
+            Status = "Getting order ID";
                 if (orderId == "Error")
                 {
                     Status = "Error occur during order post";
                     do
                     {
                         Thread.Sleep(5000);
-                        orderId = post.postOrderRequest(contactId, orderValue);
+                        orderId = post.postOrderRequest("2854", orderValue);
                     } while (orderId == "Error");
                 }
 
@@ -135,7 +125,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 orderValue.TotalPaid = total;
 
                 // post receipt
-                post.postReceipt(orderId, contactId, orderValue);
+                post.postReceipt(orderId, "2854", orderValue);
                 Status = "Posting receipt";
                 if (post.HasError)
                 {
@@ -143,106 +133,10 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                     do
                     {
                         Thread.Sleep(5000);
-                        post.postReceipt(orderId, contactId, orderValue);
+                        post.postReceipt(orderId, "2854", orderValue);
                     } while (post.HasError);
                 }
-                #endregion
-            }
-            else
-            {
-                Status = "Customer does not exist";
-
-                #region Customer Not Exist Case
-                // initialize order BPvalues object
-                BPvalues orderValue = new BPvalues(value.Recipient, value.TransactionID, value.CustOrderDate, 7, 7, null, null, 0, 0, 0, 0);
-
-                // post new order with new customer
-                string addressId = post.postAddressRequest(orderValue.Address);
-                Status = "Getting address ID";
-                contactId = post.postContactRequest(addressId, orderValue);
-                Status = "Getting new contact ID";
-
-                // post order
-                string orderId = post.postOrderRequest(contactId, orderValue);
-                Status = "Getting order ID";
-                if (orderId == "Error")
-                {
-                    Status = "Error occur during order post";
-                    do
-                    {
-                        Thread.Sleep(5000);
-                        orderId = post.postOrderRequest(contactId, orderValue);
-                    } while (orderId == "Error");
-                }
-
-                // post order row and reservation
-                for (int i = 0; i < value.LineCount; i++)
-                {
-                    // boolean flag to see if the item is cancelled
-                    bool cancelled = false;
-
-                    // check if the item is cancelled or not
-                    foreach (int j in cancelList.Where(j => j == i))
-                    {
-                        // substract the item's price
-                        total -= value.LineBalanceDue[j];
-
-                        cancelled = true;
-                        break;
-                    }
-
-                    // the case if not cancel post it to brightpearl
-                    if (cancelled) continue;
-                    // GST, HST, PST
-                    double tax = value.GST_HST_Extended[i] + value.PST_Extended[i] + value.GST_HST_Total[i] + value.PST_Total[i];
-
-                    // initialize item BPvalues object
-                    BPvalues itemValue = new BPvalues(null, null, DateTime.Today, 7, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], value.UnitPrice[i], tax, value.LineBalanceDue[i]);
-
-                    // post order row
-                    string orderRowId = post.postOrderRowRequest(orderId, itemValue);
-                    Status = "Getting order row ID";
-                    if (orderRowId == "Error")
-                    {
-                        Status = "Error occur during order row post " + i;
-                        do
-                        {
-                            Thread.Sleep(5000);
-                            orderRowId = post.postOrderRowRequest(orderId, itemValue);
-                        } while (orderRowId == "Error");
-                    }
-
-                    // post reservation
-                    string reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
-                    Status = "Posting reservation request " + i;
-                    if (reservation == "Error")
-                    {
-                        Status = "Error occur during reservation post " + i;
-                        do
-                        {
-                            Thread.Sleep(5000);
-                            reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
-                        } while (reservation == "Error");
-                    }
-                }
-
-                // set total paid to bp value
-                orderValue.TotalPaid = total;
-
-                // post receipt
-                post.postReceipt(orderId, contactId, orderValue);
-                Status = "Posting Receipt";
-                if (post.HasError)
-                {
-                    Status = "Error occur during receipt post";
-                    do
-                    {
-                        Thread.Sleep(5000);
-                        post.postReceipt(orderId, contactId, orderValue);
-                    } while (post.HasError);
-                }
-                #endregion
-            }
+            #endregion
         }
 
         #region Supporting Methods
@@ -526,8 +420,8 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 request.Headers.Add("brightpearl-account-token", appToken);
 
                 // generate JSON file for order post
-                string textJSON = "{\"orderTypeCode\":\"SO\",\"reference\":\"" + value.Reference + "\",\"placeOn\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\",\"orderStatus\":{\"orderStatusId\":2}," + 
-                                  "\"delivery\":{\"deliveryDate\":\"" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ', 'T') + "+00:00\",\"shippingMethodId\":7},\"currency\":{\"orderCurrencyCode\":\"CAD\"},\"parties\":{\"customer\":{\"contactId\":" + contactID + "}},\"assignment\":{\"current\":{\"channelId\":" + value.ChannelId + "}}}";
+                string textJSON = "{\"orderTypeCode\":\"SO\",\"reference\":\"" + value.Reference + "\",\"placeOn\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\",\"orderStatus\":{\"orderStatusId\":2}," + "\"delivery\":{\"deliveryDate\":\"" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ', 'T') + "+00:00\",\"shippingMethodId\":7},\"currency\":{\"orderCurrencyCode\":\"CAD\"},\"parties\":{\"customer\":{\"contactId\":" + 
+                                  contactID + "},\"delivery\":{\"addressFullName\":\"" + value.Address.Name + "\",\"addressLine1\":\"" + value.Address.Address1 + "\",\"addressLine2\":\"" + value.Address.Address2 + "\",\"addressLine3\":\"" + value.Address.City + "\",\"addressLine4\":\"" + value.Address.State + "\",\"postalCode\":\"" + value.Address.PostalCode + "\",\"countryIsoCode\":\"CAN\",\"telephone\":\"" + value.Address.DayPhone + "\"}},\"assignment\":{\"current\":{\"channelId\":" + value.ChannelId + "}}}";
 
 
                 // turn request string into a byte stream

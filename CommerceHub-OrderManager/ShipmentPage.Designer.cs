@@ -35,7 +35,7 @@
             this.trackingNumberHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.IdentificationHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.selectAllCheckbox = new System.Windows.Forms.CheckBox();
-            this.cancelShipmentButton = new System.Windows.Forms.Button();
+            this.voidShipmentButton = new System.Windows.Forms.Button();
             this.backButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
@@ -89,21 +89,21 @@
             this.selectAllCheckbox.UseVisualStyleBackColor = true;
             this.selectAllCheckbox.CheckedChanged += new System.EventHandler(this.selectAllCheckbox_CheckedChanged);
             // 
-            // cancelShipmentButton
+            // voidShipmentButton
             // 
-            this.cancelShipmentButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cancelShipmentButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(254)))), ((int)(((byte)(126)))), ((int)(((byte)(116)))));
-            this.cancelShipmentButton.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.cancelShipmentButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cancelShipmentButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cancelShipmentButton.ForeColor = System.Drawing.Color.White;
-            this.cancelShipmentButton.Location = new System.Drawing.Point(358, 12);
-            this.cancelShipmentButton.Name = "cancelShipmentButton";
-            this.cancelShipmentButton.Size = new System.Drawing.Size(139, 34);
-            this.cancelShipmentButton.TabIndex = 2;
-            this.cancelShipmentButton.Text = "Cancel Shipment";
-            this.cancelShipmentButton.UseVisualStyleBackColor = false;
-            this.cancelShipmentButton.Click += new System.EventHandler(this.cancelShipmentButton_Click);
+            this.voidShipmentButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.voidShipmentButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(254)))), ((int)(((byte)(126)))), ((int)(((byte)(116)))));
+            this.voidShipmentButton.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.voidShipmentButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.voidShipmentButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.voidShipmentButton.ForeColor = System.Drawing.Color.White;
+            this.voidShipmentButton.Location = new System.Drawing.Point(358, 12);
+            this.voidShipmentButton.Name = "voidShipmentButton";
+            this.voidShipmentButton.Size = new System.Drawing.Size(139, 34);
+            this.voidShipmentButton.TabIndex = 2;
+            this.voidShipmentButton.Text = "Void Shipment";
+            this.voidShipmentButton.UseVisualStyleBackColor = false;
+            this.voidShipmentButton.Click += new System.EventHandler(this.cancelShipmentButton_Click);
             // 
             // backButton
             // 
@@ -125,13 +125,14 @@
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(245)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(511, 396);
             this.Controls.Add(this.backButton);
-            this.Controls.Add(this.cancelShipmentButton);
+            this.Controls.Add(this.voidShipmentButton);
             this.Controls.Add(this.selectAllCheckbox);
             this.Controls.Add(this.listview);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "ShipmentPage";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "ShipmentPage";
+            this.Text = "Daily Shipment";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -144,7 +145,7 @@
         private System.Windows.Forms.ColumnHeader transactionIdHeader;
         private System.Windows.Forms.ColumnHeader trackingNumberHeader;
         private System.Windows.Forms.CheckBox selectAllCheckbox;
-        private System.Windows.Forms.Button cancelShipmentButton;
+        private System.Windows.Forms.Button voidShipmentButton;
         private System.Windows.Forms.ColumnHeader IdentificationHeader;
         private System.Windows.Forms.Button backButton;
     }

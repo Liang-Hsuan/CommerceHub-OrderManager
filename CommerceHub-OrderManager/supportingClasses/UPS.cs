@@ -293,7 +293,7 @@ namespace CommerceHub_OrderManager.supportingClasses
                 "<Request>" +
                 "<RequestAction>1</RequestAction>" +
                 "</Request>" +
-                "<ShipmentIdentificationNumber>" + "1ZISDE016691676846" + "</ShipmentIdentificationNumber>" +
+                "<ShipmentIdentificationNumber>" + identificationNumber + "</ShipmentIdentificationNumber>" +
                 "</VoidShipmentRequest>";
 
             // turn request string into a byte stream
@@ -322,7 +322,7 @@ namespace CommerceHub_OrderManager.supportingClasses
             if (responseStatus != "1")
                 return "Error: " + getTarget(substringMethod(result, "ErrorDescription", 17));
 
-            return null;
+            return "";
         }
         #endregion
 

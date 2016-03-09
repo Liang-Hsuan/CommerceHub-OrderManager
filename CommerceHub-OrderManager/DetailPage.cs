@@ -238,12 +238,16 @@ namespace CommerceHub_OrderManager
             timerShip.Stop();
             trackingNumberTextbox.Text = value.Package.TrackingNumber;
 
-            shipmentConfirmButton.Enabled = true;
-
+            // if error occur enable button else diable it and show shipment cancel button
             if (error)
                 createLabelButton.Enabled = true;
             else
+            {
                 createLabelButton.Enabled = false;
+                voidShipmentButton.Visible = true;
+            }
+
+            shipmentConfirmButton.Enabled = true;
         }
 
         /* shipment loading promopt */
@@ -261,6 +265,32 @@ namespace CommerceHub_OrderManager
                 trackingNumberTextbox.Text += ".";
         }
         #endregion
+
+        /* void shipment button that void the current shipment for the order */
+        private void voidShipmentButton_Click(object sender, EventArgs e)
+        {
+            // post void shipment request and get the response
+            string voidResult = new UPS().postShipmentVoid(value.Package.IdentificationNumber);
+
+            // the case if is bad request
+            if (voidResult.Contains("Error:"))
+            {
+                MessageBox.Show(voidResult, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // mark transaction as not shipped
+            new Sears().PostCancel(new string[] { value.TransactionID });
+
+            // mark cancel as invisible, set tracking number text to not shipped, and enable create label button
+            voidShipmentButton.Visible = false;
+            trackingNumberTextbox.Text = "Not Shipped";
+            createLabelButton.Enabled = true;
+
+            // set tracking and identification to nothing
+            value.Package.IdentificationNumber = "";
+            value.Package.TrackingNumber = "";
+        }
 
         #region Shipment Confirm
         /* shipment confirm button clicks that send the confirm xml to sears */
