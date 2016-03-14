@@ -25,7 +25,7 @@ namespace CommerceHub_OrderManager.channel.sears
         private readonly string completeOrderDir;
 
         // field for sftp connection
-        private Sftp sftp = new Sftp("ashlinbpg.sftp-test.commercehub.com", "ashlinbpg", "Pay4Examine9Rather$");
+        private Sftp sftp;
 
         /* constructor that restore the data and initialize folders for xml feed */
         public Sears()
@@ -43,6 +43,16 @@ namespace CommerceHub_OrderManager.channel.sears
             if (!Directory.Exists(completeOrderDir))
                 Directory.CreateDirectory(completeOrderDir);
             #endregion
+
+            // get credentials for sears sftp log on and initialize the field
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.ASCMcs))
+            {
+                SqlCommand command = new SqlCommand("SELECT Field1_Value, Field2_Value, Field3_Value FROM ASCM_Credentials WHERE Source = 'CommerceHub' and Client = 'Sears';", connection);
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                reader.Read();
+                sftp = new Sftp(reader.GetString(2), reader.GetString(0), reader.GetString(1));
+            }
         }
 
         /* a method that get all new order on the server and update to the database */

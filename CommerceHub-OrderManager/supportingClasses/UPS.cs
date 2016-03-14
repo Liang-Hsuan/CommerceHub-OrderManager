@@ -17,7 +17,7 @@ namespace CommerceHub_OrderManager.supportingClasses
         private const string USER_ID = "leonmaandbee";
         private const string PASSWORD = "Whatthefuck630";
         private const string ACCOUNT_NUMBER = "15XR35";
-        private const string SEARS_ACCOUNT_NUMBER = "A9725A";
+        private readonly string SEARS_ACCOUNT_NUMBER = "A9725A";
 
         // field for save image path
         private string savePathSears = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_ShippingLabel";

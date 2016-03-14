@@ -283,6 +283,7 @@
             // 
             // shipmentButton
             // 
+            this.shipmentButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.shipmentButton.BackColor = System.Drawing.Color.Transparent;
             this.shipmentButton.FlatAppearance.BorderSize = 0;
             this.shipmentButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;

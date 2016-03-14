@@ -92,7 +92,8 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                     double tax = value.GST_HST_Extended[i] + value.PST_Extended[i] + value.GST_HST_Total[i] + value.PST_Total[i];
 
                     // initialize item BPvalues object
-                    BPvalues itemValue = new BPvalues(null, null, DateTime.Today, 7, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], value.UnitPrice[i], tax, value.LineBalanceDue[i]);
+                    double netPrice = value.UnitPrice[i] * value.TrxQty[i];
+                    BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 7, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], netPrice, tax, value.LineBalanceDue[i]);
 
                     // post order row
                     string orderRowId = post.postOrderRowRequest(orderId, itemValue);
@@ -467,16 +468,60 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 request.Headers.Add("brightpearl-app-ref", appRef);
                 request.Headers.Add("brightpearl-account-token", appToken);
 
+                // tax determination
+                string taxCode;
+                switch (value.Address.State)
+                {
+                    case "NB":
+                        taxCode = "NB";
+                        break;
+                    case "NF":
+                        taxCode = "NF";
+                        break;
+                    case "NL":
+                        taxCode = "NL";
+                        break;
+                    case "NS":
+                        taxCode = "NS";
+                        break;
+                    case "ON":
+                        taxCode = "ON";
+                        break;
+                    case "PEI":
+                        taxCode = "PEI";
+                        break;
+                    case "BC":
+                        taxCode = "BC";
+                        break;
+                    case "MAN":
+                        taxCode = "MAN";
+                        break;
+                    case "PQ":
+                        taxCode = "PQ";
+                        break;
+                    case "SK":
+                        taxCode = "SK";
+                        break;
+                    case "AB":
+                        taxCode = "AB";
+                        break;
+                    case "NV":
+                        taxCode = "NV";
+                        break;
+                    case "YK":
+                        taxCode = "YK";
+                        break;
+                    default:
+                        taxCode = "N";
+                        break;
+                }
+
                 // generate JSON file for order row post
                 string textJSON;
                 if (productId != null)
-                {
-                    textJSON = "{\"productId\":\"" + productId + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"T\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 2) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax) + "\"}}}";
-                }
+                    textJSON = "{\"productId\":\"" + productId + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"" + taxCode + "\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 4) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax, 4) + "\"}}}";
                 else
-                {
-                    textJSON = "{\"productName\":\"" + value.ProductName + " " + value.SKU  + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"T\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 2) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax) + "\"}}}";
-                }
+                    textJSON = "{\"productName\":\"" + value.ProductName + " " + value.SKU  + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"" + taxCode + "\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 4) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax, 4) + "\"}}}";
 
 
                 // turn request string into a byte stream
@@ -568,7 +613,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 request.Headers.Add("brightpearl-app-ref", appRef);
                 request.Headers.Add("brightpearl-account-token", appToken);
 
-                string textJSON = "{\"orderId\":\"" + orderID + "\",\"customerId\":\"" + contactID + "\",\"received\":{\"currency\":\"CAD\",\"value\":\"" + Math.Round(value.TotalPaid, 2) + "\"},\"bankAccountNominalCode\":\"1001\",\"channelId\":" + value.ChannelId + ",\"taxDate\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\"}";
+                string textJSON = "{\"orderId\":\"" + orderID + "\",\"customerId\":\"" + contactID + "\",\"received\":{\"currency\":\"CAD\",\"value\":\"" + Math.Round(value.TotalPaid, 4) + "\"},\"bankAccountNominalCode\":\"1001\",\"channelId\":" + value.ChannelId + ",\"taxDate\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\"}";
 
                 // turn request string into a byte stream
                 byte[] postBytes = Encoding.UTF8.GetBytes(textJSON);
