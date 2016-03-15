@@ -236,7 +236,7 @@
             this.detailButton.Name = "detailButton";
             this.detailButton.Size = new System.Drawing.Size(160, 34);
             this.detailButton.TabIndex = 5;
-            this.detailButton.Text = "More Detailes";
+            this.detailButton.Text = "More Details";
             this.detailButton.UseVisualStyleBackColor = false;
             this.detailButton.Click += new System.EventHandler(this.detailButton_Click);
             // 

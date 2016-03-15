@@ -1,5 +1,6 @@
 ﻿using CommerceHub_OrderManager.channel.sears;
 using System;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Net;
@@ -13,14 +14,34 @@ namespace CommerceHub_OrderManager.supportingClasses
     public class UPS
     {
         // field for credentials
-        private const string ACCESS_LISCENSE_NUMBER = "6D0586DC089C2606";
-        private const string USER_ID = "ASHLINBPG@123";
-        private const string PASSWORD = "Bunny123456";
-        private const string ACCOUNT_NUMBER = "A91A78";
-        private readonly string SEARS_ACCOUNT_NUMBER = "A9725A";
+        private readonly string ACCESS_LISCENSE_NUMBER;
+        private readonly string USER_ID;
+        private readonly string PASSWORD;
+        private readonly string ACCOUNT_NUMBER;
+        private readonly string SEARS_ACCOUNT_NUMBER;
 
         // field for save image path
         private string savePathSears = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_ShippingLabel";
+
+        /* constructor that initialize UPS credentials */
+        public UPS()
+        {
+            // get credentials from database
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.ASCMcs))
+            {
+                SqlCommand command = new SqlCommand("SELECT Username, [Password], Field1_Value, Field2_Value, Field3_Value FROM ASCM_Credentials WHERE Source = 'UPS'", connection);
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                reader.Read();
+
+                // allocate data
+                USER_ID = reader.GetString(0);
+                PASSWORD = reader.GetString(1);
+                ACCOUNT_NUMBER = reader.GetString(2);
+                SEARS_ACCOUNT_NUMBER = reader.GetString(3);
+                ACCESS_LISCENSE_NUMBER = reader.GetString(4);
+            }
+        }
 
         #region Posting Methods
         /* a method that post shipment confirm request and return shipment digest and identification number*/
@@ -60,7 +81,7 @@ namespace CommerceHub_OrderManager.supportingClasses
                 "</Address>" +
                 "</Shipper>" +
                 "<ShipTo>" +
-                "<CompanyName>" + value.ShipTo.Name + "</CompanyName>" +
+                "<CompanyName>" + value.Recipient.Name + "</CompanyName>" +
                 "<PhoneNumber>" + value.ShipTo.DayPhone + "</PhoneNumber>" +
                 "<Address>" +
                 "<AddressLine1>" + value.ShipTo.Address1 + "</AddressLine1>";
@@ -331,12 +352,7 @@ namespace CommerceHub_OrderManager.supportingClasses
 
         /* a method that turn base64 string into GIF format image */
         public void exportLabel(string base64String, string transactionId, bool preview)
-        {
-            // first, get the pixels for the image
-            Graphics g = Graphics.FromHwnd(IntPtr.Zero);
-            float dpiX = g.DpiX;
-            int pixelX = (int) (3.8f * dpiX);
-
+        { 
             // Convert Base64 String to byte[]
             byte[] imageBytes = Convert.FromBase64String(base64String);
             MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length);
@@ -346,9 +362,13 @@ namespace CommerceHub_OrderManager.supportingClasses
             Image image = Image.FromStream(ms, true);
             image.RotateFlip(RotateFlipType.Rotate90FlipNone);
 
-            // set image size
+            /*// set image size
+            Graphics g = Graphics.FromHwnd(IntPtr.Zero);
+            float dpiX = g.DpiX;
+            int pixelX = (int)(3.8f * dpiX);
+
             float ratio = (float)image.Width / image.Height;
-            image = new Bitmap(image, pixelX, (int)(pixelX/ratio));
+            image = new Bitmap(image, pixelX, (int)(pixelX/ratio)); */
 
             // save image
             // check if the save directory exist -> if not create it

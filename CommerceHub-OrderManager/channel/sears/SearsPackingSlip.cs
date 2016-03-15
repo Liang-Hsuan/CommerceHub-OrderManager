@@ -699,7 +699,7 @@ namespace CommerceHub_OrderManager.channel.sears
                     ct.Go();
 
                     // address
-                    text = new Phrase(value.ShipTo.Name + "\n" + value.ShipTo.Address1 + "\n" + value.ShipTo.Address2 + "\n" + value.ShipTo.City, new Font(baseFont, 9));
+                    text = new Phrase(value.Recipient.Name + "\n" + value.ShipTo.Address1 + "\n" + value.ShipTo.Address2 + "\n" + value.ShipTo.City, new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 318f, 375f, 468f, 420f, 9f, Element.ALIGN_LEFT);
                     ct.Go();
                     text = new Phrase(value.ShipTo.State + "\n" + value.ShipTo.PostalCode, new Font(baseFont, 9));
