@@ -656,8 +656,13 @@ namespace CommerceHub_OrderManager.channel.sears
                     ct.Go();
 
                     #region Right Unknown Region
-                    // strange thing
-                    string take = "DIRECT";
+                    // determine if the order is direct shipment
+                    string take;
+                    if (value.PartnerPersonPlaceId == "")
+                        take = "DIRECT";
+                    else
+                        take = value.PartnerPersonPlaceId;
+
                     text = new Phrase(take, new Font(boldFont, 16));
                     ct.SetSimpleColumn(text, 318f, 519f, 418f, 539f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
@@ -668,11 +673,11 @@ namespace CommerceHub_OrderManager.channel.sears
                     if (take != "DIRECT")
                     {
                         // strange address
-                        text = new Phrase("Jiji\nAshlin BPG Marketing INC\n2351 Royal Windsor Dr\nMississauga", new Font(baseFont, 9));
-                        ct.SetSimpleColumn(text, 318f, 481f, 458f, 526f, 9f, Element.ALIGN_LEFT);
+                        text = new Phrase(value.ShipTo.Name + "\n" + value.ShipTo.Address1 + "\n" + value.ShipTo.Address2 + "\n" + value.ShipTo.City, new Font(baseFont, 9));
+                        ct.SetSimpleColumn(text, 318f, 481f, 468f, 526f, 9f, Element.ALIGN_LEFT);
                         ct.Go();
-                        text = new Phrase("ON\nL5J 4S7", new Font(baseFont, 9));
-                        ct.SetSimpleColumn(text, 428f, 460f, 488f, 500f, 9f, Element.ALIGN_LEFT);
+                        text = new Phrase(value.ShipTo.State + "\n" + value.ShipTo.PostalCode, new Font(baseFont, 9));
+                        ct.SetSimpleColumn(text, 428f, 459f, 488f, 499f, 9f, Element.ALIGN_LEFT);
                         ct.Go();
 
                         // strange message
@@ -680,6 +685,7 @@ namespace CommerceHub_OrderManager.channel.sears
                         ct.SetSimpleColumn(text, 318f, 452f, 618f, 472f, 9f, Element.ALIGN_LEFT);
                         ct.Go();
                     }
+
                     // strange message continue
                     text = new Phrase(value.PackSlipMessage, new Font(baseFont, 7));
                     ct.SetSimpleColumn(text, 318f, 441f, 418f, 451f, 0f, Element.ALIGN_LEFT);

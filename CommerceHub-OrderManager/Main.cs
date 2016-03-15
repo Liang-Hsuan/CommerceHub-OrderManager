@@ -112,7 +112,7 @@ namespace CommerceHub_OrderManager
                 if (item.SubItems[0].Text == "Sears")
                 {
                     string transaction = item.SubItems[4].Text;
-                    SearsValues value = sears.generateValue(transaction);
+                    SearsValues value = sears.GenerateValue(transaction);
                     searsPS.createPackingSlip(value, new int[0], false);
 
                     channel = true;
@@ -149,7 +149,7 @@ namespace CommerceHub_OrderManager
                 return;
             }
 
-            SearsValues value = sears.generateValue(listview.CheckedItems[0].SubItems[4].Text);
+            SearsValues value = sears.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
 
             new DetailPage(value).ShowDialog(this);
         }
@@ -170,7 +170,7 @@ namespace CommerceHub_OrderManager
                 if (order.source == "Sears")
                 {
                     // first get the detail for the order
-                    SearsValues value = sears.generateValue(order.transactionId);
+                    SearsValues value = sears.GenerateValue(order.transactionId);
 
                     // second ship it
                     string[] digest = ups.postShipmentConfirm(value, new Package(value));
@@ -196,7 +196,7 @@ namespace CommerceHub_OrderManager
                     value.Package.IdentificationNumber = digest[0];
                     value.Package.TrackingNumber = result[0];
                     ups.exportLabel(result[1], value.TransactionID, false);
-                    sears.generateXML(value, new System.Collections.Generic.Dictionary<int, string>());
+                    sears.GenerateXML(value, new System.Collections.Generic.Dictionary<int, string>());
 
                     // post order to brightpearl with no cancellation
                     bp.postOrder(value, new int[0]); 

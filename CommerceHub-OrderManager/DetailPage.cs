@@ -22,7 +22,6 @@ namespace CommerceHub_OrderManager
         // supporting field for keeping track cancelled items and time for loading prompt
         private Dictionary<int, string> cancelList;
         private int timeLeft = 4;   // default set to 4
-        private bool error = false;
 
         /* constructor that initializes graphic compents and order fields */
         public DetailPage(SearsValues value)
@@ -201,13 +200,13 @@ namespace CommerceHub_OrderManager
             if (digest == null)
             {
                 MessageBox.Show("Error occur while requesting shipment, please try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                error = true;
+                e.Result = true;
                 return;
             }
             if (digest[0].Contains("Error:"))
             {
                 MessageBox.Show(digest[0], "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                error = true;
+                e.Result = true;
                 return;
             }
 
@@ -218,7 +217,7 @@ namespace CommerceHub_OrderManager
             if (acceptResult == null)
             {
                 MessageBox.Show("Error occur while requesting shipment, please try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                error = true;
+                e.Result = true;
                 return;
             }
 
@@ -226,11 +225,14 @@ namespace CommerceHub_OrderManager
             value.Package.IdentificationNumber = digest[0];
             value.Package.TrackingNumber = acceptResult[0];
 
+            // update database set the order's tracking number and identification number
+            new Sears().PostShip(value.Package.TrackingNumber, value.Package.IdentificationNumber, value.TransactionID);
+
             // get the shipment label and show it
             ups.exportLabel(acceptResult[1], value.TransactionID, true);
 
             // set bool flag to false
-            error = false;
+            e.Result = false;
         }
         private void backgroundWorkerShip_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
@@ -239,7 +241,7 @@ namespace CommerceHub_OrderManager
             trackingNumberTextbox.Text = value.Package.TrackingNumber;
 
             // if error occur enable button else diable it and show shipment cancel button
-            if (error)
+            if ((bool) e.Result)
                 createLabelButton.Enabled = true;
             else
             {
@@ -280,7 +282,7 @@ namespace CommerceHub_OrderManager
             }
 
             // mark transaction as not shipped
-            new Sears().PostCancel(new string[] { value.TransactionID });
+            new Sears().PostVoid(new string[] { value.TransactionID });
 
             // mark cancel as invisible, set tracking number text to not shipped, and enable create label button
             voidShipmentButton.Visible = false;
@@ -336,7 +338,7 @@ namespace CommerceHub_OrderManager
             simulate(1, 40);
 
             // export xml file
-            new Sears().generateXML(value, cancelList);
+            new Sears().GenerateXML(value, cancelList);
 
             simulate(40, 70);
 

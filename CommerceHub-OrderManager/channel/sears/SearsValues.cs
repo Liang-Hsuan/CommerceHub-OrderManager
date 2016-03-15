@@ -26,7 +26,6 @@ namespace CommerceHub_OrderManager.channel.sears
         public string PackageDetailID { get; set; }
         public string ServiceLevel { get; set; }
         public Package Package { get; set; }
-        //public string TrackingNumber { get; set; }
 
         // other fields for packing slip
         public DateTime OrderDate { get; set; }
@@ -48,6 +47,7 @@ namespace CommerceHub_OrderManager.channel.sears
         public Address BillTo { get; set; }
         public Address Recipient { get; set; }
         public Address ShipTo { get; set; }
+        public string PartnerPersonPlaceId { get; set; }
         public string FreightLane { get; set; }
         public string Spur { get; set; }
 
@@ -91,6 +91,7 @@ namespace CommerceHub_OrderManager.channel.sears
             BillTo = new Address();
             Recipient = new Address();
             ShipTo = new Address();
+            PartnerPersonPlaceId = "";
             FreightLane = "";
             Spur = "";
         }
@@ -99,7 +100,7 @@ namespace CommerceHub_OrderManager.channel.sears
         public SearsValues(string transactionId, int lineCount, string poNumber, double trxBalanceDue, List<double> lineBalanceDue, string vendorInvoiceNumber, List<int> merchantLineNumber, List<string> trxVendorSku,
                            List<string> trxMerchantSku, List<string> upc, List<int> trxQty, List<double> trxUnitCost, string packageDetailId, string serviceLevel1, Package package, DateTime orderDate, string paymentMethod, string custOrderNumber, DateTime custOrderDate, string packslipMessage,
                            List<string> description, List<string> description2, List<double> unitPrice, List<double> lineHandling, List<DateTime> expectedShipDate, List<double> gstHstExtended, List<double> pstExtended, List<double> gstHstTotal, List<double> pstTotal, List<string> encodedPrice,
-                           List<string> receivingInstructions, Address billTo, Address recipient, Address shipTo, string freightLane, string spur)
+                           List<string> receivingInstructions, Address billTo, Address recipient, Address shipTo, string partnerPersonPlaceId, string freightLane, string spur)
         {
             PartnerTrxID = "ashlinbpg";
 
@@ -138,6 +139,7 @@ namespace CommerceHub_OrderManager.channel.sears
             BillTo = billTo;
             Recipient = recipient;
             ShipTo = shipTo;
+            PartnerPersonPlaceId = partnerPersonPlaceId;
             FreightLane = freightLane;
             Spur = spur;
         }

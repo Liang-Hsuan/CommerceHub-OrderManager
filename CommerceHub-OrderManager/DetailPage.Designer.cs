@@ -85,6 +85,7 @@
             this.backgroundWorkerConfirm = new System.ComponentModel.BackgroundWorker();
             this.progressbar = new System.Windows.Forms.ProgressBar();
             this.shippingPanel = new System.Windows.Forms.Panel();
+            this.voidShipmentButton = new System.Windows.Forms.Button();
             this.trackingNumberTextbox = new System.Windows.Forms.TextBox();
             this.shippingPicturebox = new System.Windows.Forms.PictureBox();
             this.createLabelButton = new System.Windows.Forms.Button();
@@ -108,7 +109,6 @@
             this.timerShip = new System.Windows.Forms.Timer(this.components);
             this.statusLabel = new System.Windows.Forms.Label();
             this.timerConfirm = new System.Windows.Forms.Timer(this.components);
-            this.voidShipmentButton = new System.Windows.Forms.Button();
             this.orderSummaryPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.moneyPicturebox)).BeginInit();
             this.topPanel.SuspendLayout();
@@ -798,6 +798,23 @@
             this.shippingPanel.Size = new System.Drawing.Size(440, 648);
             this.shippingPanel.TabIndex = 10;
             // 
+            // voidShipmentButton
+            // 
+            this.voidShipmentButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.voidShipmentButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(254)))), ((int)(((byte)(126)))), ((int)(((byte)(116)))));
+            this.voidShipmentButton.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.voidShipmentButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.voidShipmentButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.voidShipmentButton.ForeColor = System.Drawing.Color.White;
+            this.voidShipmentButton.Location = new System.Drawing.Point(174, 509);
+            this.voidShipmentButton.Name = "voidShipmentButton";
+            this.voidShipmentButton.Size = new System.Drawing.Size(174, 23);
+            this.voidShipmentButton.TabIndex = 28;
+            this.voidShipmentButton.Text = "Void Shipment";
+            this.voidShipmentButton.UseVisualStyleBackColor = false;
+            this.voidShipmentButton.Visible = false;
+            this.voidShipmentButton.Click += new System.EventHandler(this.voidShipmentButton_Click);
+            // 
             // trackingNumberTextbox
             // 
             this.trackingNumberTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -927,15 +944,15 @@
             this.serviceCombobox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.serviceCombobox.FormattingEnabled = true;
             this.serviceCombobox.Items.AddRange(new object[] {
-            "UPS Express",
             "UPS Standard",
+            "UPS Express",
             "UPS 3 Day Select",
             "UPS Worldwide Express"});
             this.serviceCombobox.Location = new System.Drawing.Point(131, 169);
             this.serviceCombobox.Name = "serviceCombobox";
             this.serviceCombobox.Size = new System.Drawing.Size(239, 21);
             this.serviceCombobox.TabIndex = 16;
-            this.serviceCombobox.Text = "UPS Ground";
+            this.serviceCombobox.Text = "UPS Standard";
             // 
             // serviceLabel
             // 
@@ -1066,23 +1083,6 @@
             // 
             this.timerConfirm.Interval = 600;
             this.timerConfirm.Tick += new System.EventHandler(this.timerConfirm_Tick);
-            // 
-            // voidShipmentButton
-            // 
-            this.voidShipmentButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.voidShipmentButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(254)))), ((int)(((byte)(126)))), ((int)(((byte)(116)))));
-            this.voidShipmentButton.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.voidShipmentButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.voidShipmentButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.voidShipmentButton.ForeColor = System.Drawing.Color.White;
-            this.voidShipmentButton.Location = new System.Drawing.Point(174, 509);
-            this.voidShipmentButton.Name = "voidShipmentButton";
-            this.voidShipmentButton.Size = new System.Drawing.Size(174, 23);
-            this.voidShipmentButton.TabIndex = 28;
-            this.voidShipmentButton.Text = "Void Shipment";
-            this.voidShipmentButton.UseVisualStyleBackColor = false;
-            this.voidShipmentButton.Visible = false;
-            this.voidShipmentButton.Click += new System.EventHandler(this.voidShipmentButton_Click);
             // 
             // DetailPage
             // 

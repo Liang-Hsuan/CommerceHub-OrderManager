@@ -22,6 +22,7 @@ namespace CommerceHub_OrderManager
         {
             public string source;
             public string transactionId;
+            public string shipmentIdentificationNumber;
         }
 
         /* constructor that initialize graphic components and data in listview */
@@ -76,7 +77,7 @@ namespace CommerceHub_OrderManager
 
                 order.source = item.SubItems[0].Text;
                 order.transactionId = item.SubItems[1].Text;
-                ups.postShipmentVoid(item.SubItems[2].Text);
+                order.shipmentIdentificationNumber = ups.postShipmentVoid(item.SubItems[2].Text);
 
                 cancelList.Add(order);
             }
@@ -85,9 +86,17 @@ namespace CommerceHub_OrderManager
             foreach (Order cancelledOrder in cancelList)
             {
                 if (cancelledOrder.source == "Sears")
+                {
                     list.Add(cancelledOrder.transactionId);
+                    string voidResult = ups.postShipmentVoid(cancelledOrder.shipmentIdentificationNumber);
+                    if (voidResult.Contains("Error:"))
+                    {
+                        MessageBox.Show(voidResult, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }
             }
-            sears.PostCancel(list.ToArray());
+            sears.PostVoid(list.ToArray());
 
             // show new result
             showResult();

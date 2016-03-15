@@ -13,10 +13,10 @@ namespace CommerceHub_OrderManager.supportingClasses
     public class UPS
     {
         // field for credentials
-        private const string ACCESS_LISCENSE_NUMBER = "0D03B5751F524086";
-        private const string USER_ID = "leonmaandbee";
-        private const string PASSWORD = "Whatthefuck630";
-        private const string ACCOUNT_NUMBER = "15XR35";
+        private const string ACCESS_LISCENSE_NUMBER = "6D0586DC089C2606";
+        private const string USER_ID = "ASHLINBPG@123";
+        private const string PASSWORD = "Bunny123456";
+        private const string ACCOUNT_NUMBER = "A91A78";
         private readonly string SEARS_ACCOUNT_NUMBER = "A9725A";
 
         // field for save image path
@@ -27,6 +27,7 @@ namespace CommerceHub_OrderManager.supportingClasses
         public string[] postShipmentConfirm(SearsValues value, Package package)
         {
             string shipmentConfirmUri = "https://wwwcie.ups.com/ups.app/xml/ShipConfirm";
+            // string shipmentConfirmUri = "https://onlinetools.ups.com/ups.app/xml/ShipConfirm";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentConfirmUri);
             request.Method = "POST";
@@ -59,8 +60,8 @@ namespace CommerceHub_OrderManager.supportingClasses
                 "</Address>" +
                 "</Shipper>" +
                 "<ShipTo>" +
-                "<CompanyName>Sears</CompanyName>" +
-                "<PhoneNumber>" + value.Recipient.DayPhone + "</PhoneNumber>" +
+                "<CompanyName>" + value.ShipTo.Name + "</CompanyName>" +
+                "<PhoneNumber>" + value.ShipTo.DayPhone + "</PhoneNumber>" +
                 "<Address>" +
                 "<AddressLine1>" + value.ShipTo.Address1 + "</AddressLine1>";
             if (value.ShipTo.Address2 != "")
@@ -211,6 +212,7 @@ namespace CommerceHub_OrderManager.supportingClasses
         public string[] postShipmentAccept(string shipmentDigest)
         {
             string shipmentAcceptmUri = "https://wwwcie.ups.com/ups.app/xml/ShipAccept";
+            // string shipmentAcceptmUri = "https://onlinetools.ups.com/ups.app/xml/ShipAccept";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentAcceptmUri);
             request.Method = "POST";
@@ -275,9 +277,10 @@ namespace CommerceHub_OrderManager.supportingClasses
         /* a method that post shipment void request and check if the void request is success */
         public string postShipmentVoid(string identificationNumber)
         {
-            string shipmentAcceptmUri = "https://wwwcie.ups.com/ups.app/xml/Void";
+            string shipmentVoidUri = "https://wwwcie.ups.com/ups.app/xml/Void";
+            // string shipmentVoidUri = "https://onlinetools.ups.com/ups.app/xml/Void";
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentAcceptmUri);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentVoidUri);
             request.Method = "POST";
             request.ContentType = "application/xml";
 
@@ -329,6 +332,11 @@ namespace CommerceHub_OrderManager.supportingClasses
         /* a method that turn base64 string into GIF format image */
         public void exportLabel(string base64String, string transactionId, bool preview)
         {
+            // first, get the pixels for the image
+            Graphics g = Graphics.FromHwnd(IntPtr.Zero);
+            float dpiX = g.DpiX;
+            int pixelX = (int) (3.8f * dpiX);
+
             // Convert Base64 String to byte[]
             byte[] imageBytes = Convert.FromBase64String(base64String);
             MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length);
@@ -337,6 +345,10 @@ namespace CommerceHub_OrderManager.supportingClasses
             ms.Write(imageBytes, 0, imageBytes.Length);
             Image image = Image.FromStream(ms, true);
             image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+
+            // set image size
+            float ratio = (float)image.Width / image.Height;
+            image = new Bitmap(image, pixelX, (int)(pixelX/ratio));
 
             // save image
             // check if the save directory exist -> if not create it
@@ -355,7 +367,7 @@ namespace CommerceHub_OrderManager.supportingClasses
             }
         }
 
-        /*  a Get for savepath for shipment label */
+        /* a Get for savepath for shipment label */
         public string SavePathSears
         {
             get

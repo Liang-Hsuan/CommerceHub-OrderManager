@@ -55,6 +55,7 @@ namespace CommerceHub_OrderManager.channel.sears
             }
         }
 
+        #region Public Get
         /* a method that get all new order on the server and update to the database */
         public void GetOrder()
         {
@@ -72,7 +73,7 @@ namespace CommerceHub_OrderManager.channel.sears
             // get information for each unprocessed transaction and update the them to the database
             foreach (string transaction in orderCheck)
             {
-                SearsValues value = generateValue(transaction, textXML);
+                SearsValues value = GenerateValue(transaction, textXML);
                 addNewOrder(value);
             }
         }
@@ -177,7 +178,7 @@ namespace CommerceHub_OrderManager.channel.sears
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 SqlCommand command = new SqlCommand("SELECT TransactionId, TrackingNumber, ShipmentIdentificationNumber FROM Sears_Order " +
-                                                    "WHERE TrackingNumber != '' AND CompleteDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\';", connection);
+                                                    "WHERE TrackingNumber != '' AND CustOrderDate > \'" + DateTime.Today.AddDays(-6).ToString("yyyy-MM-dd") + "\';", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 
@@ -194,9 +195,23 @@ namespace CommerceHub_OrderManager.channel.sears
 
             return list.ToArray();
         }
+        #endregion
+
+        #region Ship and Void 
+        /* a method that mark the order as shipped but not readlly posting a confirm order to sears only for local reference */
+        public void PostShip(string trackingNumber, string shipmentIdentificationNumber, string transactionId)
+        {
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            {
+                SqlCommand command = new SqlCommand("UPDATE Sears_Order SET TrackingNumber = \'" + trackingNumber + "\', ShipmentIdentificationNumber = \'" + shipmentIdentificationNumber + "\' " 
+                                                  + "WHERE TransactionId = \'" + transactionId + "\';", connection);
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
 
         /* a method that mark the order as cancelled but not really posting a cancel order to sears only for local reference */
-        public void PostCancel(string[] transactionId)
+        public void PostVoid(string[] transactionId)
         {
             // generate the range 
             string candidate = "(";
@@ -208,11 +223,12 @@ namespace CommerceHub_OrderManager.channel.sears
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 // for entire order cancellation
-                SqlCommand command = new SqlCommand("UPDATE Sears_Order SET TrackingNumber = '' WHERE TransactionId IN " + candidate, connection);
+                SqlCommand command = new SqlCommand("UPDATE Sears_Order SET TrackingNumber = '', ShipmentIdentificationNumber = '' WHERE TransactionId IN " + candidate, connection);
                 connection.Open();
                 command.ExecuteNonQuery();
             }
         }
+        #endregion
 
         #region Number of Orders and Shipments
         /* methods that return the number of order and shipment from the given date */
@@ -321,7 +337,7 @@ namespace CommerceHub_OrderManager.channel.sears
             int fileCount = filesLocal.Length;
             string[] textXML = new string[fileCount];      // xml text for each file
             for (int i = 0; i < fileCount; i++)
-                textXML[i] = File.ReadAllText(newOrderDir + filesLocal[i]);
+                textXML[i] = File.ReadAllText(newOrderDir + "\\" + filesLocal[i]);
 
             return textXML;
         }
@@ -387,7 +403,7 @@ namespace CommerceHub_OrderManager.channel.sears
 
         #region XML Generation
         /* a method that generate xml order and upload to the sftp server and update database */
-        public void generateXML(SearsValues value, Dictionary<int, string> cancelList)
+        public void GenerateXML(SearsValues value, Dictionary<int, string> cancelList)
         {
             // get other necessary values
             value.VendorInvoiceNumber = getInvoiceNumber();
@@ -546,12 +562,12 @@ namespace CommerceHub_OrderManager.channel.sears
 
             // upload file to sftp server
             // sftp.Connect();
-            // sftp.Put(@"C:\Users\Intern1001\Desktop\F15_Intern\Orders\SearsCompleteOrders\" + value.TransactionID + ".xsd", confirmDir);
+            // sftp.Put(completeOrderDir + "\\" + value.TransactionID + ".xsd", CONFIRM_DIR);
             // sftp.Close();
         }
 
         /* a method that generate SearsValues object for the given transaction number (first version -> take from local) */
-        public SearsValues generateValue(string targetTransaction, string[] textXml)
+        public SearsValues GenerateValue(string targetTransaction, string[] textXml)
         {
             // local field for storing values
             SearsValues value = new SearsValues();
@@ -565,7 +581,7 @@ namespace CommerceHub_OrderManager.channel.sears
 
                     // transaction id
                     copy = substringMethod(copy, targetTransaction, 0);
-                    copy = copy.Remove(copy.IndexOf("/hubOrder"));
+                    copy = copy.Remove(copy.IndexOf("/hubOrder>"));
                     value.TransactionID = getTarget(copy);
 
                     // line count
@@ -593,7 +609,7 @@ namespace CommerceHub_OrderManager.channel.sears
                     string billToId = getTarget(copy);
 
                     // customer person place id 
-                    copy = substringMethod(copy, "customer personPlaceID", 26);
+                    copy = substringMethod(copy, "customer personPlaceID", 24);
                     string customerPlaceId = getTarget(copy);
 
                     // cust order number
@@ -620,16 +636,26 @@ namespace CommerceHub_OrderManager.channel.sears
                         value.TrxQty.Add(Convert.ToInt32(getTarget(copy)));
 
                         // upc
-                        copy = substringMethod(copy, "UPC", 4);
-                        value.UPC.Add(getTarget(copy));
+                        if (copy.Contains("UPC"))
+                        {
+                            copy = substringMethod(copy, "UPC", 4);
+                            value.UPC.Add(getTarget(copy));
+                        }
+                        else
+                            value.UPC.Add("");
 
                         // description 
                         copy = substringMethod(copy, "description", 12);
                         value.Description.Add(getTarget(copy));
 
                         // description 2
-                        copy = substringMethod(copy, "description2", 13);
-                        value.Description2.Add(getTarget(copy));
+                        if (copy.Contains("description2"))
+                        {
+                            copy = substringMethod(copy, "description2", 13);
+                            value.Description2.Add(getTarget(copy));
+                        }
+                        else
+                            value.Description2.Add("");
 
                         // merchant sku
                         copy = substringMethod(copy, "merchantSKU", 12);
@@ -653,6 +679,8 @@ namespace CommerceHub_OrderManager.channel.sears
                             copy = substringMethod(copy, "lineHandling", 13);
                             value.LineHandling.Add(Convert.ToDouble(getTarget(copy)));
                         }
+                        else
+                            value.LineHandling.Add(0);
 
                         if (i == 1)
                         {
@@ -681,12 +709,12 @@ namespace CommerceHub_OrderManager.channel.sears
                         value.PST_Extended.Add(Convert.ToDouble(getTarget(copy)));
 
                         // gst and hst
-                        copy = substringMethod(copy, "GST_HST_Total_H", 16);
+                        copy = substringMethod(copy, "GST_HST_Total", 16);
                         copy = substringMethod(copy, ">", 1);
                         value.GST_HST_Total.Add(Convert.ToDouble(getTarget(copy)));
 
                         // pst
-                        copy = substringMethod(copy, "PST_Total_H", 13);
+                        copy = substringMethod(copy, "PST_Total", 13);
                         copy = substringMethod(copy, ">", 1);
                         value.PST_Total.Add(Convert.ToDouble(getTarget(copy)));
 
@@ -697,129 +725,136 @@ namespace CommerceHub_OrderManager.channel.sears
                         // ps receiving instructions
                         copy = substringMethod(copy, "psReceivingInstructions", 24);
                         value.ReceivingInstructions.Add(getTarget(copy));
+                    }
 
-                        string copyCopy = copy;
+                    string copyCopy = copy;
 
-                        #region Bill To Address
-                        // bill to name
-                        copyCopy = substringMethod(copyCopy, billToId, billToId.Length);
-                        copyCopy = substringMethod(copyCopy, "name1", 6);
-                        value.BillTo.Name = getTarget(copyCopy);
+                    #region Bill To Address
+                    // bill to name
+                    copyCopy = substringMethod(copyCopy, billToId, billToId.Length);
+                    copyCopy = substringMethod(copyCopy, "name1", 6);
+                    value.BillTo.Name = getTarget(copyCopy);
 
-                        // bill to address
-                        copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
-                        copyCopy = substringMethod(copyCopy, "address1", 9);
-                        value.BillTo.Address1 = getTarget(copyCopy);
-                        if (copyCopy.Contains("address2"))
-                        {
-                            copyCopy = substringMethod(copyCopy, "address2", 9);
-                            value.BillTo.Address2 = getTarget(copyCopy);
-                        }
+                    // bill to address
+                    copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
+                    copyCopy = substringMethod(copyCopy, "address1", 9);
+                    value.BillTo.Address1 = getTarget(copyCopy);
+                    if (copyCopy.Contains("address2"))
+                    {
+                        copyCopy = substringMethod(copyCopy, "address2", 9);
+                        value.BillTo.Address2 = getTarget(copyCopy);
+                    }
 
-                        // bill to city
-                        copyCopy = substringMethod(copyCopy, "city", 5);
-                        value.BillTo.City = getTarget(copyCopy);
+                    // bill to city
+                    copyCopy = substringMethod(copyCopy, "city", 5);
+                    value.BillTo.City = getTarget(copyCopy);
 
-                        // bill to state
-                        copyCopy = substringMethod(copyCopy, "state", 6);
-                        value.BillTo.State = getTarget(copyCopy);
+                    // bill to state
+                    copyCopy = substringMethod(copyCopy, "state", 6);
+                    value.BillTo.State = getTarget(copyCopy);
 
-                        // bill to postal code
-                        copyCopy = substringMethod(copyCopy, "postalCode", 11);
-                        value.BillTo.PostalCode = getTarget(copyCopy);
+                    // bill to postal code
+                    copyCopy = substringMethod(copyCopy, "postalCode", 11);
+                    value.BillTo.PostalCode = getTarget(copyCopy);
 
-                        // bill to phone
+                    // bill to phone
+                    copyCopy = substringMethod(copyCopy, "dayPhone", 9);
+                    value.BillTo.DayPhone = getTarget(copyCopy);
+                    #endregion
+
+                    copyCopy = copy;
+
+                    #region Recipient Address
+                    // recipient name
+                    copyCopy = substringMethod(copyCopy, customerPlaceId, billToId.Length);
+                    copyCopy = substringMethod(copyCopy, "name1", 6);
+                    value.Recipient.Name = getTarget(copyCopy);
+
+                    // recipient address
+                    copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
+                    copyCopy = substringMethod(copyCopy, "address1", 9);
+                    value.Recipient.Address1 = getTarget(copyCopy);
+                    if (copyCopy.Contains("address2"))
+                    {
+                        copyCopy = substringMethod(copyCopy, "address2", 9);
+                        value.Recipient.Address2 = getTarget(copyCopy);
+                    }
+
+                    // recipient city
+                    copyCopy = substringMethod(copyCopy, "city", 5);
+                    value.Recipient.City = getTarget(copyCopy);
+
+                    // recipient state
+                    copyCopy = substringMethod(copyCopy, "state", 6);
+                    value.Recipient.State = getTarget(copyCopy);
+
+                    // recipient postal code
+                    copyCopy = substringMethod(copyCopy, "postalCode", 11);
+                    value.Recipient.PostalCode = getTarget(copyCopy);
+
+                    // recipient phone
+                    copyCopy = substringMethod(copyCopy, "dayPhone", 9);
+                    value.Recipient.DayPhone = getTarget(copyCopy);
+                    #endregion
+
+                    copyCopy = copy;
+
+                    #region Ship To Address
+                    // ship to name
+                    copyCopy = substringMethod(copyCopy, shipToId, billToId.Length);
+                    copyCopy = substringMethod(copyCopy, "name1", 6);
+                    value.ShipTo.Name = getTarget(copyCopy);
+
+                    // ship to
+                    copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
+                    copyCopy = substringMethod(copyCopy, "address1", 9);
+                    value.ShipTo.Address1 = getTarget(copyCopy);
+                    if (copyCopy.Contains("address2"))
+                    {
+                        copyCopy = substringMethod(copyCopy, "address2", 9);
+                        value.ShipTo.Address2 = getTarget(copyCopy);
+                    }
+
+                    // ship to city
+                    copyCopy = substringMethod(copyCopy, "city", 5);
+                    value.ShipTo.City = getTarget(copyCopy);
+
+                    // ship to state
+                    copyCopy = substringMethod(copyCopy, "state", 6);
+                    value.ShipTo.State = getTarget(copyCopy);
+
+                    // ship to postal code
+                    copyCopy = substringMethod(copyCopy, "postalCode", 11);
+                    value.ShipTo.PostalCode = getTarget(copyCopy);
+
+                    // ship to day phone
+                    if (copyCopy.Contains("dayPhone"))
+                    {
                         copyCopy = substringMethod(copyCopy, "dayPhone", 9);
-                        value.BillTo.DayPhone = getTarget(copyCopy);
-                        #endregion
+                        value.ShipTo.DayPhone = getTarget(copyCopy);
+                    }
 
-                        copyCopy = copy;
+                    // ship to partner person place id
+                    if (copyCopy.Contains("partnerPersonPlaceId"))
+                    {
+                        copyCopy = substringMethod(copyCopy, "partnerPersonPlaceId", 21);
+                        value.PartnerPersonPlaceId = getTarget(copyCopy);
+                    }
+                    #endregion
 
-                        #region Recipient Address
-                        // recipient name
-                        copyCopy = substringMethod(copyCopy, customerPlaceId, billToId.Length);
-                        copyCopy = substringMethod(copyCopy, "name1", 6);
-                        value.Recipient.Name = getTarget(copyCopy);
+                    // freight lane & spur -> only if exist
+                    if (copyCopy.Contains("attnLine"))
+                    {
+                        copyCopy = substringMethod(copyCopy, "attnLine", 9);
+                        string attention = getTarget(copyCopy);
 
-                        // recipient address
-                        copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
-                        copyCopy = substringMethod(copyCopy, "address1", 9);
-                        value.Recipient.Address1 = getTarget(copyCopy);
-                        if (copyCopy.Contains("address2"))
-                        {
-                            copyCopy = substringMethod(copyCopy, "address2", 9);
-                            value.Recipient.Address2 = getTarget(copyCopy);
-                        }
-
-                        // recipient city
-                        copyCopy = substringMethod(copyCopy, "city", 5);
-                        value.Recipient.City = getTarget(copyCopy);
-
-                        // recipient state
-                        copyCopy = substringMethod(copyCopy, "state", 6);
-                        value.Recipient.State = getTarget(copyCopy);
-
-                        // recipient postal code
-                        copyCopy = substringMethod(copyCopy, "postalCode", 11);
-                        value.Recipient.PostalCode = getTarget(copyCopy);
-
-                        // recipient phone
-                        copyCopy = substringMethod(copyCopy, "dayPhone", 9);
-                        value.Recipient.DayPhone = getTarget(copyCopy);
-                        #endregion
-
-                        copyCopy = copy;
-
-                        #region Ship To Address
-                        // ship to name
-                        copyCopy = substringMethod(copyCopy, shipToId, billToId.Length);
-                        copyCopy = substringMethod(copyCopy, "name1", 6);
-                        value.ShipTo.Name = getTarget(copyCopy);
-
-                        // ship to
-                        copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
-                        copyCopy = substringMethod(copyCopy, "address1", 9);
-                        value.ShipTo.Address1 = getTarget(copyCopy);
-                        if (copyCopy.Contains("address2"))
-                        {
-                            copyCopy = substringMethod(copyCopy, "address2", 9);
-                            value.ShipTo.Address2 = getTarget(copyCopy);
-                        }
-
-                        // ship to
-                        copyCopy = substringMethod(copyCopy, "city", 5);
-                        value.ShipTo.City = getTarget(copyCopy);
-
-                        // ship to
-                        copyCopy = substringMethod(copyCopy, "state", 6);
-                        value.ShipTo.State = getTarget(copyCopy);
-
-                        // ship to
-                        copyCopy = substringMethod(copyCopy, "postalCode", 11);
-                        value.ShipTo.PostalCode = getTarget(copyCopy);
-
-                        // ship to
-                        if (copyCopy.Contains("dayPhone"))
-                        {
-                            copyCopy = substringMethod(copyCopy, "dayPhone", 9);
-                            value.ShipTo.DayPhone = getTarget(copyCopy);
-                        }
-                        #endregion
-
-                        // freight lane & spur -> only if exist
-                        if (copyCopy.Contains("attnLine"))
-                        {
-                            copyCopy = substringMethod(copyCopy, "attnLine", 9);
-                            string attention = getTarget(copyCopy);
-
-                            int index = 0;
-                            while ((char.IsLetter(attention[index]) || char.IsNumber(attention[index])) && attention[index] != ' ' && attention[index] != '_')
-                                index++;
-                            value.FreightLane = attention.Substring(0, index);
-                            while (!char.IsNumber(attention[index]))
-                                index++;
-                            value.Spur = attention.Substring(index);
-                        }
+                        int index = 0;
+                        while ((char.IsLetter(attention[index]) || char.IsNumber(attention[index])) && attention[index] != ' ' && attention[index] != '_')
+                            index++;
+                        value.FreightLane = attention.Substring(0, index);
+                        while (!char.IsNumber(attention[index]))
+                            index++;
+                        value.Spur = attention.Substring(index);
                     }
 
                     break;
@@ -829,7 +864,7 @@ namespace CommerceHub_OrderManager.channel.sears
             return value;
         }
         /* second version -> take from database */
-        public SearsValues generateValue(string targetTransaction)
+        public SearsValues GenerateValue(string targetTransaction)
         {
             // local field for storing values
             SearsValues value = new SearsValues();
@@ -837,8 +872,8 @@ namespace CommerceHub_OrderManager.channel.sears
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 SqlCommand command = new SqlCommand("SELECT LineCount, PoNumber, TrxBalanceDue, ServiceLevel, OrderDate, paymentMethod, CustOrderNumber, CustOrderDate, PackSlipmessage, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, " +
-                                                    "RecipientName, RecipientAddress1, RecipientAddress2, RecipientCity, RecipientState, RecipientPostalCode, RecipientPhone, ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, FreightLane, Spur " + 
-                                                    "FROM Sears_Order WHERE TransactionId = \'" + targetTransaction + "\'", connection);
+                                                    "RecipientName, RecipientAddress1, RecipientAddress2, RecipientCity, RecipientState, RecipientPostalCode, RecipientPhone, ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, PartnerPersonPlaceId, FreightLane, Spur, " + 
+                                                    "TrackingNumber, ShipmentIdentificationNumber FROM Sears_Order WHERE TransactionId = \'" + targetTransaction + "\'", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 reader.Read();
@@ -874,8 +909,12 @@ namespace CommerceHub_OrderManager.channel.sears
                 value.ShipTo.State = reader.GetString(27);
                 value.ShipTo.PostalCode = reader.GetString(28);
                 value.ShipTo.DayPhone = reader.GetString(29);
-                value.FreightLane = reader.GetString(30);
-                value.Spur = reader.GetString(31);
+                if (!reader.IsDBNull(30))
+                    value.PartnerPersonPlaceId = reader.GetString(30);
+                value.FreightLane = reader.GetString(31);
+                value.Spur = reader.GetString(32);
+                value.Package.TrackingNumber = reader.GetString(33);
+                value.Package.IdentificationNumber = reader.GetString(34);
 
                 SqlDataAdapter adatper = new SqlDataAdapter("SELECT LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, LineHandling, " +
                                                                 "ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions " +
@@ -917,16 +956,23 @@ namespace CommerceHub_OrderManager.channel.sears
             {
                 // add new transaction to order
                 SqlCommand command = new SqlCommand("INSERT INTO Sears_Order " +
-                                                    "(TransactionId, LineCount, PoNumber, TrxBalanceDue, VendorInvoiceNumber, PakageDetailId, ServiceLevel, TrackingNumber, ShipmentIdentificationNumber, OrderDate, PaymentMethod, CustOrderNumber, CustOrderDate, PackSlipMessage, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, RecipientName, RecipientAddress1, RecipientAddress2, RecipientCity, RecipientState, RecipientPostalCode, RecipientPhone, ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, FreightLane, Spur, Complete) Values " +
+                                                    "(TransactionId, LineCount, PoNumber, TrxBalanceDue, VendorInvoiceNumber, PakageDetailId, ServiceLevel, TrackingNumber, ShipmentIdentificationNumber, OrderDate, PaymentMethod, CustOrderNumber, CustOrderDate, PackSlipMessage, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, RecipientName, RecipientAddress1, RecipientAddress2, RecipientCity, RecipientState, RecipientPostalCode, RecipientPhone, ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, PartnerPersonPlaceId, FreightLane, Spur, Complete) Values " +
                                                     "(\'" + value.TransactionID + "\'," + value.LineCount + ",\'" + value.PoNumber + "\'," + value.TrxBalanceDue + ",\'" + value.VendorInvoiceNumber + "\',\'" + value.PackageDetailID + "\',\'" + value.ServiceLevel + "\',\'" + value.Package.TrackingNumber + "\',\'" + value.Package.IdentificationNumber + "\', \'" + value.OrderDate.ToString("yyyy-MM-dd") + "\',\'" + value.PaymentMethod + "\',\'" + value.CustOrderNumber + "\',\'" + value.CustOrderDate.ToString("yyyy-MM-dd") + "\',\'" + value.PackSlipMessage + "\',\'" +
                                                     value.BillTo.Name + "\',\'" + value.BillTo.Address1 + "\',\'" + value.BillTo.Address2 + "\',\'" + value.BillTo.City + "\',\'" + value.BillTo.State + "\',\'" + value.BillTo.PostalCode + "\',\'" + value.BillTo.DayPhone + "\',\'" + value.Recipient.Name + "\',\'" + value.Recipient.Address1 + "\',\'" + value.Recipient.Address2 + "\',\'" + value.Recipient.City + "\',\'" + value.Recipient.State + "\',\'" + value.Recipient.PostalCode + "\',\'" + value.Recipient.DayPhone + "\',\'" + value.ShipTo.Name + "\',\'" + value.ShipTo.Address1 + "\',\'" + value.ShipTo.Address2 + "\',\'" + value.ShipTo.City + "\',\'" + value.ShipTo.State + "\',\'" + value.ShipTo.PostalCode + "\',\'" + value.ShipTo.DayPhone +
-                                                    "\',\'" + value.FreightLane + "\',\'" + value.Spur + "\',\'False\')", connection);
+                                                    "\',\'" + value.PartnerPersonPlaceId + "\',\'" + value.FreightLane + "\',\'" + value.Spur + "\',\'False\')", connection);
                 connection.Open();
                 command.ExecuteNonQuery();
 
                 // add each item for the order to database
                 for (int i = 0; i < value.LineCount; i++)
                 {
+                    if (value.UPC[i] == null)
+                        value.UPC[i] = "";
+                    if (value.LineHandling == null)
+                        value.LineHandling[i] = 0;
+                    if (value.Description2[i] == null)
+                        value.Description2[i] = "";
+
                     command = new SqlCommand("INSERT INTO Sears_Order_Item " +
                                              "(TransactionId, LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, LineHandling, ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions, Shipped, Cancelled) Values" +
                                              "(\'" + value.TransactionID + "\'," + value.LineBalanceDue[i] + "," + value.MerchantLineNumber[i] + ",\'"+ value.TrxVendorSKU[i] + "\',\'" + value.TrxMerchantSKU[i] + "\',\'" + value.UPC[i] + "\'," + value.TrxQty[i] + "," + value.TrxUnitCost[i] + ",\'" + value.Description[i].Replace("'","''") + "\',\'" + value.Description2[i].Replace("'", "''") +
