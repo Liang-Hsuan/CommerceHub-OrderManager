@@ -481,6 +481,9 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                     case "PQ":
                         taxCode = "PQ";
                         break;
+                    case "QC":
+                        taxCode = "PQ";
+                        break;
                     case "SK":
                         taxCode = "SK";
                         break;

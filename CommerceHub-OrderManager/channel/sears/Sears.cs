@@ -51,6 +51,7 @@ namespace CommerceHub_OrderManager.channel.sears
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 reader.Read();
+
                 sftp = new Sftp(reader.GetString(2), reader.GetString(0), reader.GetString(1));
             }
         }
@@ -642,7 +643,7 @@ namespace CommerceHub_OrderManager.channel.sears
                         }
 
                         // trx balance due (plus line balance due)
-                        copy = substringMethod(copy, "lineBalanceDue", 15);
+                        copy = substringMethod(copy, "lineTotal", 10);
                         value.LineBalanceDue.Add(Convert.ToDouble(getTarget(copy)));
                         value.TrxBalanceDue += Convert.ToDouble(getTarget(copy));
 
