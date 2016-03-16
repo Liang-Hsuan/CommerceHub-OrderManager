@@ -31,3 +31,4 @@ C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceH
 \\Mac\Home\Documents\Visual Studio 2015\Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.supportingClasses.ConfirmPanel.resources
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.supportingClasses.ConfirmPanel.resources
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.ShipmentPage.resources
+\\Mac\Home\Documents\Visual Studio 2015\Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.ShipmentPage.resources

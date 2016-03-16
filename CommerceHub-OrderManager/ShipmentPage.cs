@@ -2,6 +2,7 @@
 using CommerceHub_OrderManager.supportingClasses;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace CommerceHub_OrderManager
@@ -12,10 +13,10 @@ namespace CommerceHub_OrderManager
     public partial class ShipmentPage : Form
     {
         // field for commerce hub order
-        private Sears sears = new Sears();
+        private readonly Sears sears = new Sears();
 
         // field for UPS connection
-        UPS ups = new UPS();
+        private readonly UPS ups = new UPS();
 
         // field for storing data
         private struct Order
@@ -83,17 +84,14 @@ namespace CommerceHub_OrderManager
             }
 
             // sears cancellation
-            foreach (Order cancelledOrder in cancelList)
+            foreach (Order cancelledOrder in cancelList.Where(cancelledOrder => cancelledOrder.source == "Sears"))
             {
-                if (cancelledOrder.source == "Sears")
+                list.Add(cancelledOrder.transactionId);
+                string voidResult = ups.postShipmentVoid(cancelledOrder.shipmentIdentificationNumber);
+                if (voidResult.Contains("Error:"))
                 {
-                    list.Add(cancelledOrder.transactionId);
-                    string voidResult = ups.postShipmentVoid(cancelledOrder.shipmentIdentificationNumber);
-                    if (voidResult.Contains("Error:"))
-                    {
-                        MessageBox.Show(voidResult, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
+                    MessageBox.Show(voidResult, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
             }
             sears.PostVoid(list.ToArray());

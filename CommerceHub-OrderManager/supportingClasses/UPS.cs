@@ -21,7 +21,7 @@ namespace CommerceHub_OrderManager.supportingClasses
         private readonly string SEARS_ACCOUNT_NUMBER;
 
         // field for save image path
-        private string savePathSears = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_ShippingLabel";
+        private readonly string savePathSears = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_ShippingLabel";
 
         /* constructor that initialize UPS credentials */
         public UPS()
@@ -182,9 +182,7 @@ namespace CommerceHub_OrderManager.supportingClasses
 
             // send request
             using (Stream requestStream = request.GetRequestStream())
-            {
                 requestStream.Write(postBytes, 0, postBytes.Length);
-            }
 
             // get the response from the server
             HttpWebResponse response;
@@ -201,9 +199,7 @@ namespace CommerceHub_OrderManager.supportingClasses
 
             string result;
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-            {
                 result = streamReader.ReadToEnd();
-            }
 
             // get the response stattus
             result = substringMethod(result, "ResponseStatusCode", 19);
@@ -259,18 +255,14 @@ namespace CommerceHub_OrderManager.supportingClasses
 
             // send request
             using (Stream requestStream = request.GetRequestStream())
-            {
                 requestStream.Write(postBytes, 0, postBytes.Length);
-            }
 
             // get the response from the server
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             string result;
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-            {
                 result = streamReader.ReadToEnd();
-            }
 
             // get the response stattus
             result = substringMethod(result, "ResponseStatusCode", 19);
@@ -325,18 +317,14 @@ namespace CommerceHub_OrderManager.supportingClasses
 
             // send request
             using (Stream requestStream = request.GetRequestStream())
-            {
                 requestStream.Write(postBytes, 0, postBytes.Length);
-            }
 
             // get the response from the server
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             string result;
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-            {
                 result = streamReader.ReadToEnd();
-            }
 
             // get the response stattus
             result = substringMethod(result, "ResponseStatusCode", 19);
@@ -388,13 +376,7 @@ namespace CommerceHub_OrderManager.supportingClasses
         }
 
         /* a Get for savepath for shipment label */
-        public string SavePathSears
-        {
-            get
-            {
-                return savePathSears;
-            }
-        }
+        public string SavePathSears => savePathSears;
 
         #region Supporting Methods
         /* a method that substring the given string */

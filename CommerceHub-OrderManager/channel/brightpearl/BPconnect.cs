@@ -17,7 +17,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
     {
         // fields for brightpearl integration
         private GetRequest get;
-        private PostRequest post;
+        private readonly PostRequest post;
 
         // public field for accessing the status of the current progress
         public string Status { get; set; }
@@ -196,9 +196,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 // read all the text from JSON response
                 string textJSON;
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-                {
                     textJSON = streamReader.ReadToEnd();
-                }
 
                 // check if there is result return or not
                 textJSON = substringMethod(textJSON, "resultsReturned", 17);
@@ -246,9 +244,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 // read all the text from JSON response
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-                {
                     textJSON = streamReader.ReadToEnd();
-                }
 
                 // looping through each customer's postal code to see if the cutomer exist in these IDs
                 for (int i = 0; i < number; i++)
@@ -297,9 +293,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 // read all the text from JSON response
                 string textJSON;
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-                {
                     textJSON = streamReader.ReadToEnd();
-                }
 
                 // check if there is result return or not
                 textJSON = substringMethod(textJSON, "resultsReturned", 17);
@@ -323,8 +317,8 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             private HttpWebResponse response;
 
             // fields for credentials
-            private string appRef;
-            private string appToken;
+            private readonly string appRef;
+            private readonly string appToken;
 
             // field for telling client if there is error occur
             public bool HasError { get; set; }
@@ -357,17 +351,13 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 // send request
                 using (Stream requestStream = request.GetRequestStream())
-                {
                     requestStream.Write(postBytes, 0, postBytes.Length);
-                }
 
                 // get the response from the server
                 response = (HttpWebResponse)request.GetResponse();
                 string result;
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-                {
                     result = streamReader.ReadToEnd();
-                }
 
                 result = substringMethod(result, ":", 1);
                 return getTarget(result);  //return the addresss ID
@@ -393,17 +383,13 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 // send request
                 using (Stream requestStream = request.GetRequestStream())
-                {
                     requestStream.Write(postBytes, 0, postBytes.Length);
-                }
 
                 // get the response from the server
                 response = (HttpWebResponse)request.GetResponse();
                 string result;
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-                {
                     result = streamReader.ReadToEnd();
-                }
 
                 result = substringMethod(result, ":", 1);
                 return getTarget(result);  //return the contact ID
@@ -430,9 +416,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 // send request
                 using (Stream requestStream = request.GetRequestStream())
-                {
                     requestStream.Write(postBytes, 0, postBytes.Length);
-                }
 
                 // get the response from the server
                 try    // might have server internal error, so do it in try and catch
@@ -446,9 +430,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 string result;
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-                {
                     result = streamReader.ReadToEnd();
-                }
 
                 result = substringMethod(result, ":", 1);
                 return getTarget(result);  //return the order ID
@@ -529,9 +511,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 // send request
                 using (Stream requestStream = request.GetRequestStream())
-                {
                     requestStream.Write(postBytes, 0, postBytes.Length);
-                }
 
                 // get the response from server
                 try
@@ -542,11 +522,10 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 {
                     return "Error";     // 503 Server Unabailable
                 }
+
                 string result;
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-                {
                     result = streamReader.ReadToEnd();
-                }
 
                 result = substringMethod(result, ":", 1);
                 return getTarget(result);  //return the order row ID
@@ -578,9 +557,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 // send request
                 using (Stream requestStream = request.GetRequestStream())
-                {
                     requestStream.Write(postBytes, 0, postBytes.Length);
-                }
 
                 // get response from the server to see if there has error or not
                 try
@@ -620,9 +597,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 // send request
                 using (Stream requestStream = request.GetRequestStream())
-                {
                     requestStream.Write(postBytes, 0, postBytes.Length);
-                }
 
                 // get response from server to see if there is error or not
                 try

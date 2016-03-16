@@ -34,9 +34,7 @@ namespace CommerceHub_OrderManager.supportingClasses
             response = (HttpWebResponse)request.GetResponse();
             string result;
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-            {
                 result = streamReader.ReadToEnd();
-            }
 
             // counting the number of result -> the count must be 1 in order to be valid
             int count = 0;

@@ -14,10 +14,10 @@ namespace CommerceHub_OrderManager
     public partial class DetailPage : Form
     {
         // field for storing order details
-        private SearsValues value;
+        private readonly SearsValues value;
 
         // field for brightpearl connection
-        private BPconnect bp = new BPconnect();
+        private readonly BPconnect bp = new BPconnect();
 
         // supporting field for keeping track cancelled items and time for loading prompt
         private Dictionary<int, string> cancelList;
@@ -282,7 +282,7 @@ namespace CommerceHub_OrderManager
             }
 
             // mark transaction as not shipped
-            new Sears().PostVoid(new string[] { value.TransactionID });
+            new Sears().PostVoid(new[] { value.TransactionID });
 
             // mark cancel as invisible, set tracking number text to not shipped, and enable create label button
             voidShipmentButton.Visible = false;
@@ -328,9 +328,7 @@ namespace CommerceHub_OrderManager
 
                 // call background worker
                 if (!backgroundWorkerConfirm.IsBusy)
-                {
                     backgroundWorkerConfirm.RunWorkerAsync();
-                }
             }
         }
         private void backgroundWorkerConfirm_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)

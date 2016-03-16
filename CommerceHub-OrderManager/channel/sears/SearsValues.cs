@@ -115,7 +115,7 @@ namespace CommerceHub_OrderManager.channel.sears
             TrxMerchantSKU = trxMerchantSku;
             UPC = upc;
             TrxQty = trxQty;
-            TrxUnitCost = TrxUnitCost;
+            TrxUnitCost = trxUnitCost;
             PackageDetailID = packageDetailId;
             ServiceLevel = serviceLevel1;
             Package = package;
@@ -132,7 +132,7 @@ namespace CommerceHub_OrderManager.channel.sears
             ExpectedShipDate = expectedShipDate;
             GST_HST_Extended = gstHstExtended;
             PST_Extended = pstExtended;
-            GST_HST_Total = gstHstExtended;
+            GST_HST_Total = gstHstTotal;
             PST_Total = pstTotal;
             EncodedPrice = encodedPrice;
             ReceivingInstructions = receivingInstructions;

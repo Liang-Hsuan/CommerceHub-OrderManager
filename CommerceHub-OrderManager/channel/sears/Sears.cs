@@ -25,7 +25,7 @@ namespace CommerceHub_OrderManager.channel.sears
         private readonly string completeOrderDir;
 
         // field for sftp connection
-        private Sftp sftp;
+        private readonly Sftp sftp;
 
         /* constructor that restore the data and initialize folders for xml feed */
         public Sears()
@@ -214,9 +214,7 @@ namespace CommerceHub_OrderManager.channel.sears
         public void PostVoid(string[] transactionId)
         {
             // generate the range 
-            string candidate = "(";
-            foreach (string id in transactionId)
-                candidate += '\'' + id + "\',";
+            string candidate = transactionId.Aggregate("(", (current, id) => current + ('\'' + id + "\',"));
             candidate = candidate.Remove(candidate.Length - 1) + ')';
 
             // update to not shipped 
@@ -234,7 +232,7 @@ namespace CommerceHub_OrderManager.channel.sears
         /* methods that return the number of order and shipment from the given date */
         public int GetNumberOfOrder(DateTime time)
         {
-            int count = 0;
+            int count;
 
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
@@ -244,12 +242,11 @@ namespace CommerceHub_OrderManager.channel.sears
                 count = (int) command.ExecuteScalar();
             }
 
-
             return count;
         }
         public int GetNumberOfShipped(DateTime time)
         {
-            int count = 0;
+            int count;
 
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
@@ -287,22 +284,10 @@ namespace CommerceHub_OrderManager.channel.sears
             // connection to sftp server and read all the list of file
             sftp.Connect();
             ArrayList list = sftp.GetFileList(serverDir);
-
-            // field for storing each batch number for the file on sftp server
-            List<string> bactch = new List<string>();
-
-            // retrieve all the files name to the list
-            foreach (var item in list)
-            {
-                string itemName = item.ToString();
-
-                if (itemName != "." && itemName != "..")
-                    bactch.Add(itemName);
-            }
-
             sftp.Close();
 
-            return bactch.ToArray();
+            // retrieve all the files name to the list
+            return list.Cast<object>().Select(item => item.ToString()).Where(itemName => itemName != "." && itemName != "..").ToArray();
         }
 
         /* method that get all the transaction in the file */
@@ -350,23 +335,12 @@ namespace CommerceHub_OrderManager.channel.sears
             // get all order file on local
             DirectoryInfo dirInfo = new DirectoryInfo(newOrderDir);
             FileInfo[] filesLocal = dirInfo.GetFiles("*.txt");       // getting all file that have been on local
-            List<string> neworderList = new List<string>();
 
             // get all order file on server
             string[] fileOnServer = getOrderName(SHIPMENT_DIR);
 
             // check the number of new order on the server compare to ones on the computer
-            foreach (string file1 in fileOnServer)
-            {
-                // checking if there is duplicate
-                bool found = filesLocal.Select(file2 => file2.ToString()).Any(file2Copy => file1.Remove(file1.LastIndexOf('.')) == file2Copy.Remove(file2Copy.LastIndexOf('.')));
-
-                // if there is no duplicate write the new file and increment the number
-                if (!found)
-                    neworderList.Add(file1);
-            }
-
-            return neworderList.ToArray();
+            return (from file1 in fileOnServer let found = filesLocal.Select(file2 => file2.ToString()).Any(file2Copy => file1.Remove(file1.LastIndexOf('.')) == file2Copy.Remove(file2Copy.LastIndexOf('.'))) where !found select file1).ToArray();
         }
 
         /* a method that receive all the current transaction and check the duplicate then only return the ones that have not been added to the database */
@@ -383,21 +357,8 @@ namespace CommerceHub_OrderManager.channel.sears
                     completeTransactionList.Add(reader.GetString(0));
             }
 
-            // local field for storing incomplete transaction
-            List<string> newtransactionList = new List<string>();
-
-            // check the number of new order on the server compare to ones on the computer
-            foreach (string transaction in allTransactionList)
-            {
-                // checking if ther is duplication
-                bool found = completeTransactionList.Any(complete => complete.Contains(transaction));
-
-                // if there is no duplicate write the new file and increment the number
-                if (!found)
-                    newtransactionList.Add(transaction);
-            }
-
-            return newtransactionList.ToArray();
+            // check the number of new transaction on the server compare to ones on the database
+            return (from transaction in allTransactionList let found = completeTransactionList.Any(complete => complete.Contains(transaction)) where !found select transaction).ToArray();
         }
         #endregion
 
@@ -430,14 +391,8 @@ namespace CommerceHub_OrderManager.channel.sears
                 // substract the amount that the orders are cancelled
                 for (int i = 0; i < value.LineCount; i++)
                 {
-                    foreach (int j in cancelList.Keys)
-                    {
-                        if (j == i)
-                        {
-                            value.TrxBalanceDue -= value.LineBalanceDue[i];
-                            break;
-                        }
-                    }
+                    if (cancelList.Keys.Any(j => j == i))
+                        value.TrxBalanceDue -= value.LineBalanceDue[i];
                 }
 
                 xml += "<trxBalanceDue>" + value.TrxBalanceDue + "</trxBalanceDue>" +
@@ -451,62 +406,59 @@ namespace CommerceHub_OrderManager.channel.sears
                 bool isCancelled = false;
 
                 // check if the order is cancel
-                foreach (int j in cancelList.Keys)
+                foreach (int j in cancelList.Keys.Where(j => j == i - 1))
                 {
-                    if (j == i - 1)
+                    string reason;
+
+                    switch (cancelList[j])
                     {
-                        string reason;
-
-                        switch (cancelList[j])
-                        {
-                            case "Incorrect Ship To Address":
-                                reason = "bad_address";
-                                break;
-                            case "Incorrect SKU":
-                                reason = "bad_sku​";
-                                break;
-                            case "Cancelled at Merchant's Request":
-                                reason = "merchant_request";
-                                break;
-                            case "Cannot fulfill the order in time":
-                                reason = "fulfill_time_expired";
-                                break;
-                            case "Cannot Ship as Ordered":
-                                reason = "cannot_meet_all_reqs";
-                                break;
-                            case "Invalid Item Cost":
-                                reason = "invalid_item_cost";
-                                break;
-                            case "Merchant detected fraud":
-                                reason = "merchant_detected_fraud";
-                                break;
-                            case "Order missing information":
-                                reason = "info_missing";
-                                break;
-                            case "Out of Stock":
-                                reason = "out_of_stock";
-                                break;
-                            case "Product Has Been Discontinued":
-                                reason = "discontinued";
-                                break;
-                            default:
-                                reason = "other";
-                                break;
-                        }
-
-                        xml +=
-                            "<hubAction>" +
-                            "<action>v_cancel</action>" +
-                            "<actionCode>" + reason + "</actionCode>";
-
-                        // update item to cancelled to database
-                        command = new SqlCommand("UPDATE Sears_Order_Item SET Cancelled = 'True' WHERE TransactionId = \'" + value.TransactionID +
-                                                 "\' AND MerchantLineNumber = \'" + value.MerchantLineNumber[j] + "\';", connection);
-                        command.ExecuteNonQuery();
-
-                        isCancelled = true;
-                        break;
+                        case "Incorrect Ship To Address":
+                            reason = "bad_address";
+                            break;
+                        case "Incorrect SKU":
+                            reason = "bad_sku​";
+                            break;
+                        case "Cancelled at Merchant's Request":
+                            reason = "merchant_request";
+                            break;
+                        case "Cannot fulfill the order in time":
+                            reason = "fulfill_time_expired";
+                            break;
+                        case "Cannot Ship as Ordered":
+                            reason = "cannot_meet_all_reqs";
+                            break;
+                        case "Invalid Item Cost":
+                            reason = "invalid_item_cost";
+                            break;
+                        case "Merchant detected fraud":
+                            reason = "merchant_detected_fraud";
+                            break;
+                        case "Order missing information":
+                            reason = "info_missing";
+                            break;
+                        case "Out of Stock":
+                            reason = "out_of_stock";
+                            break;
+                        case "Product Has Been Discontinued":
+                            reason = "discontinued";
+                            break;
+                        default:
+                            reason = "other";
+                            break;
                     }
+
+                    xml +=
+                        "<hubAction>" +
+                        "<action>v_cancel</action>" +
+                        "<actionCode>" + reason + "</actionCode>";
+
+                    // update item to cancelled to database
+                    command = new SqlCommand("UPDATE Sears_Order_Item SET Cancelled = 'True' WHERE TransactionId = \'" + value.TransactionID +
+                                             "\' AND MerchantLineNumber = \'" + value.MerchantLineNumber[j] + "\';", connection);
+                    command.ExecuteNonQuery();
+
+                    isCancelled = true;
+                    break;
                 }
 
                 if (!isCancelled)
@@ -966,13 +918,6 @@ namespace CommerceHub_OrderManager.channel.sears
                 // add each item for the order to database
                 for (int i = 0; i < value.LineCount; i++)
                 {
-                    if (value.UPC[i] == null)
-                        value.UPC[i] = "";
-                    if (value.LineHandling == null)
-                        value.LineHandling[i] = 0;
-                    if (value.Description2[i] == null)
-                        value.Description2[i] = "";
-
                     command = new SqlCommand("INSERT INTO Sears_Order_Item " +
                                              "(TransactionId, LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, LineHandling, ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions, Shipped, Cancelled) Values" +
                                              "(\'" + value.TransactionID + "\'," + value.LineBalanceDue[i] + "," + value.MerchantLineNumber[i] + ",\'"+ value.TrxVendorSKU[i] + "\',\'" + value.TrxMerchantSKU[i] + "\',\'" + value.UPC[i] + "\'," + value.TrxQty[i] + "," + value.TrxUnitCost[i] + ",\'" + value.Description[i].Replace("'","''") + "\',\'" + value.Description2[i].Replace("'", "''") +

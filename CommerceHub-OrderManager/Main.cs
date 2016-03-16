@@ -10,10 +10,10 @@ namespace CommerceHub_OrderManager
     public partial class Main : Form
     {
         // field for commerce hub order
-        private Sears sears = new Sears();
+        private readonly Sears sears = new Sears();
 
         // field for brightpearl connection
-        private BPconnect bp = new BPconnect();
+        private readonly BPconnect bp = new BPconnect();
 
         // field for storing data
         private struct Order
@@ -82,9 +82,7 @@ namespace CommerceHub_OrderManager
 
                 // call backgorund worker
                 if (!backgroundWorker.IsBusy)
-                {
                     backgroundWorker.RunWorkerAsync();
-                }
             }
         }
 
@@ -106,17 +104,10 @@ namespace CommerceHub_OrderManager
             bool channel = false;
 
             // check the user check item and get the selected transaction id for exportin packing slip
-            foreach (ListViewItem item in listview.CheckedItems)
+            foreach (SearsValues value in from ListViewItem item in listview.CheckedItems where item.SubItems[0].Text == "Sears" select item.SubItems[4].Text into transaction select sears.GenerateValue(transaction))
             {
-                // for sears order
-                if (item.SubItems[0].Text == "Sears")
-                {
-                    string transaction = item.SubItems[4].Text;
-                    SearsValues value = sears.GenerateValue(transaction);
-                    searsPS.createPackingSlip(value, new int[0], false);
-
-                    channel = true;
-                }
+                searsPS.createPackingSlip(value, new int[0], false);
+                channel = true;
             }
 
             // create message
@@ -179,7 +170,7 @@ namespace CommerceHub_OrderManager
                         MessageBox.Show("Error occur while requesting shipment, please refresh and try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
-                    else if (digest.Contains("Error:"))
+                    if (digest.Contains("Error:"))
                     {
                         MessageBox.Show(digest[0], "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
