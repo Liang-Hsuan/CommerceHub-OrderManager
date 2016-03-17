@@ -410,7 +410,6 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 string textJSON = "{\"orderTypeCode\":\"SO\",\"reference\":\"" + value.Reference + "\",\"placeOn\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\",\"orderStatus\":{\"orderStatusId\":2}," + "\"delivery\":{\"deliveryDate\":\"" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ', 'T') + "+00:00\",\"shippingMethodId\":7},\"currency\":{\"orderCurrencyCode\":\"CAD\"},\"parties\":{\"customer\":{\"contactId\":" + 
                                   contactID + "},\"delivery\":{\"addressFullName\":\"" + value.Address.Name + "\",\"addressLine1\":\"" + value.Address.Address1 + "\",\"addressLine2\":\"" + value.Address.Address2 + "\",\"addressLine3\":\"" + value.Address.City + "\",\"addressLine4\":\"" + value.Address.State + "\",\"postalCode\":\"" + value.Address.PostalCode + "\",\"countryIsoCode\":\"CAN\",\"telephone\":\"" + value.Address.DayPhone + "\"}},\"assignment\":{\"current\":{\"channelId\":" + value.ChannelId + "}}}";
 
-
                 // turn request string into a byte stream
                 byte[] postBytes = Encoding.UTF8.GetBytes(textJSON);
 
