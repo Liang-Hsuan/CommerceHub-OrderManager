@@ -74,26 +74,32 @@
   <ItemGroup>
     <Compile Include="channel\brightpearl\BPconnect.cs" />
     <Compile Include="channel\brightpearl\BPvalues.cs" />
-    <Compile Include="ShipmentPage.cs">
+    <Compile Include="Login.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ShipmentPage.Designer.cs">
+    <Compile Include="Login.Designer.cs">
+      <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
+    <Compile Include="mainForms\ShipmentPage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="mainForms\ShipmentPage.Designer.cs">
       <DependentUpon>ShipmentPage.cs</DependentUpon>
     </Compile>
     <Compile Include="supportingClasses\Address.cs" />
     <Compile Include="channel\sears\Sears.cs" />
     <Compile Include="channel\sears\SearsPackingSlip.cs" />
     <Compile Include="channel\sears\SearsValues.cs" />
-    <Compile Include="DetailPage.cs">
+    <Compile Include="mainForms\DetailPage.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DetailPage.Designer.cs">
+    <Compile Include="mainForms\DetailPage.Designer.cs">
       <DependentUpon>DetailPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Main.cs">
+    <Compile Include="mainForms\Main.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Main.Designer.cs">
+    <Compile Include="mainForms\Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
@@ -107,10 +113,13 @@
     </Compile>
     <Compile Include="supportingClasses\Package.cs" />
     <Compile Include="supportingClasses\UPS.cs" />
-    <EmbeddedResource Include="DetailPage.resx">
+    <EmbeddedResource Include="Login.resx">
+      <DependentUpon>Login.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="mainForms\DetailPage.resx">
       <DependentUpon>DetailPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Main.resx">
+    <EmbeddedResource Include="mainForms\Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -122,7 +131,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="ShipmentPage.resx">
+    <EmbeddedResource Include="mainForms\ShipmentPage.resx">
       <DependentUpon>ShipmentPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="supportingClasses\ConfirmPanel.resx">

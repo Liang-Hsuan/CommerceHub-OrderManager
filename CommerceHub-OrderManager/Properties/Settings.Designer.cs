@@ -46,34 +46,75 @@ namespace CommerceHub_OrderManager.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"Data Source = kpjvpp867r.database.windows.net; Initial Catalog = CommerceHub; Integrated Security = False; User ID = database_admin; Password = AshlinData1; Connect Timeout = 60; Encrypt = False; TrustServerCertificate = False; MultipleActiveResultSets=true;")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string CHcs {
             get {
                 return ((string)(this["CHcs"]));
             }
+            set {
+                this["CHcs"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source = kpjvpp867r.database.windows.net; Initial Catalog = Design_Database;" +
-            " Integrated Security = False; User ID = database_admin; Password = AshlinData1; " +
-            "Connect Timeout = 60; Encrypt = False; TrustServerCertificate = False;")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string Designcs {
             get {
                 return ((string)(this["Designcs"]));
             }
+            set {
+                this["Designcs"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=kpjvpp867r.database.windows.net;Initial Catalog=ChannelPartner_Databa" +
-            "se;Integrated Security=False;User ID=database_admin;Password=AshlinData1;Connect" +
-            " Timeout=60;Encrypt=False;TrustServerCertificate=False;")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string ASCMcs {
             get {
                 return ((string)(this["ASCMcs"]));
+            }
+            set {
+                this["ASCMcs"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Username {
+            get {
+                return ((string)(this["Username"]));
+            }
+            set {
+                this["Username"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Password {
+            get {
+                return ((string)(this["Password"]));
+            }
+            set {
+                this["Password"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Remember {
+            get {
+                return ((bool)(this["Remember"]));
+            }
+            set {
+                this["Remember"] = value;
             }
         }
     }

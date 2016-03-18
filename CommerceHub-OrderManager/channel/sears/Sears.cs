@@ -35,11 +35,11 @@ namespace CommerceHub_OrderManager.channel.sears
             if (!Directory.Exists(rootDir))
                 Directory.CreateDirectory(rootDir);
 
-            newOrderDir = rootDir + "\\SearsNewOrders";
+            newOrderDir = rootDir + "//SearsNewOrders";
             if (!Directory.Exists(newOrderDir))
                 Directory.CreateDirectory(newOrderDir);
 
-            completeOrderDir = rootDir + "\\SearsCompleteOrders";
+            completeOrderDir = rootDir + "//SearsCompleteOrders";
             if (!Directory.Exists(completeOrderDir))
                 Directory.CreateDirectory(completeOrderDir);
             #endregion
@@ -501,7 +501,7 @@ namespace CommerceHub_OrderManager.channel.sears
                 "</ConfirmMessageBatch>";
 
             // convert txt to xsd file
-            string path = completeOrderDir + "//" + value.TransactionID + ".xsd";
+            string path = completeOrderDir + "\\" + value.TransactionID + ".xsd";
             StreamWriter writer = new StreamWriter(path);
             writer.WriteLine(xml);
             writer.Close();
@@ -515,7 +515,7 @@ namespace CommerceHub_OrderManager.channel.sears
 
             // upload file to sftp server
             // sftp.Connect();
-            // sftp.Put(completeOrderDir + "\\" + value.TransactionID + ".xsd", CONFIRM_DIR);
+            // sftp.Put(path, CONFIRM_DIR);
             // sftp.Close();
         }
 

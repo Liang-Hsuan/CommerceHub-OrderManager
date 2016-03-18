@@ -8,14 +8,23 @@
     <Setting Name="Date" Type="System.DateTime" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="CHcs" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Data Source = kpjvpp867r.database.windows.net; Initial Catalog = CommerceHub; Integrated Security = False; User ID = database_admin; Password = AshlinData1; Connect Timeout = 60; Encrypt = False; TrustServerCertificate = False; MultipleActiveResultSets=true;</Value>
+    <Setting Name="CHcs" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="Designcs" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Data Source = kpjvpp867r.database.windows.net; Initial Catalog = Design_Database; Integrated Security = False; User ID = database_admin; Password = AshlinData1; Connect Timeout = 60; Encrypt = False; TrustServerCertificate = False;</Value>
+    <Setting Name="Designcs" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ASCMcs" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Data Source=kpjvpp867r.database.windows.net;Initial Catalog=ChannelPartner_Database;Integrated Security=False;User ID=database_admin;Password=AshlinData1;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;</Value>
+    <Setting Name="ASCMcs" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Username" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Password" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Remember" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

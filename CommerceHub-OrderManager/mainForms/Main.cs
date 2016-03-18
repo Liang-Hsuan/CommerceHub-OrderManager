@@ -15,6 +15,9 @@ namespace CommerceHub_OrderManager
         // field for brightpearl connection
         private readonly BPconnect bp = new BPconnect();
 
+        // field for parent
+        private Form parent;
+
         // field for storing data
         private struct Order
         {
@@ -23,7 +26,7 @@ namespace CommerceHub_OrderManager
         }
         private Order[] orderList;
 
-        public Main()
+        public Main(Form parent)
         {
             InitializeComponent();
 
@@ -32,6 +35,9 @@ namespace CommerceHub_OrderManager
 
             // show result on the chart
             refreshGraph();
+
+            // get parent
+            this.parent = parent;
         }
 
         /* save data when form close */
@@ -39,6 +45,8 @@ namespace CommerceHub_OrderManager
         {
             Properties.Settings.Default.Date = DateTime.Today;
             Properties.Settings.Default.Save();
+
+            parent.Close();
         }
 
         #region Top Buttons
