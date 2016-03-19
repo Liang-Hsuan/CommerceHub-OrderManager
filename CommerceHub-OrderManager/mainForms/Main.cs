@@ -1,11 +1,11 @@
-﻿using CommerceHub_OrderManager.channel.brightpearl;
-using CommerceHub_OrderManager.channel.sears;
-using CommerceHub_OrderManager.supportingClasses;
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows.Forms;
+using CommerceHub_OrderManager.channel.brightpearl;
+using CommerceHub_OrderManager.channel.sears;
+using CommerceHub_OrderManager.supportingClasses;
 
-namespace CommerceHub_OrderManager
+namespace CommerceHub_OrderManager.mainForms
 {
     public partial class Main : Form
     {
@@ -16,7 +16,7 @@ namespace CommerceHub_OrderManager
         private readonly BPconnect bp = new BPconnect();
 
         // field for parent
-        private Form parent;
+        private readonly Form parent;
 
         // field for storing data
         private struct Order

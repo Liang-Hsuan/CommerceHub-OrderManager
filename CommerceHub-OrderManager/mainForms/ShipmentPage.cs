@@ -1,11 +1,11 @@
-﻿using CommerceHub_OrderManager.channel.sears;
-using CommerceHub_OrderManager.supportingClasses;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using CommerceHub_OrderManager.channel.sears;
+using CommerceHub_OrderManager.supportingClasses;
 
-namespace CommerceHub_OrderManager
+namespace CommerceHub_OrderManager.mainForms
 {
     /*
      * An application module that can manage the shipped order

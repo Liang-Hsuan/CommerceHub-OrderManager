@@ -1,4 +1,4 @@
-﻿namespace CommerceHub_OrderManager
+﻿namespace CommerceHub_OrderManager.mainForms
 {
     partial class ShipmentPage
     {

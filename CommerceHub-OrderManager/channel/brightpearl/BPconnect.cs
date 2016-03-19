@@ -20,7 +20,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
         private readonly PostRequest post;
 
         // public field for accessing the status of the current progress
-        public string Status { get; set; }
+        public string Status { get; private set; }
 
         /* constructor that initialize request objects*/
         public BPconnect()
@@ -168,8 +168,8 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             private HttpWebResponse response;
 
             // fields for credentials
-            private string appRef;
-            private string appToken;
+            private readonly string appRef;
+            private readonly string appToken;
 
             /* constructor to initialize the web request of app reference and app token */
             public GetRequest(string appRef, string appToken)
@@ -321,7 +321,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             private readonly string appToken;
 
             // field for telling client if there is error occur
-            public bool HasError { get; set; }
+            public bool HasError { get; private set; }
 
             /* constructor to initialize the web request of app reference and app token */
             public PostRequest(string appRef, string appToken)
@@ -407,7 +407,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 request.Headers.Add("brightpearl-account-token", appToken);
 
                 // generate JSON file for order post
-                string textJSON = "{\"orderTypeCode\":\"SO\",\"reference\":\"" + value.Reference + "\",\"priceListId\":3\"placeOn\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\",\"orderStatus\":{\"orderStatusId\":2}," + "\"delivery\":{\"deliveryDate\":\"" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ', 'T') + "+00:00\",\"shippingMethodId\":7},\"currency\":{\"orderCurrencyCode\":\"CAD\"},\"parties\":{\"customer\":{\"contactId\":" + 
+                string textJSON = "{\"orderTypeCode\":\"SO\",\"reference\":\"" + value.Reference + "\",\"priceListId\":3,\"placeOn\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\",\"orderStatus\":{\"orderStatusId\":2}," + "\"delivery\":{\"deliveryDate\":\"" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ', 'T') + "+00:00\",\"shippingMethodId\":7},\"currency\":{\"orderCurrencyCode\":\"CAD\"},\"parties\":{\"customer\":{\"contactId\":" + 
                                   contactID + "},\"delivery\":{\"addressFullName\":\"" + value.Address.Name + "\",\"addressLine1\":\"" + value.Address.Address1 + "\",\"addressLine2\":\"" + value.Address.Address2 + "\",\"addressLine3\":\"" + value.Address.City + "\",\"addressLine4\":\"" + value.Address.State + "\",\"postalCode\":\"" + value.Address.PostalCode + "\",\"countryIsoCode\":\"CAN\",\"telephone\":\"" + value.Address.DayPhone + "\"}},\"assignment\":{\"current\":{\"channelId\":" + value.ChannelId + "}}}";
 
                 // turn request string into a byte stream

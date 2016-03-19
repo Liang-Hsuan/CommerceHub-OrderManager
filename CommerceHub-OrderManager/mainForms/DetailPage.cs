@@ -1,15 +1,15 @@
-﻿using CommerceHub_OrderManager.channel.brightpearl;
-using CommerceHub_OrderManager.channel.sears;
-using CommerceHub_OrderManager.supportingClasses;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using CommerceHub_OrderManager.channel.brightpearl;
+using CommerceHub_OrderManager.channel.sears;
+using CommerceHub_OrderManager.supportingClasses;
 
-namespace CommerceHub_OrderManager
+namespace CommerceHub_OrderManager.mainForms
 {
     public partial class DetailPage : Form
     {

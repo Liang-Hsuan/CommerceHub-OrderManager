@@ -35,11 +35,11 @@ namespace CommerceHub_OrderManager.channel.sears
             if (!Directory.Exists(rootDir))
                 Directory.CreateDirectory(rootDir);
 
-            newOrderDir = rootDir + "//SearsNewOrders";
+            newOrderDir = rootDir + "\\SearsNewOrders";
             if (!Directory.Exists(newOrderDir))
                 Directory.CreateDirectory(newOrderDir);
 
-            completeOrderDir = rootDir + "//SearsCompleteOrders";
+            completeOrderDir = rootDir + "\\SearsCompleteOrders";
             if (!Directory.Exists(completeOrderDir))
                 Directory.CreateDirectory(completeOrderDir);
             #endregion
