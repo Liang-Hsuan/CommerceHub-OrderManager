@@ -14,6 +14,9 @@ namespace CommerceHub_OrderManager.channel.sears
         // field for pdf generation
         private Document doc;
 
+        // boolearn flag to track error
+        public bool Error { get; private set; }
+
         /* get the save path of the sears packing slip */
         public string SavePath { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_PackingSlip";
 
@@ -27,6 +30,9 @@ namespace CommerceHub_OrderManager.channel.sears
         /* a method that save the packing slip pdf */
         public void createPackingSlip(SearsValues value, int[] cancelIndex, bool preview)
         {
+            // set error to false
+            Error = false;
+
             // the case if all of the items in the order are cancelled -> don't need to print the packing slip
             if (cancelIndex.Length >= value.LineCount)
                 return;
@@ -47,7 +53,16 @@ namespace CommerceHub_OrderManager.channel.sears
                     // initialize PdfWriter object
                     doc = new Document(PageSize.LETTER, 10, 10, 42, 35);
                     string file = SavePath + "\\" + value.TransactionID + "_" + (i + 1) + ".pdf";
-                    PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(file, FileMode.Create));
+                    PdfWriter writer = null;
+                    try
+                    {
+                        writer = PdfWriter.GetInstance(doc, new FileStream(file, FileMode.Create));
+                    }
+                    catch
+                    {
+                        Error = true;
+                        return;
+                    }
 
                     // open the document 
                     doc.Open();

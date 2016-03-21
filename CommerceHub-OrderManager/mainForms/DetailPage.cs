@@ -23,6 +23,9 @@ namespace CommerceHub_OrderManager.mainForms
         private Dictionary<int, string> cancelList;
         private int timeLeft = 4;   // default set to 4
 
+        // supporting field for storing address
+        private string addressOld;
+
         /* constructor that initializes graphic compents and order fields */
         public DetailPage(SearsValues value)
         {
@@ -39,6 +42,11 @@ namespace CommerceHub_OrderManager.mainForms
             int[] cancelIndex = getCancelIndex();
             SearsPackingSlip packingSlip = new SearsPackingSlip();
             packingSlip.createPackingSlip(value, cancelIndex, true);
+            if (packingSlip.Error)
+            {
+                MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
         }
 
         /* the event for verify button click that show the result of the address validity */
@@ -513,5 +521,54 @@ namespace CommerceHub_OrderManager.mainForms
             }
         }
         #endregion
+
+        #region ShipToCombineTextbox Events
+        /* key press event for ship to combine textbox that does not allow comma character */
+        private void shipToCombineTextbox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            char ch = e.KeyChar;
+
+            if (ch != ',')
+                e.Handled = false;
+        }
+
+        /* got focus event for ship to combine textbox that store old address value */
+        private void shipToCombineTextbox_Enter(object sender, EventArgs e)
+        {
+            addressOld = shipToCombineTextbox.Text;
+        }
+
+        /* text change event for ship to combine textbox that check if the user has delete any comma */
+        private void shipToCombineTextbox_TextChanged(object sender, EventArgs e)
+        {
+            if (addressOld == null) return;
+
+            // find number of comma in old address text
+            int[] count = { 0, 0 };
+            foreach (char c in addressOld)
+                if (c == ',') count[0]++;
+
+            // find number of comma in new address text
+            foreach (char c in shipToCombineTextbox.Text)
+                if (c == ',') count[1]++;
+
+            if (count[0] != count[1])
+                shipToCombineTextbox.Text = addressOld;
+            else
+            {
+                string addressNew = shipToCombineTextbox.Text;
+                value.ShipTo.City = addressNew.Substring(0, addressNew.IndexOf(','));
+                addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
+                value.ShipTo.State = addressNew.Substring(0, addressNew.IndexOf(','));
+                addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
+                value.ShipTo.PostalCode = addressNew.Substring(0);
+            }
+        }
+        #endregion
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(value.ShipTo.City + ", " + value.ShipTo.State + ", " + value.ShipTo.PostalCode);
+        }
     }
 }

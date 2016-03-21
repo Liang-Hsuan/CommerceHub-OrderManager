@@ -2,7 +2,6 @@ C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceH
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\CommerceHub-OrderManager.exe
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\CommerceHub-OrderManager.pdb
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub-OrderManager.csprojResolveAssemblyReference.cache
-C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.Main.resources
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.Properties.Resources.resources
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub-OrderManager.csproj.GenerateResource.Cache
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub-OrderManager.exe
@@ -12,7 +11,6 @@ C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceH
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\DiffieHellman.dll
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\Org.Mentalis.Security.dll
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\itextsharp.xml
-C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.DetailPage.resources
 \\Mac\Home\Documents\Visual Studio 2015\Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\CommerceHub-OrderManager.exe.config
 \\Mac\Home\Documents\Visual Studio 2015\Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub-OrderManager.exe
 \\Mac\Home\Documents\Visual Studio 2015\Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub-OrderManager.pdb
@@ -28,7 +26,6 @@ C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceH
 \\Mac\Home\Documents\Visual Studio 2015\Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\itextsharp.xml
 \\Mac\Home\Documents\Visual Studio 2015\Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.supportingClasses.ConfirmPanel.resources
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.supportingClasses.ConfirmPanel.resources
-C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.ShipmentPage.resources
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.Login.resources
 \\Mac\Home\Documents\Work\Ashlin BPG Markeing Inc\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\CommerceHub-OrderManager.exe.config
 \\Mac\Home\Documents\Work\Ashlin BPG Markeing Inc\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub-OrderManager.exe
@@ -52,3 +49,9 @@ C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceH
 \\Mac\Home\Documents\Visual Studio 2015\Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.mainForms.DetailPage.resources
 \\Mac\Home\Documents\Visual Studio 2015\Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.mainForms.Main.resources
 \\Mac\Home\Documents\Visual Studio 2015\Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.mainForms.ShipmentPage.resources
+V:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\CommerceHub-OrderManager.exe.config
+V:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub-OrderManager.exe
+V:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub-OrderManager.pdb
+C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.mainForms.DetailPage.resources
+C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.mainForms.Main.resources
+C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.mainForms.ShipmentPage.resources

@@ -179,7 +179,7 @@ namespace CommerceHub_OrderManager.channel.sears
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 SqlCommand command = new SqlCommand("SELECT TransactionId, TrackingNumber, ShipmentIdentificationNumber FROM Sears_Order " +
-                                                    "WHERE TrackingNumber != '' AND CustOrderDate > \'" + DateTime.Today.AddDays(-6).ToString("yyyy-MM-dd") + "\';", connection);
+                                                    "WHERE TrackingNumber != '' AND CompleteDate > \'" + DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd") + "\';", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 

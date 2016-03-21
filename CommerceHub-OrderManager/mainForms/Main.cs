@@ -115,6 +115,11 @@ namespace CommerceHub_OrderManager.mainForms
             foreach (SearsValues value in from ListViewItem item in listview.CheckedItems where item.SubItems[0].Text == "Sears" select item.SubItems[4].Text into transaction select sears.GenerateValue(transaction))
             {
                 searsPS.createPackingSlip(value, new int[0], false);
+                if (searsPS.Error)
+                {
+                    MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
                 channel = true;
             }
 

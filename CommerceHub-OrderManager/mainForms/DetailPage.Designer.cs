@@ -514,9 +514,11 @@
             this.shipToCombineTextbox.Location = new System.Drawing.Point(87, 178);
             this.shipToCombineTextbox.MaxLength = 40;
             this.shipToCombineTextbox.Name = "shipToCombineTextbox";
-            this.shipToCombineTextbox.ReadOnly = true;
             this.shipToCombineTextbox.Size = new System.Drawing.Size(206, 13);
             this.shipToCombineTextbox.TabIndex = 19;
+            this.shipToCombineTextbox.TextChanged += new System.EventHandler(this.shipToCombineTextbox_TextChanged);
+            this.shipToCombineTextbox.Enter += new System.EventHandler(this.shipToCombineTextbox_Enter);
+            this.shipToCombineTextbox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.shipToCombineTextbox_KeyPress);
             // 
             // shipToAddress2Textbox
             // 
