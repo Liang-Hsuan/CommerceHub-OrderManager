@@ -320,6 +320,5 @@ namespace CommerceHub_OrderManager.mainForms
             chart.Series["point"].MarkerSize = 10;
         }
         #endregion
-
     }
 }

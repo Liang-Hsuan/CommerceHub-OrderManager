@@ -43,10 +43,7 @@ namespace CommerceHub_OrderManager.mainForms
             SearsPackingSlip packingSlip = new SearsPackingSlip();
             packingSlip.createPackingSlip(value, cancelIndex, true);
             if (packingSlip.Error)
-            {
                 MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
         }
 
         /* the event for verify button click that show the result of the address validity */
@@ -478,7 +475,7 @@ namespace CommerceHub_OrderManager.mainForms
         }
 
         /* a method that get the detail of the given sku */
-        private decimal[] getSkuDetail(string sku)
+        private static decimal[] getSkuDetail(string sku)
         {
             // local supporting fields
             decimal[] list = new decimal[4];
@@ -545,12 +542,12 @@ namespace CommerceHub_OrderManager.mainForms
 
             // find number of comma in old address text
             int[] count = { 0, 0 };
-            foreach (char c in addressOld)
-                if (c == ',') count[0]++;
+            foreach (char c in addressOld.Where(c => c == ','))
+                count[0]++;
 
             // find number of comma in new address text
-            foreach (char c in shipToCombineTextbox.Text)
-                if (c == ',') count[1]++;
+            foreach (char c in shipToCombineTextbox.Text.Where(c => c == ','))
+                count[1]++;
 
             if (count[0] != count[1])
                 shipToCombineTextbox.Text = addressOld;
@@ -565,10 +562,5 @@ namespace CommerceHub_OrderManager.mainForms
             }
         }
         #endregion
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show(value.ShipTo.City + ", " + value.ShipTo.State + ", " + value.ShipTo.PostalCode);
-        }
     }
 }

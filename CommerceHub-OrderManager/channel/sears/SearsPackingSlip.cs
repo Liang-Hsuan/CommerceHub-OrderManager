@@ -53,7 +53,7 @@ namespace CommerceHub_OrderManager.channel.sears
                     // initialize PdfWriter object
                     doc = new Document(PageSize.LETTER, 10, 10, 42, 35);
                     string file = SavePath + "\\" + value.TransactionID + "_" + (i + 1) + ".pdf";
-                    PdfWriter writer = null;
+                    PdfWriter writer;
                     try
                     {
                         writer = PdfWriter.GetInstance(doc, new FileStream(file, FileMode.Create));
@@ -98,7 +98,7 @@ namespace CommerceHub_OrderManager.channel.sears
 
                     // set ship to
                     // title
-                    text = new Phrase("RECIPIENT/DESTINATAIRA:", new iTextSharp.text.Font(baseFont, 7));
+                    text = new Phrase("RECIPIENT/DESTINATAIRA:", new Font(baseFont, 7));
                     ct.SetSimpleColumn(text, 10f, 693f, 150f, 713f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
 
