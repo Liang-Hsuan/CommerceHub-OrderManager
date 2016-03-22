@@ -64,7 +64,6 @@ namespace CommerceHub_OrderManager
                 invalidLabel.Visible = true;
 
             Properties.Settings.Default.Remember = remember;
-            Properties.Settings.Default.Save();
         }
 
         /* a supporting method that see if the connection is valid or not */

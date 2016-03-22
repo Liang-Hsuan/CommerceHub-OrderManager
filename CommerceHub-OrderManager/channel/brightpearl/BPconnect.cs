@@ -27,7 +27,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
         {
             // initialize API authentication
             SqlConnection authenticationConnection = new SqlConnection(Properties.Settings.Default.ASCMcs);
-            SqlCommand getAuthetication = new SqlCommand("SELECT Field3_Value, Field1_Value FROM ASCM_Credentials WHERE Source = \'Brightpearl Testing\';", authenticationConnection);
+            SqlCommand getAuthetication = new SqlCommand("SELECT Field3_Value, Field1_Value FROM ASCM_Credentials WHERE Source = \'Brightpearl\';", authenticationConnection);
             authenticationConnection.Open();
             SqlDataReader reader = getAuthetication.ExecuteReader();
             reader.Read();
@@ -55,7 +55,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             double total = value.TrxBalanceDue;
 
             // initialize order BPvalues object
-            BPvalues orderValue = new BPvalues(value.Recipient, value.TransactionID, value.CustOrderDate, 7, 7, null, null, 0, 0, 0, 0);
+            BPvalues orderValue = new BPvalues(value.Recipient, value.TransactionID, value.CustOrderDate, 1, 7, null, null, 0, 0, 0, 0);
 
             // post order
             string orderId = post.postOrderRequest("2854", orderValue);
@@ -93,7 +93,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                     // initialize item BPvalues object
                     double netPrice = value.UnitPrice[i] * value.TrxQty[i];
-                    BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 7, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], netPrice, tax, value.LineBalanceDue[i]);
+                    BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], netPrice, tax, value.LineBalanceDue[i]);
 
                     // post order row
                     string orderRowId = post.postOrderRowRequest(orderId, itemValue);
@@ -182,7 +182,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             public string getCustomerId(string firstName, string lastName, string postalCode)
             {
                 #region Contact ID Get
-                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlintest/contact-service/contact-search?firstName=" + firstName + "&lastName=" + lastName;
+                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/contact-service/contact-search?firstName=" + firstName + "&lastName=" + lastName;
 
                 // post request to uri
                 request = WebRequest.Create(uri);
@@ -225,7 +225,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 #region Postal Code Compare
                 // generate uri for getting more information on the customer id found to compare result
-                uri = "https://ws-use.brightpearl.com/public-api/ashlintest/contact-service/contact/";
+                uri = "https://ws-use.brightpearl.com/public-api/ashlin/contact-service/contact/";
 
                 for (int i = 0; i < number; i++)
                     uri += list[i] + ',';
@@ -235,8 +235,8 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 Console.ReadLine();
 
                 request = WebRequest.Create(uri);
-                request.Headers.Add("brightpearl-app-ref", "ashlintest_intern-1002");
-                request.Headers.Add("brightpearl-account-token", "aZroyMTQ7Lf3EygEbyvXYTsYnDB7S4HjgHjuxjbMA00=");
+                request.Headers.Add("brightpearl-app-ref", appRef);
+                request.Headers.Add("brightpearl-account-token", appToken);
                 request.Method = "GET";
 
                 // get the response from the server
@@ -279,7 +279,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             /* a method that return product id from given sku */
             public string getProductId(string sku)
             {
-                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlintest/product-service/product-search?SKU=" + sku;
+                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/product-service/product-search?SKU=" + sku;
 
                 // post request to uri
                 request = WebRequest.Create(uri);
@@ -335,7 +335,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             /* post new address to API */
             public string postAddressRequest(Address address)
             {
-                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlintest/contact-service/postal-address";
+                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/contact-service/postal-address";
 
                 request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Method = "POST";
@@ -366,7 +366,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             /* post new customer to API */
             public string postContactRequest(string addressID, BPvalues value)
             {
-                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlintest/contact-service/contact";
+                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/contact-service/contact";
 
                 request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Method = "POST";
@@ -376,7 +376,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                 // generate JSON file for contact post
                 string textJSON = "{\"firstName\":\"" + value.Address.Name.Remove(value.Address.Name.IndexOf(' ')) + "\",\"lastName\":\"" + value.Address.Name.Substring(value.Address.Name.IndexOf(' ') + 1) + "\",\"postAddressIds\":{\"DEF\":" + addressID + ",\"BIL\":" + addressID + ",\"DEL\":" + addressID + "}," + 
-                                  "\"communication\":{\"telephones\":{\"PRI\":\"" + value.Address.DayPhone + "\"}},\"relationshipToAccount\":{\"isSupplier\": false,\"isStaff\":false,\"isCustomer\":true},\"financialDetails\":{\"priceListId\": 5}}";
+                                  "\"communication\":{\"telephones\":{\"PRI\":\"" + value.Address.DayPhone + "\"}},\"relationshipToAccount\":{\"isSupplier\": false,\"isStaff\":false,\"isCustomer\":true},\"financialDetails\":{\"priceListId\":3}}";
 
                 // turn request string into a byte stream
                 byte[] postBytes = Encoding.UTF8.GetBytes(textJSON);
@@ -398,7 +398,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             /* post new order to API */
             public string postOrderRequest(string contactID, BPvalues value)
             {
-                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlintest/order-service/order";
+                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/order-service/order";
 
                 request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Method = "POST";
@@ -407,7 +407,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 request.Headers.Add("brightpearl-account-token", appToken);
 
                 // generate JSON file for order post
-                string textJSON = "{\"orderTypeCode\":\"SO\",\"reference\":\"" + value.Reference + "\",\"priceListId\":3,\"placeOn\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\",\"orderStatus\":{\"orderStatusId\":2}," + "\"delivery\":{\"deliveryDate\":\"" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ', 'T') + "+00:00\",\"shippingMethodId\":7},\"currency\":{\"orderCurrencyCode\":\"CAD\"},\"parties\":{\"customer\":{\"contactId\":" + 
+                string textJSON = "{\"orderTypeCode\":\"SO\",\"reference\":\"" + value.Reference + "\",\"priceListId\":3,\"placeOn\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\",\"orderStatus\":{\"orderStatusId\":2}," + "\"delivery\":{\"deliveryDate\":\"" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ', 'T') + "+00:00\",\"shippingMethodId\":" + value.DeliveryId + "},\"currency\":{\"orderCurrencyCode\":\"CAD\"},\"parties\":{\"customer\":{\"contactId\":" + 
                                   contactID + "},\"delivery\":{\"addressFullName\":\"" + value.Address.Name + "\",\"addressLine1\":\"" + value.Address.Address1 + "\",\"addressLine2\":\"" + value.Address.Address2 + "\",\"addressLine3\":\"" + value.Address.City + "\",\"addressLine4\":\"" + value.Address.State + "\",\"postalCode\":\"" + value.Address.PostalCode + "\",\"countryIsoCode\":\"CAN\",\"telephone\":\"" + value.Address.DayPhone + "\"}},\"assignment\":{\"current\":{\"channelId\":" + value.ChannelId + "}}}";
 
                 // turn request string into a byte stream
@@ -442,7 +442,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 GetRequest get = new GetRequest(appRef, appToken);
                 string productId = get.getProductId(value.SKU);
 
-                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlintest/order-service/order/" + orderID + "/row";
+                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/order-service/order/" + orderID + "/row";
                 request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Method = "POST";
                 request.ContentType = "application/json";
@@ -540,7 +540,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 GetRequest get = new GetRequest(appRef, appToken);
                 string productId = get.getProductId(value.SKU);
 
-                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlintest/warehouse-service/order/" + orderID + "/reservation/warehouse/2";
+                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/warehouse-service/order/" + orderID + "/reservation/warehouse/2";
                 request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Method = "POST";
                 request.ContentType = "application/json";
@@ -585,7 +585,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 // reset boolean flag to false 
                 HasError = false;
 
-                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlintest/accounting-service/sales-receipt";
+                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/accounting-service/sales-receipt";
                 request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Method = "POST";
                 request.ContentType = "application/json";
