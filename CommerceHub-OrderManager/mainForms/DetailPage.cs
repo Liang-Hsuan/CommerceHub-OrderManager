@@ -329,6 +329,12 @@ namespace CommerceHub_OrderManager.mainForms
                     cancelList.Add(i, reason);
                 }
 
+                if (cancelList.Count < value.LineCount && value.Package.TrackingNumber == "")
+                {
+                    MessageBox.Show("There are items that are not shipped", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 progressbar.Visible = true;
 
                 // call background worker
@@ -560,6 +566,20 @@ namespace CommerceHub_OrderManager.mainForms
                 addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
                 value.ShipTo.PostalCode = addressNew.Substring(0);
             }
+        }
+        #endregion
+
+        #region Numeric Up Down
+        /* weight kg numeric updown value change that change the value of pound numeric updown as well */
+        private void weightKgUpdown_ValueChanged(object sender, EventArgs e)
+        {
+            weightLbUpdown.Value = weightKgUpdown.Value * 2.20462m;
+        }
+
+        /* weight lb numeric updown value change that change the value of kilgram numeric updown as well */
+        private void weightLbUpdown_ValueChanged(object sender, EventArgs e)
+        {
+            weightKgUpdown.Value = weightLbUpdown.Value / 2.20462m;
         }
         #endregion
     }

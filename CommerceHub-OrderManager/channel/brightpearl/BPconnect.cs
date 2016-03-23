@@ -93,7 +93,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
 
                     // initialize item BPvalues object
                     double netPrice = value.UnitPrice[i] * value.TrxQty[i];
-                    BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], netPrice, tax, value.LineBalanceDue[i]);
+                    BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], netPrice, tax, value.TrxUnitCost[i]);
 
                     // post order row
                     string orderRowId = post.postOrderRowRequest(orderId, itemValue);

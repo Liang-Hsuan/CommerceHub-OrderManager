@@ -864,6 +864,11 @@
             // heightUpdown
             // 
             this.heightUpdown.DecimalPlaces = 2;
+            this.heightUpdown.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
             this.heightUpdown.Location = new System.Drawing.Point(269, 265);
             this.heightUpdown.Maximum = new decimal(new int[] {
             1000,
@@ -877,6 +882,11 @@
             // widthUpdown
             // 
             this.widthUpdown.DecimalPlaces = 2;
+            this.widthUpdown.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
             this.widthUpdown.Location = new System.Drawing.Point(200, 265);
             this.widthUpdown.Maximum = new decimal(new int[] {
             1000,
@@ -890,6 +900,11 @@
             // lengthUpdown
             // 
             this.lengthUpdown.DecimalPlaces = 2;
+            this.lengthUpdown.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
             this.lengthUpdown.Location = new System.Drawing.Point(131, 265);
             this.lengthUpdown.Maximum = new decimal(new int[] {
             1000,
@@ -970,6 +985,11 @@
             // weightLbUpdown
             // 
             this.weightLbUpdown.DecimalPlaces = 3;
+            this.weightLbUpdown.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            196608});
             this.weightLbUpdown.Location = new System.Drawing.Point(238, 120);
             this.weightLbUpdown.Maximum = new decimal(new int[] {
             20,
@@ -979,10 +999,16 @@
             this.weightLbUpdown.Name = "weightLbUpdown";
             this.weightLbUpdown.Size = new System.Drawing.Size(66, 20);
             this.weightLbUpdown.TabIndex = 13;
+            this.weightLbUpdown.ValueChanged += new System.EventHandler(this.weightLbUpdown_ValueChanged);
             // 
             // weightKgUpdown
             // 
             this.weightKgUpdown.DecimalPlaces = 3;
+            this.weightKgUpdown.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            196608});
             this.weightKgUpdown.Location = new System.Drawing.Point(131, 120);
             this.weightKgUpdown.Maximum = new decimal(new int[] {
             10,
@@ -992,6 +1018,7 @@
             this.weightKgUpdown.Name = "weightKgUpdown";
             this.weightKgUpdown.Size = new System.Drawing.Size(66, 20);
             this.weightKgUpdown.TabIndex = 12;
+            this.weightKgUpdown.ValueChanged += new System.EventHandler(this.weightKgUpdown_ValueChanged);
             // 
             // weightLabel
             // 

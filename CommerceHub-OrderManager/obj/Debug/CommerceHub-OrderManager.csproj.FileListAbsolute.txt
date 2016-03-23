@@ -55,3 +55,21 @@ V:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\D
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.mainForms.DetailPage.resources
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.mainForms.Main.resources
 C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.mainForms.ShipmentPage.resources
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\CommerceHub-OrderManager.exe.config
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub-OrderManager.exe
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub-OrderManager.pdb
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\CommerceHub-OrderManager.exe
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\CommerceHub-OrderManager.pdb
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\itextsharp.dll
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\Tamir.SharpSSH.dll
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\DiffieHellman.dll
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\Org.Mentalis.Security.dll
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\bin\Debug\itextsharp.xml
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub-OrderManager.csprojResolveAssemblyReference.cache
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.Login.resources
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.mainForms.DetailPage.resources
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.mainForms.Main.resources
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.Properties.Resources.resources
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.mainForms.ShipmentPage.resources
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub_OrderManager.supportingClasses.ConfirmPanel.resources
+E:\Project\Real Projects\CommerceHub-OrderManager\CommerceHub-OrderManager\obj\Debug\CommerceHub-OrderManager.csproj.GenerateResource.Cache
