@@ -51,9 +51,6 @@ namespace CommerceHub_OrderManager.channel.brightpearl
                 return;
 
             #region Posting Order to Sears Account on BP
-            // field for receipt
-            double total = value.TrxBalanceDue;
-
             // initialize order BPvalues object
             BPvalues orderValue = new BPvalues(value.Recipient, value.TransactionID, value.CustOrderDate, 1, 7, null, null, 0, 0, 0, 0);
 
@@ -74,17 +71,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             for (int i = 0; i < value.LineCount; i++)
             {
                 // boolean flag to see if the item is cancelled
-                bool cancelled = false;
-
-                // check if the item is cancelled or not
-                foreach (int j in cancelList.Where(j => j == i))
-                {
-                    // substract the item's price
-                    total -= value.LineBalanceDue[j];
-
-                    cancelled = true;
-                    break;
-                }
+                bool cancelled = cancelList.Where(j => j == i).Any();
 
                 // the case if not cancel post it to brightpearl
                 if (cancelled) continue;
