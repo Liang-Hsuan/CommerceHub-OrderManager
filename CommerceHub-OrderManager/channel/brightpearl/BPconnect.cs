@@ -60,83 +60,85 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             // post order
             string orderId = post.postOrderRequest("2854", orderValue);
             Status = "Getting order ID";
-                if (orderId == "Error")
+            if (orderId == "Error")
+            {
+                Status = "Error occur during order post";
+                do
                 {
-                    Status = "Error occur during order post";
+                    Thread.Sleep(5000);
+                    orderId = post.postOrderRequest("2854", orderValue);
+                } while (orderId == "Error");
+            }
+
+            // calculate the total amount when excluding the cancelled items
+            for (int i = 0; i < value.LineCount; i++)
+            {
+                // boolean flag to see if the item is cancelled
+                bool cancelled = false;
+
+                // check if the item is cancelled or not
+                foreach (int j in cancelList.Where(j => j == i))
+                {
+                    // substract the item's price
+                    total -= value.LineBalanceDue[j];
+
+                    cancelled = true;
+                    break;
+                }
+
+                // the case if not cancel post it to brightpearl
+                if (cancelled) continue;
+
+                // price calculation ( no use rigth now )
+                // double tax = value.GST_HST_Extended[i] + value.PST_Extended[i] + value.GST_HST_Total[i] + value.PST_Total[i];
+                // double netPrice = value.UnitPrice[i] * value.TrxQty[i];
+
+                // initialize BPvalues object -> no need tax and total paid ( this is unit cost & no recipt )
+                BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], value.TrxUnitCost[i], 0, 0);
+
+                // post order row
+                string orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                Status = "Getting order row ID";
+                if (orderRowId == "Error")
+                {
+                    Status = "Error occur during order row post " + i;
                     do
                     {
                         Thread.Sleep(5000);
-                        orderId = post.postOrderRequest("2854", orderValue);
-                    } while (orderId == "Error");
+                        orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                    } while (orderRowId == "Error");
                 }
 
-                // calculate the total amount when excluding the cancelled items
-                for (int i = 0; i < value.LineCount; i++)
+                // post reservation
+                string reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
+                Status = "Posting reservation request " + i;
+                if (reservation == "503")
                 {
-                    // boolean flag to see if the item is cancelled
-                    bool cancelled = false;
-
-                    // check if the item is cancelled or not
-                    foreach (int j in cancelList.Where(j => j == i))
-                    {
-                        // substract the item's price
-                        total -= value.LineBalanceDue[j];
-
-                        cancelled = true;
-                        break;
-                    }
-
-                    // the case if not cancel post it to brightpearl
-                    if (cancelled) continue;
-                    // GST, HST, PST
-                    double tax = value.GST_HST_Extended[i] + value.PST_Extended[i] + value.GST_HST_Total[i] + value.PST_Total[i];
-
-                    // initialize item BPvalues object
-                    double netPrice = value.UnitPrice[i] * value.TrxQty[i];
-                    BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], netPrice, tax, value.TrxUnitCost[i]);
-
-                    // post order row
-                    string orderRowId = post.postOrderRowRequest(orderId, itemValue);
-                    Status = "Getting order row ID";
-                    if (orderRowId == "Error")
-                    {
-                        Status = "Error occur during order row post " + i;
-                        do
-                        {
-                            Thread.Sleep(5000);
-                            orderRowId = post.postOrderRowRequest(orderId, itemValue);
-                        } while (orderRowId == "Error");
-                    }
-
-                    // post reservation
-                    string reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
-                    Status = "Posting reservation request " + i;
-                    if (reservation == "503")
-                    {
-                        Status = "Error occur during reservation post " + i;
-                        do
-                        {
-                            Thread.Sleep(5000);
-                            reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
-                        } while (reservation == "503");
-                    }
-                }
-
-                // set total paid to bp value
-                orderValue.TotalPaid = total;
-
-                // post receipt
-                post.postReceipt(orderId, "2854", orderValue);
-                Status = "Posting receipt";
-                if (post.HasError)
-                {
-                    Status = "Error occur during receipt post";
+                    Status = "Error occur during reservation post " + i;
                     do
                     {
                         Thread.Sleep(5000);
-                        post.postReceipt(orderId, "2854", orderValue);
-                    } while (post.HasError);
+                        reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
+                    } while (reservation == "503");
                 }
+            }
+
+            /* ( no need to post receipt for sears )
+            // set total paid to bp value
+            orderValue.TotalPaid = total;
+
+            // post receipt
+            post.postReceipt(orderId, "2854", orderValue);
+            Status = "Posting receipt";
+            if (post.HasError)
+            {
+                Status = "Error occur during receipt post";
+                do
+                {
+                    Thread.Sleep(5000);
+                    post.postReceipt(orderId, "2854", orderValue);
+                } while (post.HasError);
+            } */
             #endregion
         }
 
@@ -439,8 +441,7 @@ namespace CommerceHub_OrderManager.channel.brightpearl
             public string postOrderRowRequest(string orderID, BPvalues value)
             {
                 // get product id
-                GetRequest get = new GetRequest(appRef, appToken);
-                string productId = get.getProductId(value.SKU);
+                string productId = new GetRequest(appRef, appToken).getProductId(value.SKU);
 
                 string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/order-service/order/" + orderID + "/row";
                 request = (HttpWebRequest)WebRequest.Create(uri);

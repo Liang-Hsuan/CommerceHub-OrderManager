@@ -292,7 +292,7 @@ namespace CommerceHub_OrderManager.channel.sears
         }
 
         /* method that get all the transaction in the file */
-        private string[] getTransactionId(string[] fileText)
+        private static string[] getTransactionId(string[] fileText)
         {
             // local field for storing data
             List<string> list = new List<string>();
@@ -345,7 +345,7 @@ namespace CommerceHub_OrderManager.channel.sears
         }
 
         /* a method that receive all the current transaction and check the duplicate then only return the ones that have not been added to the database */
-        private string[] checkTransaction(string[] allTransactionList)
+        private static string[] checkTransaction(string[] allTransactionList)
         {
             // get all complete transaction 
             List<string> completeTransactionList = new List<string>();
@@ -903,7 +903,7 @@ namespace CommerceHub_OrderManager.channel.sears
         #endregion
 
         /* a method that add a new transaction order to database */
-        private void addNewOrder(SearsValues value)
+        private static void addNewOrder(SearsValues value)
         {
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
