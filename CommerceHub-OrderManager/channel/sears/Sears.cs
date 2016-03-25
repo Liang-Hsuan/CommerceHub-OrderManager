@@ -92,7 +92,7 @@ namespace CommerceHub_OrderManager.channel.sears
             {
                 SqlCommand command = new SqlCommand("SELECT TransactionId, LineCount, PoNumber, TrxBalanceDue, ServiceLevel, OrderDate, paymentMethod, CustOrderNumber, CustOrderDate, PackSlipmessage, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, " +
                                                     "RecipientName, RecipientAddress1, RecipientAddress2, RecipientCity, RecipientState, RecipientPostalCode, RecipientPhone, ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, FreightLane, Spur " +
-                                                    "FROM Sears_Order WHERE Complete =\'False\' ORDER BY TransactionId;", connection);
+                                                    "FROM Sears_Order WHERE Complete ='False' ORDER BY TransactionId;", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
@@ -276,7 +276,7 @@ namespace CommerceHub_OrderManager.channel.sears
 
                 // change file to txt and save file to local
                 string fileNameTxt = file.Replace("neworders", "txt");
-                sftp.Get(SHIPMENT_DIR + "/" + file, filePath + "//" + fileNameTxt);
+                sftp.Get(SHIPMENT_DIR + "/" + file, filePath + "\\" + fileNameTxt);
 
                 // after download the file delete it on the server (no need it anymore)
                 ServerDelete.delete(sftp, SHIPMENT_DIR + "/" + file);
@@ -286,7 +286,7 @@ namespace CommerceHub_OrderManager.channel.sears
         }
 
         /* method that get the new order from sftp server */
-        private string[] getOrderName(string serverDir)
+        private IEnumerable<string> getOrderName(string serverDir)
         {
             // connection to sftp server and read all the list of file
             sftp.Connect();
@@ -344,7 +344,7 @@ namespace CommerceHub_OrderManager.channel.sears
             FileInfo[] filesLocal = dirInfo.GetFiles("*.txt");       // getting all file that have been on local
 
             // get all order file on server
-            string[] fileOnServer = getOrderName(SHIPMENT_DIR);
+            IEnumerable<string> fileOnServer = getOrderName(SHIPMENT_DIR);
 
             // check the number of new order on the server compare to ones on the computer
             return (from file1 in fileOnServer let found = filesLocal.Select(file2 => file2.ToString()).Any(file2Copy => file1.Remove(file1.LastIndexOf('.')) == file2Copy.Remove(file2Copy.LastIndexOf('.'))) where !found select file1).ToArray();
@@ -907,6 +907,42 @@ namespace CommerceHub_OrderManager.channel.sears
             return value;
         }
         #endregion
+
+        /* a method that delete obsolete orders in database and clear all local files */
+        public void delete()
+        {
+            #region Database Delete
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            {
+                // get all the transaction id that are obsolete
+                SqlCommand command = new SqlCommand("SELECT TransactionId FROM Sears_Order WHERE CompleteDate < \'" + DateTime.Today.AddDays(-120).ToString("yyyy-MM-dd") + "\';");
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                // add transaction id to list
+                List<string> list = new List<string>();
+                while (reader.Read())
+                    list.Add(reader.GetString(0));
+
+                // start deleting
+                foreach (string transaction in list)
+                {
+                    // delete items
+                    command.CommandText = "DELETE FROM Sears_Order_Item WHERE TransactionId = \'" + transaction + "\';";
+                    command.ExecuteNonQuery();
+
+                    // delete orders
+                    command.CommandText = "DELETE FROM Sears_Order WHERE TransactionId = \'" + transaction + "\';";
+                    command.ExecuteNonQuery();
+                }
+            }
+            #endregion
+
+            // Local Delete
+            DirectoryInfo di = new DirectoryInfo(newOrderDir);
+            foreach (FileInfo file in di.GetFiles())
+                file.Delete();
+        }
 
         /* a method that add a new transaction order to database */
         private static void addNewOrder(SearsValues value)
