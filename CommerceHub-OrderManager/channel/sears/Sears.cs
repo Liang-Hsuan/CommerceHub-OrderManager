@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using CommerceHub_OrderManager.supportingClasses;
 using Tamir.SharpSsh;
 
 namespace CommerceHub_OrderManager.channel.sears
@@ -52,6 +53,7 @@ namespace CommerceHub_OrderManager.channel.sears
                 SqlDataReader reader = command.ExecuteReader();
                 reader.Read();
 
+                // initialize Sftp
                 sftp = new Sftp(reader.GetString(2), reader.GetString(0), reader.GetString(1));
             }
         }
@@ -271,9 +273,13 @@ namespace CommerceHub_OrderManager.channel.sears
             foreach (string file in fileList)
             {
                 if (file == "." || file == "..") continue;
-                // change file to txt 
+
+                // change file to txt and save file to local
                 string fileNameTxt = file.Replace("neworders", "txt");
                 sftp.Get(SHIPMENT_DIR + "/" + file, filePath + "//" + fileNameTxt);
+
+                // after download the file delete it on the server (no need it anymore)
+                ServerDelete.delete(sftp, SHIPMENT_DIR + "/" + file);
             }
 
             sftp.Close();

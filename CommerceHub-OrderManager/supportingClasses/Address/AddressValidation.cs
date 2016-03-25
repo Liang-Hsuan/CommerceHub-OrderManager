@@ -14,7 +14,7 @@ namespace CommerceHub_OrderManager.supportingClasses
         private HttpWebResponse response;
 
         /* the main method of the object that return if the address is valid or not */
-        public bool validate(Address address)
+        public bool validate(Address.Address address)
         {
             // generate uri
             string uri = "https://maps.googleapis.com/maps/api/geocode/xml?address=";
@@ -44,11 +44,8 @@ namespace CommerceHub_OrderManager.supportingClasses
                 result = substringMethod(result, "</result>", 8);
             }
 
-            // the case if the total results more than 1 -> invalid address
-            if (count != 1)
-                return false;
-
-            return true;
+            // only has 1 result will be the correct value
+            return count == 1;
         }
 
         #region Supporting Methods

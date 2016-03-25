@@ -1,5 +1,6 @@
 ﻿using System;
 using CommerceHub_OrderManager.supportingClasses;
+using CommerceHub_OrderManager.supportingClasses.Address;
 
 namespace CommerceHub_OrderManager.channel.brightpearl
 {

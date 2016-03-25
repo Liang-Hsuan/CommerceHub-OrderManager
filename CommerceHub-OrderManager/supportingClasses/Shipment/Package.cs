@@ -1,9 +1,9 @@
-﻿using CommerceHub_OrderManager.channel.sears;
-using System;
+﻿using System;
 using System.Data.SqlClient;
 using System.Linq;
+using CommerceHub_OrderManager.channel.sears;
 
-namespace CommerceHub_OrderManager.supportingClasses
+namespace CommerceHub_OrderManager.supportingClasses.Shipment
 {
     /* 
      * A class that is able to store package detail
@@ -78,7 +78,7 @@ namespace CommerceHub_OrderManager.supportingClasses
         }
 
         /* a method that get the detail of the given sku */
-        private decimal[] getSkuDetail(string sku)
+        private static decimal[] getSkuDetail(string sku)
         {
             // local supporting fields
             decimal[] list = new decimal[4];

@@ -1,12 +1,12 @@
-﻿using CommerceHub_OrderManager.channel.sears;
-using System;
+﻿using System;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Text;
+using CommerceHub_OrderManager.channel.sears;
 
-namespace CommerceHub_OrderManager.supportingClasses
+namespace CommerceHub_OrderManager.supportingClasses.Shipment
 {
     /* 
      * A class that post shipment to UPS
@@ -350,14 +350,6 @@ namespace CommerceHub_OrderManager.supportingClasses
             Image image = Image.FromStream(ms, true);
             image.RotateFlip(RotateFlipType.Rotate90FlipNone);
 
-            /*// set image size
-            Graphics g = Graphics.FromHwnd(IntPtr.Zero);
-            float dpiX = g.DpiX;
-            int pixelX = (int)(3.8f * dpiX);
-
-            float ratio = (float)image.Width / image.Height;
-            image = new Bitmap(image, pixelX, (int)(pixelX/ratio)); */
-
             // save image
             // check if the save directory exist -> if not create it
             if (!File.Exists(savePathSears))
@@ -380,13 +372,13 @@ namespace CommerceHub_OrderManager.supportingClasses
 
         #region Supporting Methods
         /* a method that substring the given string */
-        private string substringMethod(string original, string startingString, int additionIndex)
+        private static string substringMethod(string original, string startingString, int additionIndex)
         {
             return original.Substring(original.IndexOf(startingString) + additionIndex);
         }
 
         /* a method that get the next target token */
-        private string getTarget(string text)
+        private static string getTarget(string text)
         {
             int i = 0;
             while (text[i] != '<' && text[i] != '>' && text[i] != '"')

@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using CommerceHub_OrderManager.channel.brightpearl;
 using CommerceHub_OrderManager.channel.sears;
 using CommerceHub_OrderManager.supportingClasses;
+using CommerceHub_OrderManager.supportingClasses.Shipment;
 
 namespace CommerceHub_OrderManager.mainForms
 {

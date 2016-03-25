@@ -1,4 +1,4 @@
-﻿namespace CommerceHub_OrderManager.supportingClasses
+﻿namespace CommerceHub_OrderManager.supportingClasses.Address
 {
     /* 
      * A class that store address value

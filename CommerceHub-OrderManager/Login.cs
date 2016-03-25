@@ -83,7 +83,7 @@ namespace CommerceHub_OrderManager
         /* remember check box event that determine if the program will remember user's credentials */
         private void rememberCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            remember = rememberCheckbox.Checked ? true : false;
+            remember = rememberCheckbox.Checked;
         }
     }
 }

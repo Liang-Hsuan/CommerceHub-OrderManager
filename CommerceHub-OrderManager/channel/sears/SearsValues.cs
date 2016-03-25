@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommerceHub_OrderManager.supportingClasses;
+using CommerceHub_OrderManager.supportingClasses.Address;
+using CommerceHub_OrderManager.supportingClasses.Shipment;
 
 namespace CommerceHub_OrderManager.channel.sears
 {

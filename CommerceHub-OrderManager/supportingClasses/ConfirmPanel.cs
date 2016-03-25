@@ -17,7 +17,7 @@ namespace CommerceHub_OrderManager.supportingClasses
         }
 
         /* get and set the text of question */
-        public string Text
+        public string Question
         {
             get
             {

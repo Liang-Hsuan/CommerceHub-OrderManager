@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using CommerceHub_OrderManager.channel.sears;
-using CommerceHub_OrderManager.supportingClasses;
+using CommerceHub_OrderManager.supportingClasses.Shipment;
 
 namespace CommerceHub_OrderManager.mainForms
 {
@@ -68,20 +68,16 @@ namespace CommerceHub_OrderManager.mainForms
             }
 
             // local fields for storing data
-            List<Order> cancelList = new List<Order>();
             List<string> list = new List<string>();
 
             // adding cancel order list and post shipment void
-            foreach (ListViewItem item in listview.CheckedItems)
-            {
-                Order order = new Order();
-
-                order.source = item.SubItems[0].Text;
-                order.transactionId = item.SubItems[1].Text;
-                order.shipmentIdentificationNumber = ups.postShipmentVoid(item.SubItems[2].Text);
-
-                cancelList.Add(order);
-            }
+            List<Order> cancelList = (from ListViewItem item in listview.CheckedItems
+                select new Order
+                {
+                    source = item.SubItems[0].Text,
+                    transactionId = item.SubItems[1].Text,
+                    shipmentIdentificationNumber = ups.postShipmentVoid(item.SubItems[2].Text)
+                }).ToList();
 
             // sears cancellation
             foreach (Order cancelledOrder in cancelList.Where(cancelledOrder => cancelledOrder.source == "Sears"))

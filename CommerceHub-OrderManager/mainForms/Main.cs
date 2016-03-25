@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using CommerceHub_OrderManager.channel.brightpearl;
 using CommerceHub_OrderManager.channel.sears;
 using CommerceHub_OrderManager.supportingClasses;
+using CommerceHub_OrderManager.supportingClasses.Shipment;
 
 namespace CommerceHub_OrderManager.mainForms
 {
@@ -80,10 +81,11 @@ namespace CommerceHub_OrderManager.mainForms
                 // adding each order to the list with source and transaction id
                 for (int i = 0; i < length; i++)
                 {
-                    Order order = new Order();
-
-                    order.source = listview.CheckedItems[i].SubItems[0].Text;
-                    order.transactionId = listview.CheckedItems[i].SubItems[4].Text;
+                    Order order = new Order
+                    {
+                        source = listview.CheckedItems[i].SubItems[0].Text,
+                        transactionId = listview.CheckedItems[i].SubItems[4].Text
+                    };
 
                     orderList[i] = order;
                 }

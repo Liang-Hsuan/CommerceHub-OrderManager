@@ -6,7 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using CommerceHub_OrderManager.supportingClasses;
+using CommerceHub_OrderManager.supportingClasses.Address;
 
 namespace CommerceHub_OrderManager.channel.brightpearl
 {
