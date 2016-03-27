@@ -7,14 +7,14 @@ namespace Order_Manager.supportingClasses.Address
     /*
      * A class that validate the given address
      */
-    public class AddressValidation
+    public static class AddressValidation
     {
         // local fields for web request
-        private WebRequest request;
-        private HttpWebResponse response;
+        private static WebRequest request;
+        private static HttpWebResponse response;
 
         /* the main method of the object that return if the address is valid or not */
-        public bool validate(Address address)
+        public static bool validate(Address address)
         {
             // generate uri
             string uri = "https://maps.googleapis.com/maps/api/geocode/xml?address=";

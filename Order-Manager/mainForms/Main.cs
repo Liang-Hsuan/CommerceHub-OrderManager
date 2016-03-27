@@ -177,24 +177,20 @@ namespace Order_Manager.mainForms
                 {
                     // first get the detail for the order
                     SearsValues value = sears.GenerateValue(order.transactionId);
+                    value.Package = new Package(value);
 
                     // second ship it
-                    string[] digest = ups.postShipmentConfirm(value, new Package(value));
-                    if (digest == null)
+                    string[] digest = ups.postShipmentConfirm(value);
+                    if (ups.Error)
                     {
-                        MessageBox.Show("Error occur while requesting shipment, please refresh and try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                    if (digest.Contains("Error:"))
-                    {
-                        MessageBox.Show(digest[0], "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
 
                     string[] result = ups.postShipmentAccept(digest[1]);
-                    if (result == null)
+                    if (ups.Error)
                     {
-                        MessageBox.Show("Error occur while requesting shipment, please refresh and try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
 

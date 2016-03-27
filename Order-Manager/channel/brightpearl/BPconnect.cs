@@ -20,7 +20,7 @@ namespace Order_Manager.channel.brightpearl
         private readonly PostRequest post;
 
         // public field for accessing the status of the current progress
-        public string Status { get; private set; }
+        public string Status { get; private set; } = "";
 
         /* constructor that initialize request objects*/
         public BPconnect()
@@ -38,9 +38,6 @@ namespace Order_Manager.channel.brightpearl
             // initializes request fields
             get = new GetRequest(appRef, appToken);
             post = new PostRequest(appRef, appToken);
-
-            // set status to default -> nothing
-            Status = "";
         }
 
         /* a method that post sears order to brightpearl on sears account */

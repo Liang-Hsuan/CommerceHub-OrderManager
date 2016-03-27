@@ -76,17 +76,17 @@ namespace Order_Manager.mainForms
                 {
                     source = item.SubItems[0].Text,
                     transactionId = item.SubItems[1].Text,
-                    shipmentIdentificationNumber = ups.postShipmentVoid(item.SubItems[2].Text)
+                    shipmentIdentificationNumber = item.SubItems[2].Text
                 }).ToList();
 
             // sears cancellation
             foreach (Order cancelledOrder in cancelList.Where(cancelledOrder => cancelledOrder.source == "Sears"))
             {
                 list.Add(cancelledOrder.transactionId);
-                string voidResult = ups.postShipmentVoid(cancelledOrder.shipmentIdentificationNumber);
-                if (voidResult.Contains("Error:"))
+                ups.postShipmentVoid(cancelledOrder.shipmentIdentificationNumber);
+                if (ups.Error)
                 {
-                    MessageBox.Show(voidResult, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(ups.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
             }

@@ -68,7 +68,7 @@
             this.weeklyOverviewLabel.ForeColor = System.Drawing.Color.White;
             this.weeklyOverviewLabel.Location = new System.Drawing.Point(12, 9);
             this.weeklyOverviewLabel.Name = "weeklyOverviewLabel";
-            this.weeklyOverviewLabel.Size = new System.Drawing.Size(1412, 54);
+            this.weeklyOverviewLabel.Size = new System.Drawing.Size(1404, 54);
             this.weeklyOverviewLabel.TabIndex = 0;
             this.weeklyOverviewLabel.Text = "Weekly Overview";
             this.weeklyOverviewLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -121,7 +121,7 @@
             this.chart.Series.Add(series1);
             this.chart.Series.Add(series2);
             this.chart.Series.Add(series3);
-            this.chart.Size = new System.Drawing.Size(1412, 255);
+            this.chart.Size = new System.Drawing.Size(1404, 255);
             this.chart.TabIndex = 1;
             // 
             // listview
@@ -146,7 +146,7 @@
             this.listview.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.listview.Location = new System.Drawing.Point(12, 378);
             this.listview.Name = "listview";
-            this.listview.Size = new System.Drawing.Size(1412, 481);
+            this.listview.Size = new System.Drawing.Size(1404, 473);
             this.listview.TabIndex = 2;
             this.listview.UseCompatibleStateImageBehavior = false;
             this.listview.View = System.Windows.Forms.View.Details;
@@ -232,7 +232,7 @@
             this.detailButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.detailButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.detailButton.ForeColor = System.Drawing.Color.White;
-            this.detailButton.Location = new System.Drawing.Point(1264, 340);
+            this.detailButton.Location = new System.Drawing.Point(1256, 340);
             this.detailButton.Name = "detailButton";
             this.detailButton.Size = new System.Drawing.Size(160, 34);
             this.detailButton.TabIndex = 5;
@@ -257,7 +257,7 @@
             this.refreshButton.FlatAppearance.BorderSize = 0;
             this.refreshButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.refreshButton.Image = ((System.Drawing.Image)(resources.GetObject("refreshButton.Image")));
-            this.refreshButton.Location = new System.Drawing.Point(1159, 339);
+            this.refreshButton.Location = new System.Drawing.Point(1151, 339);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(47, 34);
             this.refreshButton.TabIndex = 7;
@@ -288,7 +288,7 @@
             this.shipmentButton.FlatAppearance.BorderSize = 0;
             this.shipmentButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.shipmentButton.Image = ((System.Drawing.Image)(resources.GetObject("shipmentButton.Image")));
-            this.shipmentButton.Location = new System.Drawing.Point(1207, 339);
+            this.shipmentButton.Location = new System.Drawing.Point(1199, 339);
             this.shipmentButton.Name = "shipmentButton";
             this.shipmentButton.Size = new System.Drawing.Size(47, 34);
             this.shipmentButton.TabIndex = 9;
@@ -300,7 +300,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(245)))), ((int)(((byte)(255)))));
-            this.ClientSize = new System.Drawing.Size(1436, 873);
+            this.ClientSize = new System.Drawing.Size(1428, 865);
             this.Controls.Add(this.shipmentButton);
             this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.refreshButton);

@@ -360,7 +360,7 @@
             this.topPanel.Controls.Add(this.logoPicturebox);
             this.topPanel.Location = new System.Drawing.Point(0, 0);
             this.topPanel.Name = "topPanel";
-            this.topPanel.Size = new System.Drawing.Size(1436, 74);
+            this.topPanel.Size = new System.Drawing.Size(1428, 74);
             this.topPanel.TabIndex = 1;
             // 
             // printPackingSlipButton
@@ -371,7 +371,7 @@
             this.printPackingSlipButton.FlatAppearance.BorderSize = 2;
             this.printPackingSlipButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.printPackingSlipButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.printPackingSlipButton.Location = new System.Drawing.Point(1287, 17);
+            this.printPackingSlipButton.Location = new System.Drawing.Point(1279, 17);
             this.printPackingSlipButton.Name = "printPackingSlipButton";
             this.printPackingSlipButton.Size = new System.Drawing.Size(137, 41);
             this.printPackingSlipButton.TabIndex = 6;
@@ -442,7 +442,7 @@
             this.recipientPanel.Controls.Add(this.buyerLabel);
             this.recipientPanel.Location = new System.Drawing.Point(506, 104);
             this.recipientPanel.Name = "recipientPanel";
-            this.recipientPanel.Size = new System.Drawing.Size(424, 257);
+            this.recipientPanel.Size = new System.Drawing.Size(416, 257);
             this.recipientPanel.TabIndex = 2;
             // 
             // soldToPhoneTextbox
@@ -461,7 +461,7 @@
             // 
             this.housePicturebox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.housePicturebox.Image = ((System.Drawing.Image)(resources.GetObject("housePicturebox.Image")));
-            this.housePicturebox.Location = new System.Drawing.Point(326, 178);
+            this.housePicturebox.Location = new System.Drawing.Point(318, 178);
             this.housePicturebox.Name = "housePicturebox";
             this.housePicturebox.Size = new System.Drawing.Size(54, 41);
             this.housePicturebox.TabIndex = 23;
@@ -474,7 +474,7 @@
             this.verifyButton.FlatAppearance.BorderSize = 2;
             this.verifyButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.verifyButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(147)))), ((int)(((byte)(208)))));
-            this.verifyButton.Location = new System.Drawing.Point(303, 121);
+            this.verifyButton.Location = new System.Drawing.Point(295, 121);
             this.verifyButton.Name = "verifyButton";
             this.verifyButton.Size = new System.Drawing.Size(106, 32);
             this.verifyButton.TabIndex = 22;
@@ -597,7 +597,7 @@
             this.buyerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buyerLabel.Location = new System.Drawing.Point(0, 0);
             this.buyerLabel.Name = "buyerLabel";
-            this.buyerLabel.Size = new System.Drawing.Size(423, 35);
+            this.buyerLabel.Size = new System.Drawing.Size(415, 35);
             this.buyerLabel.TabIndex = 1;
             this.buyerLabel.Text = "Buyer / Recipient Info";
             this.buyerLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -621,7 +621,7 @@
             this.listview.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.listview.Location = new System.Drawing.Point(13, 382);
             this.listview.Name = "listview";
-            this.listview.Size = new System.Drawing.Size(917, 459);
+            this.listview.Size = new System.Drawing.Size(909, 451);
             this.listview.TabIndex = 3;
             this.listview.UseCompatibleStateImageBehavior = false;
             this.listview.View = System.Windows.Forms.View.Details;
@@ -680,7 +680,7 @@
             this.markCancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.markCancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.markCancelButton.ForeColor = System.Drawing.Color.White;
-            this.markCancelButton.Location = new System.Drawing.Point(801, 382);
+            this.markCancelButton.Location = new System.Drawing.Point(793, 382);
             this.markCancelButton.Name = "markCancelButton";
             this.markCancelButton.Size = new System.Drawing.Size(129, 23);
             this.markCancelButton.TabIndex = 5;
@@ -710,7 +710,7 @@
             "Out of Stock",
             "Product Has Been Discontinued",
             "Other"});
-            this.reasonCombobox.Location = new System.Drawing.Point(806, 441);
+            this.reasonCombobox.Location = new System.Drawing.Point(798, 441);
             this.reasonCombobox.Name = "reasonCombobox";
             this.reasonCombobox.Size = new System.Drawing.Size(121, 21);
             this.reasonCombobox.TabIndex = 6;
@@ -725,7 +725,7 @@
             this.setReasonButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.setReasonButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.setReasonButton.ForeColor = System.Drawing.Color.White;
-            this.setReasonButton.Location = new System.Drawing.Point(817, 483);
+            this.setReasonButton.Location = new System.Drawing.Point(809, 483);
             this.setReasonButton.Name = "setReasonButton";
             this.setReasonButton.Size = new System.Drawing.Size(98, 23);
             this.setReasonButton.TabIndex = 7;
@@ -743,7 +743,7 @@
             this.shipmentConfirmButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.shipmentConfirmButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.shipmentConfirmButton.ForeColor = System.Drawing.Color.White;
-            this.shipmentConfirmButton.Location = new System.Drawing.Point(984, 774);
+            this.shipmentConfirmButton.Location = new System.Drawing.Point(976, 766);
             this.shipmentConfirmButton.Name = "shipmentConfirmButton";
             this.shipmentConfirmButton.Size = new System.Drawing.Size(440, 67);
             this.shipmentConfirmButton.TabIndex = 8;
@@ -762,7 +762,7 @@
             // 
             this.progressbar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.progressbar.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(168)))), ((int)(((byte)(17)))));
-            this.progressbar.Location = new System.Drawing.Point(984, 774);
+            this.progressbar.Location = new System.Drawing.Point(976, 766);
             this.progressbar.Name = "progressbar";
             this.progressbar.Size = new System.Drawing.Size(440, 67);
             this.progressbar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
@@ -795,9 +795,9 @@
             this.shippingPanel.Controls.Add(this.shippingInfoLabel);
             this.shippingPanel.Controls.Add(this.weightUnitLabel);
             this.shippingPanel.Controls.Add(this.sizeUnitLabel);
-            this.shippingPanel.Location = new System.Drawing.Point(984, 103);
+            this.shippingPanel.Location = new System.Drawing.Point(976, 103);
             this.shippingPanel.Name = "shippingPanel";
-            this.shippingPanel.Size = new System.Drawing.Size(440, 648);
+            this.shippingPanel.Size = new System.Drawing.Size(440, 640);
             this.shippingPanel.TabIndex = 10;
             // 
             // voidShipmentButton
@@ -808,7 +808,7 @@
             this.voidShipmentButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.voidShipmentButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.voidShipmentButton.ForeColor = System.Drawing.Color.White;
-            this.voidShipmentButton.Location = new System.Drawing.Point(174, 509);
+            this.voidShipmentButton.Location = new System.Drawing.Point(174, 501);
             this.voidShipmentButton.Name = "voidShipmentButton";
             this.voidShipmentButton.Size = new System.Drawing.Size(174, 23);
             this.voidShipmentButton.TabIndex = 28;
@@ -824,7 +824,7 @@
             this.trackingNumberTextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.trackingNumberTextbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.trackingNumberTextbox.ForeColor = System.Drawing.Color.DarkGray;
-            this.trackingNumberTextbox.Location = new System.Drawing.Point(174, 438);
+            this.trackingNumberTextbox.Location = new System.Drawing.Point(174, 430);
             this.trackingNumberTextbox.Multiline = true;
             this.trackingNumberTextbox.Name = "trackingNumberTextbox";
             this.trackingNumberTextbox.ReadOnly = true;
@@ -836,7 +836,7 @@
             // 
             this.shippingPicturebox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.shippingPicturebox.Image = ((System.Drawing.Image)(resources.GetObject("shippingPicturebox.Image")));
-            this.shippingPicturebox.Location = new System.Drawing.Point(68, 411);
+            this.shippingPicturebox.Location = new System.Drawing.Point(68, 403);
             this.shippingPicturebox.Name = "shippingPicturebox";
             this.shippingPicturebox.Size = new System.Drawing.Size(305, 190);
             this.shippingPicturebox.TabIndex = 25;
@@ -1102,7 +1102,7 @@
             // statusLabel
             // 
             this.statusLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.statusLabel.Location = new System.Drawing.Point(984, 754);
+            this.statusLabel.Location = new System.Drawing.Point(976, 746);
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(440, 17);
             this.statusLabel.TabIndex = 11;
@@ -1118,7 +1118,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(245)))), ((int)(((byte)(255)))));
-            this.ClientSize = new System.Drawing.Size(1436, 873);
+            this.ClientSize = new System.Drawing.Size(1428, 865);
             this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.shippingPanel);
             this.Controls.Add(this.progressbar);

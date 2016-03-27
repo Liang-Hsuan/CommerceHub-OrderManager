@@ -11,7 +11,7 @@ namespace Order_Manager.supportingClasses.Shipment
     /* 
      * A class that post shipment to UPS
      */
-    public class UPS
+    public class UPS : Shipment
     {
         // field for credentials
         private readonly string ACCESS_LISCENSE_NUMBER;
@@ -45,8 +45,11 @@ namespace Order_Manager.supportingClasses.Shipment
 
         #region Posting Methods
         /* a method that post shipment confirm request and return shipment digest and identification number*/
-        public string[] postShipmentConfirm(SearsValues value, Package package)
+        public string[] postShipmentConfirm(SearsValues value)
         {
+            // set error to false
+            Error = false;
+
             string shipmentConfirmUri = "https://wwwcie.ups.com/ups.app/xml/ShipConfirm";
             // string shipmentConfirmUri = "https://onlinetools.ups.com/ups.app/xml/ShipConfirm";
 
@@ -110,7 +113,7 @@ namespace Order_Manager.supportingClasses.Shipment
             "<Service>";
 
             string code;
-            switch (package.Service)
+            switch (value.Package.Service)
             {
                 case "UPS Standard":
                     code = "11";
@@ -131,7 +134,7 @@ namespace Order_Manager.supportingClasses.Shipment
             "</Service>" +
             "<Package>";
 
-            switch (package.PackageType)
+            switch (value.Package.PackageType)
             {
                 case "Letter":
                     code = "01";
@@ -155,15 +158,15 @@ namespace Order_Manager.supportingClasses.Shipment
             "<UnitOfMeasurement>" +
             "<Code>CM</Code>" +
             "</UnitOfMeasurement>" +
-            "<Length>" + package.Length + "</Length>" +
-            "<Width>" + package.Width + "</Width>" +
-            "<Height>" + package.Height + "</Height>" +
+            "<Length>" + value.Package.Length + "</Length>" +
+            "<Width>" + value.Package.Width + "</Width>" +
+            "<Height>" + value.Package.Height + "</Height>" +
             "</Dimensions>" +
             "<PackageWeight>" +
             "<UnitOfMeasurement>" +
             "<Code>KGS</Code>" +
             "</UnitOfMeasurement>" +
-            "<Weight>" + package.Weight + "</Weight>" +
+            "<Weight>" + value.Package.Weight + "</Weight>" +
             "</PackageWeight>" +
             "</Package>" +
             "</Shipment>" +
@@ -193,7 +196,9 @@ namespace Order_Manager.supportingClasses.Shipment
             }
             catch
             {
-                // the case if server error
+                // the case if server error -> set error indication
+                Error = true;
+                ErrorMessage = "Server Internal Error";
                 return null;
             }
 
@@ -217,9 +222,10 @@ namespace Order_Manager.supportingClasses.Shipment
             }
             else
             {
-                // the case if bad request
-                string[] error = { "Error: " + getTarget(substringMethod(result, "ErrorDescription", 17)) };
-                return error;
+                // the case if bad request -> set error indication
+                Error = true;
+                ErrorMessage = "Error: " + getTarget(substringMethod(result, "ErrorDescription", 17));
+                return null;
             }
 
             return returnString;
@@ -228,6 +234,9 @@ namespace Order_Manager.supportingClasses.Shipment
         /* a method that post shipment accept request and return base64 image string and tracking number*/
         public string[] postShipmentAccept(string shipmentDigest)
         {
+            // set error to false
+            Error = false;
+
             string shipmentAcceptmUri = "https://wwwcie.ups.com/ups.app/xml/ShipAccept";
             // string shipmentAcceptmUri = "https://onlinetools.ups.com/ups.app/xml/ShipAccept";
 
@@ -280,7 +289,9 @@ namespace Order_Manager.supportingClasses.Shipment
             }
             else
             {
-                // the case if bad request
+                // the case if server error -> set error indication
+                Error = true;
+                ErrorMessage = "Server Internal Error";
                 return null;
             }
 
@@ -288,8 +299,11 @@ namespace Order_Manager.supportingClasses.Shipment
         }
 
         /* a method that post shipment void request and check if the void request is success */
-        public string postShipmentVoid(string identificationNumber)
+        public void postShipmentVoid(string identificationNumber)
         {
+            // set error to false
+            Error = false;
+
             string shipmentVoidUri = "https://wwwcie.ups.com/ups.app/xml/Void";
             // string shipmentVoidUri = "https://onlinetools.ups.com/ups.app/xml/Void";
 
@@ -330,11 +344,10 @@ namespace Order_Manager.supportingClasses.Shipment
             result = substringMethod(result, "ResponseStatusCode", 19);
             string responseStatus = getTarget(result);
 
-            // the case is bad request
-            if (responseStatus != "1")
-                return "Error: " + getTarget(substringMethod(result, "ErrorDescription", 17));
-
-            return "";
+            // the case is bad request -> set error indication
+            if (responseStatus == "1") return;
+            Error = true;
+            ErrorMessage =  "Error: " + getTarget(substringMethod(result, "ErrorDescription", 17));
         }
         #endregion
 
@@ -369,23 +382,5 @@ namespace Order_Manager.supportingClasses.Shipment
 
         /* a Get for savepath for shipment label */
         public string SavePathSears => savePathSears;
-
-        #region Supporting Methods
-        /* a method that substring the given string */
-        private static string substringMethod(string original, string startingString, int additionIndex)
-        {
-            return original.Substring(original.IndexOf(startingString) + additionIndex);
-        }
-
-        /* a method that get the next target token */
-        private static string getTarget(string text)
-        {
-            int i = 0;
-            while (text[i] != '<' && text[i] != '>' && text[i] != '"')
-                i++;
-
-            return text.Substring(0, i);
-        }
-        #endregion
     }
 }

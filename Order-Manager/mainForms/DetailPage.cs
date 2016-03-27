@@ -16,7 +16,7 @@ namespace Order_Manager.mainForms
     public partial class DetailPage : Form
     {
         // field for storing order details
-        private readonly SearsValues value;
+        private readonly SearsValues searsValues;
 
         // field for brightpearl connection
         private readonly BPconnect bp = new BPconnect();
@@ -33,7 +33,7 @@ namespace Order_Manager.mainForms
         {
             InitializeComponent();
 
-            this.value = value;
+            searsValues = value;
             showResult(value);
         }
 
@@ -43,7 +43,7 @@ namespace Order_Manager.mainForms
             // get all cancel index and print the packing slip that are not cancelled
             int[] cancelIndex = getCancelIndex();
             SearsPackingSlip packingSlip = new SearsPackingSlip();
-            packingSlip.createPackingSlip(value, cancelIndex, true);
+            packingSlip.createPackingSlip(searsValues, cancelIndex, true);
             if (packingSlip.Error)
                 MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
@@ -51,7 +51,7 @@ namespace Order_Manager.mainForms
         /* the event for verify button click that show the result of the address validity */
         private void verifyButton_Click(object sender, EventArgs e)
         {
-            bool flag = new AddressValidation().validate(value.ShipTo);
+            bool flag = AddressValidation.validate(searsValues.ShipTo);
 
             if (flag)
             {
@@ -135,10 +135,10 @@ namespace Order_Manager.mainForms
             decimal[] skuDetail = { 0, 0, 0, 0 };
 
             // change the details of package
-            for (int i = 0; i < value.LineCount; i++)
+            for (int i = 0; i < searsValues.LineCount; i++)
             {
                 if (listview.Items[i].SubItems[5].Text != "") continue;
-                decimal[] detailList = getSkuDetail(value.TrxVendorSKU[i]);
+                decimal[] detailList = getSkuDetail(searsValues.TrxVendorSKU[i]);
 
                 if (detailList != null)
                 {
@@ -189,7 +189,7 @@ namespace Order_Manager.mainForms
                 timerShip.Start();
 
                 // initialize field for shipment package
-                value.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null);
+                searsValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null);
 
                 if (!backgroundWorkerShip.IsBusy)
                     backgroundWorkerShip.RunWorkerAsync();
@@ -201,18 +201,12 @@ namespace Order_Manager.mainForms
             UPS ups = new UPS();
 
             // post shipment confirm and get the digest string from response
-            string[] digest = ups.postShipmentConfirm(value, value.Package);
+            string[] digest = ups.postShipmentConfirm(searsValues);
 
             // error checking
-            if (digest == null)
+            if (ups.Error)
             {
-                MessageBox.Show("Error occur while requesting shipment, please try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                e.Result = true;
-                return;
-            }
-            if (digest[0].Contains("Error:"))
-            {
-                MessageBox.Show(digest[0], "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 e.Result = true;
                 return;
             }
@@ -221,22 +215,22 @@ namespace Order_Manager.mainForms
             string[] acceptResult = ups.postShipmentAccept(digest[1]);
 
             // error checking
-            if (acceptResult == null)
+            if (ups.Error)
             {
-                MessageBox.Show("Error occur while requesting shipment, please try again.", "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 e.Result = true;
                 return;
             }
 
             // retrieve identification number and tracking number
-            value.Package.IdentificationNumber = digest[0];
-            value.Package.TrackingNumber = acceptResult[0];
+            searsValues.Package.IdentificationNumber = digest[0];
+            searsValues.Package.TrackingNumber = acceptResult[0];
 
             // update database set the order's tracking number and identification number
-            new Sears().PostShip(value.Package.TrackingNumber, value.Package.IdentificationNumber, value.TransactionID);
+            new Sears().PostShip(searsValues.Package.TrackingNumber, searsValues.Package.IdentificationNumber, searsValues.TransactionID);
 
             // get the shipment label and show it
-            ups.exportLabel(acceptResult[1], value.TransactionID, true);
+            ups.exportLabel(acceptResult[1], searsValues.TransactionID, true);
 
             // set bool flag to false
             e.Result = false;
@@ -245,7 +239,7 @@ namespace Order_Manager.mainForms
         {
             // stop the timer and show the tracking number
             timerShip.Stop();
-            trackingNumberTextbox.Text = value.Package.TrackingNumber;
+            trackingNumberTextbox.Text = searsValues.Package.TrackingNumber;
 
             // if error occur enable button else diable it and show shipment cancel button
             if ((bool) e.Result)
@@ -279,17 +273,18 @@ namespace Order_Manager.mainForms
         private void voidShipmentButton_Click(object sender, EventArgs e)
         {
             // post void shipment request and get the response
-            string voidResult = new UPS().postShipmentVoid(value.Package.IdentificationNumber);
+            UPS ups = new UPS();
+            ups.postShipmentVoid(searsValues.Package.IdentificationNumber);
 
             // the case if is bad request
-            if (voidResult.Contains("Error:"))
+            if (ups.Error)
             {
-                MessageBox.Show(voidResult, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ups.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             // mark transaction as not shipped
-            new Sears().PostVoid(new[] { value.TransactionID });
+            new Sears().PostVoid(new[] { searsValues.TransactionID });
 
             // mark cancel as invisible, set tracking number text to not shipped, and enable create label button
             voidShipmentButton.Visible = false;
@@ -297,8 +292,8 @@ namespace Order_Manager.mainForms
             createLabelButton.Enabled = true;
 
             // set tracking and identification to nothing
-            value.Package.IdentificationNumber = "";
-            value.Package.TrackingNumber = "";
+            searsValues.Package.IdentificationNumber = "";
+            searsValues.Package.TrackingNumber = "";
         }
 
         #region Shipment Confirm
@@ -331,7 +326,7 @@ namespace Order_Manager.mainForms
                     cancelList.Add(i, reason);
                 }
 
-                if (cancelList.Count < value.LineCount && value.Package.TrackingNumber == "")
+                if (cancelList.Count < searsValues.LineCount && searsValues.Package.TrackingNumber == "")
                 {
                     MessageBox.Show("There are items that are not shipped", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
@@ -349,12 +344,12 @@ namespace Order_Manager.mainForms
             simulate(1, 40);
 
             // export xml file
-            new Sears().GenerateXML(value, cancelList);
+            new Sears().GenerateXML(searsValues, cancelList);
 
             simulate(40, 70);
 
             // post order to brightpearl
-            bp.postOrder(value, new List<int>(cancelList.Keys).ToArray());
+            bp.postOrder(searsValues, new List<int>(cancelList.Keys).ToArray());
 
             simulate(70, 100);
         }
@@ -562,11 +557,11 @@ namespace Order_Manager.mainForms
             else
             {
                 string addressNew = shipToCombineTextbox.Text;
-                value.ShipTo.City = addressNew.Substring(0, addressNew.IndexOf(','));
+                searsValues.ShipTo.City = addressNew.Substring(0, addressNew.IndexOf(','));
                 addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
-                value.ShipTo.State = addressNew.Substring(0, addressNew.IndexOf(','));
+                searsValues.ShipTo.State = addressNew.Substring(0, addressNew.IndexOf(','));
                 addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
-                value.ShipTo.PostalCode = addressNew.Substring(0);
+                searsValues.ShipTo.PostalCode = addressNew.Substring(0);
             }
         }
         #endregion
