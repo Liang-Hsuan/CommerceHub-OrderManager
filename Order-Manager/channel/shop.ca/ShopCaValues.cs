@@ -1,4 +1,5 @@
 ﻿using Order_Manager.supportingClasses.Address;
+using Order_Manager.supportingClasses.Shipment;
 using System;
 using System.Collections.Generic;
 
@@ -23,6 +24,7 @@ namespace Order_Manager.channel.shop.ca
         public Address ShipTo { get; set; }
         public bool Option { get; set; }
         public string ShippingMethod { get; set; }
+        public Package Package { get; set; }
 
         // fields for items
         public List<string> OrderItemId { get; set; }
@@ -53,6 +55,7 @@ namespace Order_Manager.channel.shop.ca
             ShipTo = new Address();
             Option = false;
             ShippingMethod = "";
+            Package = new Package();
 
             OrderItemId = new List<string>();
             Sku = new List<string>();
@@ -69,7 +72,7 @@ namespace Order_Manager.channel.shop.ca
 
         /* second constructor that take all the parametoers */
         public ShopCaValues(string orderId, string supplierId, string storeName, DateTime orderCreateDate, decimal grandTotal, decimal totalPrice, decimal totalTax, decimal totalShippingCost, decimal totalDiscount,
-                            Address billTo, Address shipTo, bool option, string shippingMethod, List<string> orderItemId, List<string> sku, List<string> title, List<decimal> ssrp, List<decimal> ssrpTax,
+                            Address billTo, Address shipTo, bool option, string shippingMethod, Package package, List<string> orderItemId, List<string> sku, List<string> title, List<decimal> ssrp, List<decimal> ssrpTax,
                             List<int> quantity, List<decimal> itemPrice, List<decimal> extendedItemPrice, List<decimal> itemTax, List<decimal> itemShippingCost, List<decimal> itemDiscount)
         {
             OrderId = orderId;
@@ -85,6 +88,7 @@ namespace Order_Manager.channel.shop.ca
             ShipTo = shipTo;
             Option = option;
             ShippingMethod = shippingMethod;
+            Package = package;
 
             OrderItemId = orderItemId;
             Sku = sku;

@@ -24,6 +24,8 @@ namespace Order_Manager.supportingClasses.Shipment
         // field for identification
         public string TrackingNumber { get; set; }
         public string IdentificationNumber { get; set; }    // for ups shipment void
+        public string RefundLink { get; set; }              // for canada post refund
+        public string LabelLink { get; set; }               // for canada post label recovery
 
         /* first constructor that take no argument */
         public Package()
@@ -38,6 +40,8 @@ namespace Order_Manager.supportingClasses.Shipment
 
             TrackingNumber = "";
             IdentificationNumber = "";
+            RefundLink = "";
+            LabelLink = "";
         }
 
         /* second constructor that take SearsValues object as parameter */
@@ -60,7 +64,7 @@ namespace Order_Manager.supportingClasses.Shipment
 
             // those are set to default
             PackageType = "Customer Supplied Package";
-            Service = "UPS Express";
+            Service = "UPS Standard";
         }
 
         /* third constructor that take ShopCaValues object as parameter */
@@ -83,10 +87,13 @@ namespace Order_Manager.supportingClasses.Shipment
 
             // service is set to default
             Service = "Regular Parcel";
+            RefundLink = "";
+            LabelLink = "";
         }
 
         /* third constructor that take all parameters */
-        public Package(decimal weight, decimal length, decimal width, decimal height, string packageType, string service, string trackingNumber, string identificationNumber)
+        public Package(decimal weight, decimal length, decimal width, decimal height, string packageType, string service, string trackingNumber, 
+                       string identificationNumber, string refundLink, string labelLink)
         {
             Weight = weight;
             Length = length;
@@ -98,10 +105,12 @@ namespace Order_Manager.supportingClasses.Shipment
 
             TrackingNumber = trackingNumber;
             IdentificationNumber = identificationNumber;
+            RefundLink = refundLink;
+            LabelLink = labelLink;
         }
 
         /* a method that get the detail of the given sku */
-        private static decimal[] getSkuDetail(string sku)
+        public static decimal[] getSkuDetail(string sku)
         {
             // local supporting fields
             decimal[] list = new decimal[4];

@@ -5,13 +5,15 @@ using Order_Manager.channel.brightpearl;
 using Order_Manager.channel.sears;
 using Order_Manager.supportingClasses;
 using Order_Manager.supportingClasses.Shipment;
+using Order_Manager.channel.shop.ca;
 
 namespace Order_Manager.mainForms
 {
     public partial class Main : Form
     {
-        // field for commerce hub order
+        // field for online shopping channels' order
         private readonly Sears sears = new Sears();
+        private readonly ShopCa shopCa = new ShopCa();
 
         // field for brightpearl connection
         private readonly BPconnect bp = new BPconnect();
@@ -31,8 +33,8 @@ namespace Order_Manager.mainForms
         {
             InitializeComponent();
 
-            // show new orders from sears
-            showSearsResult();
+            // show new orders from shopping channels
+            showResult();
 
             // show result on the chart
             refreshGraph();
@@ -135,7 +137,7 @@ namespace Order_Manager.mainForms
         /* the event for refresh button clicks that refresh the order in listview and the chart */
         private void refreshButton_Click(object sender, EventArgs e)
         {
-            showSearsResult();
+            showResult();
             refreshGraph();
         }
 
@@ -155,9 +157,20 @@ namespace Order_Manager.mainForms
                 return;
             }
 
-            SearsValues value = sears.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
+            string channel = listview.CheckedItems[0].SubItems[0].Text;
 
-            new DetailPage(value).ShowDialog(this);
+            if (channel == "Sears")
+            {
+                // the case if it is sears order
+                SearsValues value = sears.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
+                new DetailPage(value).ShowDialog(this);
+            }
+            else if (channel == "Shop.ca")
+            {
+                // the case if it is shopl.ca order
+                ShopCaValues value = shopCa.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
+                new DetailPage(value).ShowDialog(this);
+            }
         }
         #endregion
 
@@ -242,17 +255,18 @@ namespace Order_Manager.mainForms
         }
 
         #region Supporting Methods
-        /* a supporting method that get new order from sears and show them on the list view */
-        private void showSearsResult()
+        /* a supporting method that get new order from online shopping channels and show them on the list view */
+        private void showResult()
         {
             // first clear the listview
             listview.Items.Clear();
 
+            #region Sears
             // get orders from sears
             sears.GetOrder();
             SearsValues[] searsValue = sears.GetAllNewOrder();
 
-            // show new orders to the list view 
+            // show sears new orders to the list view 
             DateTime timeNow = DateTime.Now;
             foreach (SearsValues value in searsValue)
             {
@@ -282,6 +296,43 @@ namespace Order_Manager.mainForms
                 item.SubItems.Add(value.Recipient.Name);
                 listview.Items.Add(item);
             }
+            #endregion
+
+            #region Shop.ca
+            // get orders from shop.ca
+            shopCa.GetOrder();
+            ShopCaValues[] shopCaValues = shopCa.GetAllNewOrder();
+
+            // show shop.ca new orders to the list view
+            foreach (ShopCaValues value in shopCaValues)
+            {
+                ListViewItem item = new ListViewItem("Shop.ca");
+
+                TimeSpan span = timeNow.Subtract(value.OrderCreateDate);
+                item.SubItems.Add(span.Days + "d " + span.Hours + "h");
+
+                if (value.OrderItemId.Count > 1)
+                {
+                    item.SubItems.Add("(Multiple Items)");
+                    item.SubItems.Add("(Multiple Items)");
+                }
+                else
+                {
+                    item.SubItems.Add(value.Title[0]);
+                    item.SubItems.Add(value.Sku[0]);
+                }
+
+                item.SubItems.Add(value.OrderId);
+                item.SubItems.Add(value.OrderCreateDate.ToString("yyyy-MM-dd"));
+                item.SubItems.Add(value.GrandTotal.ToString());
+
+                int total = value.Quantity.Sum();
+                item.SubItems.Add(total.ToString());
+
+                item.SubItems.Add(value.ShipTo.Name);
+                listview.Items.Add(item);
+            }
+            #endregion
         }
 
         /* a supporting method that refresh the chart */
@@ -297,8 +348,8 @@ namespace Order_Manager.mainForms
             {
                 from = DateTime.Today.AddDays(i);
 
-                int order = sears.GetNumberOfOrder(from);
-                int shipped = sears.GetNumberOfShipped(from);
+                int order = sears.GetNumberOfOrder(from) + shopCa.GetNumberOfOrder(from);
+                int shipped = sears.GetNumberOfShipped(from) + shopCa.GetNumberOfShipped(from);
 
                 if (order < 1)
                 {

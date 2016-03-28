@@ -28,7 +28,7 @@ namespace Order_Manager.channel.sears
         // field for sftp connection
         private readonly Sftp sftp;
 
-        /* constructor that restore the data and initialize folders for xml feed */
+        /* constructor that initialize folders for xml feed */
         public Sears()
         {
             #region Folder Check
@@ -357,7 +357,7 @@ namespace Order_Manager.channel.sears
             List<string> completeTransactionList = new List<string>();
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("SELECT TransactionId FROM Sears_Order ORDER BY TransactionId;", connection);
+                SqlCommand command = new SqlCommand("SELECT TransactionId FROM Sears_Order;", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())

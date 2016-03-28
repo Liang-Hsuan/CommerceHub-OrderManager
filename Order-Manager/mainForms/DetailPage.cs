@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
@@ -10,6 +9,7 @@ using Order_Manager.channel.sears;
 using Order_Manager.supportingClasses;
 using Order_Manager.supportingClasses.Address;
 using Order_Manager.supportingClasses.Shipment;
+using Order_Manager.channel.shop.ca;
 
 namespace Order_Manager.mainForms
 {
@@ -17,6 +17,8 @@ namespace Order_Manager.mainForms
     {
         // field for storing order details
         private readonly SearsValues searsValues;
+        private readonly ShopCaValues shopCaValues;
+        private readonly string CHANNEL;
 
         // field for brightpearl connection
         private readonly BPconnect bp = new BPconnect();
@@ -28,14 +30,31 @@ namespace Order_Manager.mainForms
         // supporting field for storing address
         private string addressOld;
 
-        /* constructor that initializes graphic compents and order fields */
+        #region Constructor
+        /* first constructor that show sears order */
         public DetailPage(SearsValues value)
         {
             InitializeComponent();
 
             searsValues = value;
             showResult(value);
+
+            // set flag to sears
+            CHANNEL = "Sears";
         }
+
+        /* second constructor that show shop.ca order */
+        public DetailPage(ShopCaValues value)
+        {
+            InitializeComponent();
+
+            shopCaValues = value;
+            showResult(value);
+
+            // set flag to shop.ca
+            CHANNEL = "Shop.ca";
+        }
+        #endregion
 
         /* print packing slip button clicks that print the packing slip for the order item(s) */
         private void printPackingSlipButton_Click(object sender, EventArgs e)
@@ -51,7 +70,11 @@ namespace Order_Manager.mainForms
         /* the event for verify button click that show the result of the address validity */
         private void verifyButton_Click(object sender, EventArgs e)
         {
-            bool flag = AddressValidation.validate(searsValues.ShipTo);
+            bool flag = true;
+            if (CHANNEL == "Sears")
+                flag = AddressValidation.validate(searsValues.ShipTo);
+            else if (CHANNEL == "Shop.ca")
+                flag = AddressValidation.validate(shopCaValues.ShipTo);
 
             if (flag)
             {
@@ -138,7 +161,7 @@ namespace Order_Manager.mainForms
             for (int i = 0; i < searsValues.LineCount; i++)
             {
                 if (listview.Items[i].SubItems[5].Text != "") continue;
-                decimal[] detailList = getSkuDetail(searsValues.TrxVendorSKU[i]);
+                decimal[] detailList = Package.getSkuDetail(searsValues.TrxVendorSKU[i]);
 
                 if (detailList != null)
                 {
@@ -189,7 +212,7 @@ namespace Order_Manager.mainForms
                 timerShip.Start();
 
                 // initialize field for shipment package
-                searsValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null);
+                searsValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
 
                 if (!backgroundWorkerShip.IsBusy)
                     backgroundWorkerShip.RunWorkerAsync();
@@ -420,6 +443,13 @@ namespace Order_Manager.mainForms
             #endregion
 
             #region Listview and Shipping Info
+            // adding items to service combobox
+            serviceCombobox.Items.Clear();
+            serviceCombobox.Items.Add("UPS Standard");
+            serviceCombobox.Items.Add("UPS Express");
+            serviceCombobox.Items.Add("UPS 3 Day Select");
+            serviceCombobox.Items.Add("UPS Worldwide Express");
+
             // ups details
             switch (value.ServiceLevel)
             {
@@ -456,7 +486,7 @@ namespace Order_Manager.mainForms
                 listview.Items.Add(item);
 
                 // generate sku detail
-                decimal[] detailList = getSkuDetail(value.TrxVendorSKU[i]);
+                decimal[] detailList = Package.getSkuDetail(value.TrxVendorSKU[i]);
 
                 // the case if bad sku
                 if (detailList == null)
@@ -477,31 +507,92 @@ namespace Order_Manager.mainForms
             #endregion
         }
 
-        /* a method that get the detail of the given sku */
-        private static decimal[] getSkuDetail(string sku)
+        /* a method that show the information of the given ShopCaValues object */
+        private void showResult(ShopCaValues value)
         {
-            // local supporting fields
-            decimal[] list = new decimal[4];
+            topOrderNumberTextbox.Text = value.OrderId;
 
-            // [0] weight, [1] length, [2] width, [3] height
-            using (SqlConnection conneciton = new SqlConnection(Properties.Settings.Default.Designcs))
+            #region Order Summary
+            // date
+            orderDateTextbox.Text = value.OrderCreateDate.ToString("MM/dd/yyyy");
+            paidDateTextbox.Text = value.OrderCreateDate.ToString("MM/dd/yyyy");
+            shipByDateTextbox.Text = DateTime.Today.ToString("MM/dd/yyyy");
+
+            // unit price
+            unitPriceTotalTextbox.Text = value.TotalPrice.ToString();
+
+            // GST and HST
+            gsthstTextbox.Text = value.TotalTax.ToString();
+
+            // PST
+            pstTextbox.Text = "0.00";
+
+            // other fee
+            otherFeeTextbox.Text = (value.ItemShippingCost.Sum() - value.ItemDiscount.Sum()).ToString();
+
+            // total 
+            totalOrderTextbox.Text = value.GrandTotal.ToString();
+            #endregion
+
+            #region Buyer / Recipient Info
+            // sold to 
+            soldToTextbox.Text = value.BillTo.Name;
+            soldToPhoneTextbox.Text = value.BillTo.DayPhone;
+
+            // ship to
+            shipToNameTextbox.Text = value.ShipTo.Name;
+            shipToAddress1Textbox.Text = value.ShipTo.Address1;
+            shipToAddress2Textbox.Text = value.ShipTo.Address2;
+            shipToCombineTextbox.Text = value.ShipTo.City + ", " + value.ShipTo.State + ", " + value.ShipTo.PostalCode;
+            shipToPhoneTextbox.Text = value.ShipTo.DayPhone;
+            #endregion
+
+            #region Listview and Shipping Info
+            // adding items to service combobox
+            serviceCombobox.Items.Clear();
+            serviceCombobox.Items.Add("Expedited Parcel");
+            serviceCombobox.Items.Add("Regular Parcel");
+            serviceCombobox.Items.Add("Xpresspost");
+            serviceCombobox.Items.Add("Priority");
+
+            // initialize field for sku detail -> [0] weight, [1] length, [2] width, [3] height
+            decimal[] skuDetail = { 0, 0, 0, 0 };
+
+            // adding list to listview and getting sku detail
+            for (int i = 0; i < value.OrderItemId.Count; i++)
             {
-                SqlCommand command = new SqlCommand("SELECT Weight_grams, Shippable_Depth_cm, Shippable_Width_cm, Shippable_Height_cm " +
-                                                    "FROM master_Design_Attributes design JOIN master_SKU_Attributes sku ON (design.Design_Service_Code = sku.Design_Service_Code) " + 
-                                                    "WHERE SKU_Ashlin = \'" + sku + "\';", conneciton);
-                conneciton.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                reader.Read();
+                // add item to list
+                ListViewItem item = new ListViewItem(value.OrderItemId[i].ToString());
 
-                // check if there is result
-                if (!reader.HasRows)
-                    return null;
+                item.SubItems.Add(value.Title[i] + "  SKU: " + value.Sku[i]);
+                item.SubItems.Add("$ " + value.ItemPrice[i]);
+                item.SubItems.Add(value.Quantity[i].ToString());
+                item.SubItems.Add("$ " + value.ExtendedItemPrice[i]);
+                item.SubItems.Add("");
+                item.SubItems.Add("");
 
-                for (int i = 0; i < 4; i++)
-                    list[i] = Convert.ToDecimal(reader.GetValue(i));
+                listview.Items.Add(item);
+
+                // generate sku detail
+                decimal[] detailList = Package.getSkuDetail(value.Sku[i]);
+
+                // the case if bad sku
+                if (detailList == null)
+                    item.BackColor = Color.FromArgb(254, 126, 116);
+                else
+                {
+                    for (int j = 0; j < 4; j++)
+                        skuDetail[j] += detailList[j];
+                }
             }
 
-            return list;
+            // show result to shipping info
+            weightKgUpdown.Value = skuDetail[0] / 1000;
+            weightLbUpdown.Value = skuDetail[0] / 453.592m;
+            lengthUpdown.Value = skuDetail[1];
+            widthUpdown.Value = skuDetail[2];
+            heightUpdown.Value = skuDetail[3];
+            #endregion
         }
 
         /* a method that get the current cancel items' idexes */
@@ -557,11 +648,22 @@ namespace Order_Manager.mainForms
             else
             {
                 string addressNew = shipToCombineTextbox.Text;
-                searsValues.ShipTo.City = addressNew.Substring(0, addressNew.IndexOf(','));
-                addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
-                searsValues.ShipTo.State = addressNew.Substring(0, addressNew.IndexOf(','));
-                addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
-                searsValues.ShipTo.PostalCode = addressNew.Substring(0);
+                if (CHANNEL == "Sears")
+                {
+                    searsValues.ShipTo.City = addressNew.Substring(0, addressNew.IndexOf(','));
+                    addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
+                    searsValues.ShipTo.State = addressNew.Substring(0, addressNew.IndexOf(','));
+                    addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
+                    searsValues.ShipTo.PostalCode = addressNew.Substring(0);
+                }
+                else if (CHANNEL == "Shop.ca")
+                {
+                    shopCaValues.ShipTo.City = addressNew.Substring(0, addressNew.IndexOf(','));
+                    addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
+                    shopCaValues.ShipTo.State = addressNew.Substring(0, addressNew.IndexOf(','));
+                    addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
+                    shopCaValues.ShipTo.PostalCode = addressNew.Substring(0);
+                }
             }
         }
         #endregion

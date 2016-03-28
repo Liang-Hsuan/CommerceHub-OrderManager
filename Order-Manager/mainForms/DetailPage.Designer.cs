@@ -960,16 +960,10 @@
             this.serviceCombobox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
             this.serviceCombobox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.serviceCombobox.FormattingEnabled = true;
-            this.serviceCombobox.Items.AddRange(new object[] {
-            "UPS Standard",
-            "UPS Express",
-            "UPS 3 Day Select",
-            "UPS Worldwide Express"});
             this.serviceCombobox.Location = new System.Drawing.Point(131, 169);
             this.serviceCombobox.Name = "serviceCombobox";
             this.serviceCombobox.Size = new System.Drawing.Size(239, 21);
             this.serviceCombobox.TabIndex = 16;
-            this.serviceCombobox.Text = "UPS Standard";
             // 
             // serviceLabel
             // 
