@@ -9,12 +9,15 @@ namespace Order_Manager.supportingClasses
     public static class ServerDelete
     {
         /* the only function in the class that delete file on the sftp server */
-        public static void delete(Sftp sftp, string fileName)
+        public static void delete(string host, string username, string password, string fileName)
         {
             JSch js = new JSch();
 
-            // Create a session with SFTP credentials
+            // declare sftp connection 
+            Sftp sftp = new Sftp(host, username, password);
             sftp.Connect();
+
+            // Create a session with SFTP credentials
             Session session = js.getSession(sftp.Username, sftp.Host);
 
             // Get a UserInfo object

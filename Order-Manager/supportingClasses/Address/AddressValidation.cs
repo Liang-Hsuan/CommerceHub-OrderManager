@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Linq;
 using System.Net;
 
 namespace Order_Manager.supportingClasses.Address
@@ -19,10 +18,10 @@ namespace Order_Manager.supportingClasses.Address
             // generate uri
             string uri = "https://maps.googleapis.com/maps/api/geocode/xml?address=";
 
-            uri += replaceSpace(address.Address1) + ",";
-            uri += replaceSpace(address.City) + ",";
-            uri += replaceSpace(address.State) + ",";
-            uri += replaceSpace(address.PostalCode);
+            uri += address.Address1.Replace(' ', '+') + ",";
+            uri += address.City.Replace(' ', '+') + ",";
+            uri += address.State.Replace(' ', '+') + ",";
+            uri += address.PostalCode.Replace(' ', '+');
 
             uri += "&key=AIzaSyASdOsY2T3vBfYn1lBE5VQl7nZ-ivp1vKs";
             
@@ -48,19 +47,10 @@ namespace Order_Manager.supportingClasses.Address
             return count == 1;
         }
 
-        #region Supporting Methods
-        /* a method that replace space with '+' character */
-        private static string replaceSpace(string original)
-        {
-            // replace space with '+'
-            return new string(original.Select(ch => ch == ' ' ? '+' : ch).ToArray());
-        }
-
         /* a method that substring the given string */
         private static string substringMethod(string original, string startingString, int additionIndex)
         {
             return  original.Substring(original.IndexOf(startingString) + additionIndex);
         }
-        #endregion
     }
 }

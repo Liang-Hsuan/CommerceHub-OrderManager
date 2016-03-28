@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Order_Manager.supportingClasses;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -278,7 +279,7 @@ namespace Order_Manager.channel.sears
                 sftp.Get(SHIPMENT_DIR + "/" + file, filePath + "\\" + fileNameTxt);
 
                 // after download the file delete it on the server (no need it anymore)
-                // ServerDelete.delete(sftp, SHIPMENT_DIR + "/" + file);
+                ServerDelete.delete(sftp.Host, sftp.Username, sftp.Password, SHIPMENT_DIR + "/" + file);
             }
 
             sftp.Close();

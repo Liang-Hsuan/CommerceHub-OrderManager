@@ -169,7 +169,7 @@ namespace Order_Manager.supportingClasses.Shipment
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
             // read all the byte from response 
-            var memoryStream = new MemoryStream();
+            MemoryStream memoryStream = new MemoryStream();
             response.GetResponseStream().CopyTo(memoryStream);
 
             return memoryStream.ToArray();

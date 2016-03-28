@@ -2,6 +2,7 @@
 using System.Data.SqlClient;
 using System.Linq;
 using Order_Manager.channel.sears;
+using Order_Manager.channel.shop.ca;
 
 namespace Order_Manager.supportingClasses.Shipment
 {
@@ -22,7 +23,7 @@ namespace Order_Manager.supportingClasses.Shipment
 
         // field for identification
         public string TrackingNumber { get; set; }
-        public string IdentificationNumber { get; set; }
+        public string IdentificationNumber { get; set; }    // for ups shipment void
 
         /* first constructor that take no argument */
         public Package()
@@ -32,8 +33,8 @@ namespace Order_Manager.supportingClasses.Shipment
             Width = 0;
             Height = 0;
 
-            PackageType = "Customer Supplied Package";
-            Service = "UPS Express";
+            PackageType = "";
+            Service = "";
 
             TrackingNumber = "";
             IdentificationNumber = "";
@@ -60,6 +61,28 @@ namespace Order_Manager.supportingClasses.Shipment
             // those are set to default
             PackageType = "Customer Supplied Package";
             Service = "UPS Express";
+        }
+
+        /* third constructor that take ShopCaValues object as parameter */
+        public Package(ShopCaValues value)
+        {
+            // generate package detail -> weight and dimensions
+            decimal[] skuDetail = { 0, 0, 0, 0 };
+
+            foreach (decimal[] detailList in value.Sku.Select(getSkuDetail).Where(detailList => !detailList.Equals(null)))
+            {
+                for (int i = 0; i < 4; i++)
+                    skuDetail[i] += detailList[i];
+            }
+
+            // allocate data
+            Weight = skuDetail[0] / 1000;
+            Length = skuDetail[1];
+            Width = skuDetail[2];
+            Height = skuDetail[3];
+
+            // service is set to default
+            Service = "Regular Parcel";
         }
 
         /* third constructor that take all parameters */
