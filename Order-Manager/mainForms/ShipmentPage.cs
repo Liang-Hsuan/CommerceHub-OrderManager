@@ -66,7 +66,7 @@ namespace Order_Manager.mainForms
             // shor shipped item to list view 
             foreach (ShopCaValues value in shopCaValue)
             {
-                ListViewItem item = new ListViewItem("Sears");
+                ListViewItem item = new ListViewItem("Shop.ca");
 
                 item.SubItems.Add(value.OrderId);
                 item.SubItems.Add(value.Package.TrackingNumber);

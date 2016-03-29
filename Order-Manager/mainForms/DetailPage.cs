@@ -61,10 +61,23 @@ namespace Order_Manager.mainForms
         {
             // get all cancel index and print the packing slip that are not cancelled
             int[] cancelIndex = getCancelIndex();
-            SearsPackingSlip packingSlip = new SearsPackingSlip();
-            packingSlip.createPackingSlip(searsValues, cancelIndex, true);
-            if (packingSlip.Error)
-                MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+            if (CHANNEL == "Sears")
+            {
+                // ths case if the order is from sears
+                SearsPackingSlip packingSlip = new SearsPackingSlip();
+                packingSlip.createPackingSlip(searsValues, cancelIndex, true);
+                if (packingSlip.Error)
+                    MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (CHANNEL == "Shop.ca")
+            {
+                // the case if the order is from shop.ca
+                ShopCaPackingSlip packingSlip = new ShopCaPackingSlip();
+                packingSlip.createPackingSlip(shopCaValues, cancelIndex, true);
+                if (packingSlip.Error)
+                    MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         /* the event for verify button click that show the result of the address validity */
@@ -158,15 +171,32 @@ namespace Order_Manager.mainForms
             decimal[] skuDetail = { 0, 0, 0, 0 };
 
             // change the details of package
-            for (int i = 0; i < searsValues.LineCount; i++)
+            if (CHANNEL == "Sears")
             {
-                if (listview.Items[i].SubItems[5].Text != "") continue;
-                decimal[] detailList = Package.getSkuDetail(searsValues.TrxVendorSKU[i]);
-
-                if (detailList != null)
+                for (int i = 0; i < searsValues.LineCount; i++)
                 {
-                    for (int j = 0; j < 4; j++)
-                        skuDetail[j] += detailList[j];
+                    if (listview.Items[i].SubItems[5].Text != "") continue;
+                    decimal[] detailList = Package.getSkuDetail(searsValues.TrxVendorSKU[i]);
+
+                    if (detailList != null)
+                    {
+                        for (int j = 0; j < 4; j++)
+                            skuDetail[j] += detailList[j];
+                    }
+                }
+            }
+            else if (CHANNEL == "Shop.ca")
+            {
+                for (int i = 0; i < shopCaValues.OrderItemId.Count; i++)
+                {
+                    if (listview.Items[i].SubItems[5].Text != "") continue;
+                    decimal[] detailList = Package.getSkuDetail(shopCaValues.Sku[i]);
+
+                    if (detailList != null)
+                    {
+                        for (int j = 0; j < 4; j++)
+                            skuDetail[j] += detailList[j];
+                    }
                 }
             }
 
@@ -207,12 +237,16 @@ namespace Order_Manager.mainForms
             {
                 trackingNumberTextbox.Text = "Shipping";
                 shipmentConfirmButton.Enabled = false;
+                createLabelButton.Enabled = false;
 
                 // start timer
                 timerShip.Start();
 
                 // initialize field for shipment package
-                searsValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
+                if (CHANNEL == "Sears")
+                    searsValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
+                else if (CHANNEL == "Shop.ca")
+                    shopCaValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
 
                 if (!backgroundWorkerShip.IsBusy)
                     backgroundWorkerShip.RunWorkerAsync();
@@ -220,58 +254,107 @@ namespace Order_Manager.mainForms
         }
         private void backgroundWorkerShip_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            // initialize field for shipment
-            UPS ups = new UPS();
-
-            // post shipment confirm and get the digest string from response
-            string[] digest = ups.postShipmentConfirm(searsValues);
-
-            // error checking
-            if (ups.Error)
+            if (CHANNEL == "Sears")
             {
-                MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                e.Result = true;
-                return;
+                #region UPS
+                // initialize field for shipment
+                UPS ups = new UPS();
+
+                // post shipment confirm and get the digest string from response
+                string[] digest = ups.postShipmentConfirm(searsValues);
+
+                // error checking
+                if (ups.Error)
+                {
+                    MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    e.Result = true;
+                    return;
+                }
+
+                // post shipment accept and get tracking number and image 
+                string[] acceptResult = ups.postShipmentAccept(digest[1]);
+
+                // error checking
+                if (ups.Error)
+                {
+                    MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    e.Result = true;
+                    return;
+                }
+
+                // retrieve identification number and tracking number
+                searsValues.Package.IdentificationNumber = digest[0];
+                searsValues.Package.TrackingNumber = acceptResult[0];
+
+                // update database set the order's tracking number and identification number
+                new Sears().PostShip(searsValues.Package.TrackingNumber, searsValues.Package.IdentificationNumber, searsValues.TransactionID);
+
+                // get the shipment label and show it
+                ups.exportLabel(acceptResult[1], searsValues.TransactionID, true);
+
+                // set bool flag to false
+                e.Result = false;
+                #endregion
             }
-
-            // post shipment accept and get tracking number and image 
-            string[] acceptResult = ups.postShipmentAccept(digest[1]);
-
-            // error checking
-            if (ups.Error)
+            else if (CHANNEL == "Shop.ca")
             {
-                MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                e.Result = true;
-                return;
+                #region Canada Post
+                // initialize field for shipment
+                CanadaPost canadaPost = new CanadaPost();
+
+                // post shipment confirm to canada post
+                string[] result = canadaPost.postShipmentConfirm(shopCaValues, shopCaValues.Package);
+
+                // error checking
+                if (canadaPost.Error)
+                {
+                    MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    e.Result = true;
+                    return;
+                }
+
+                // retrieve tracking number, refund link and label link
+                shopCaValues.Package.TrackingNumber = result[0];
+                shopCaValues.Package.RefundLink = result[1];
+                shopCaValues.Package.LabelLink = result[2];
+
+                // update database set the order's tracking number refund link and label link
+                new ShopCa().PostShip(shopCaValues.Package.TrackingNumber, shopCaValues.Package.RefundLink, shopCaValues.Package.LabelLink, shopCaValues.OrderId);
+
+                // get artifect
+                Thread.Sleep(5000);
+                byte[] artifect = canadaPost.getAritifect(result[2]);
+
+                // error checking
+                if (canadaPost.Error)
+                {
+                    MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    e.Result = true;
+                    return;
+                }
+
+                // get the shipment label and show it
+                canadaPost.exportLabel(artifect, shopCaValues.OrderId, true);
+
+                // set bool flag to false
+                e.Result = false;
+                #endregion
             }
-
-            // retrieve identification number and tracking number
-            searsValues.Package.IdentificationNumber = digest[0];
-            searsValues.Package.TrackingNumber = acceptResult[0];
-
-            // update database set the order's tracking number and identification number
-            new Sears().PostShip(searsValues.Package.TrackingNumber, searsValues.Package.IdentificationNumber, searsValues.TransactionID);
-
-            // get the shipment label and show it
-            ups.exportLabel(acceptResult[1], searsValues.TransactionID, true);
-
-            // set bool flag to false
-            e.Result = false;
         }
         private void backgroundWorkerShip_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             // stop the timer and show the tracking number
             timerShip.Stop();
-            trackingNumberTextbox.Text = searsValues.Package.TrackingNumber;
+            if (CHANNEL == "Sears")
+                trackingNumberTextbox.Text = searsValues.Package.TrackingNumber;
+            else if (CHANNEL == "Shop.ca")
+                trackingNumberTextbox.Text = shopCaValues.Package.TrackingNumber;
 
             // if error occur enable button else diable it and show shipment cancel button
             if ((bool) e.Result)
                 createLabelButton.Enabled = true;
             else
-            {
-                createLabelButton.Enabled = false;
                 voidShipmentButton.Visible = true;
-            }
 
             shipmentConfirmButton.Enabled = true;
         }
@@ -295,19 +378,42 @@ namespace Order_Manager.mainForms
         /* void shipment button that void the current shipment for the order */
         private void voidShipmentButton_Click(object sender, EventArgs e)
         {
-            // post void shipment request and get the response
-            UPS ups = new UPS();
-            ups.postShipmentVoid(searsValues.Package.IdentificationNumber);
-
-            // the case if is bad request
-            if (ups.Error)
+            if (CHANNEL == "Sears")
             {
-                MessageBox.Show(ups.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+                #region UPS
+                // post void shipment request and get the response
+                UPS ups = new UPS();
+                ups.postShipmentVoid(searsValues.Package.IdentificationNumber);
 
-            // mark transaction as not shipped
-            new Sears().PostVoid(new[] { searsValues.TransactionID });
+                // the case if is bad request
+                if (ups.Error)
+                {
+                    MessageBox.Show(ups.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // mark transaction as not shipped
+                new Sears().PostVoid(new[] { searsValues.TransactionID });
+                #endregion
+            }
+            else if (CHANNEL == "Shop.ca")
+            {
+                #region Canada Post
+                // post void shipment request and get the response
+                CanadaPost canadaPost = new CanadaPost();
+                canadaPost.postShipmentVoid(shopCaValues.Package.RefundLink);
+
+                // the cas if is bad request
+                if (canadaPost.Error)
+                {
+                    MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // mar order as not shipped
+                new ShopCa().PostVoid(new[] { shopCaValues.OrderId });
+                #endregion
+            }
 
             // mark cancel as invisible, set tracking number text to not shipped, and enable create label button
             voidShipmentButton.Visible = false;
@@ -453,6 +559,22 @@ namespace Order_Manager.mainForms
             serviceCombobox.Items.Add("UPS Worldwide Express");
             serviceCombobox.SelectedIndex = 0;
 
+            // adding items to reason combobox
+            reasonCombobox.Items.Clear();
+            reasonCombobox.Items.Add("Select Reason");
+            reasonCombobox.Items.Add("Incorrect Ship To Address");
+            reasonCombobox.Items.Add("Incorrect SKU");
+            reasonCombobox.Items.Add("Cancelled at Merchant's Request");
+            reasonCombobox.Items.Add("Cannot fulfill the order in time");
+            reasonCombobox.Items.Add("Cannot Ship as Ordered");
+            reasonCombobox.Items.Add("Invalid Item Cost");
+            reasonCombobox.Items.Add("Merchant detected fraud");
+            reasonCombobox.Items.Add("Order missing information");
+            reasonCombobox.Items.Add("Out of Stock");
+            reasonCombobox.Items.Add("Product Has Been Discontinued");
+            reasonCombobox.Items.Add("Other");
+            reasonCombobox.SelectedIndex = 0;
+
             // ups details
             switch (value.ServiceLevel)
             {
@@ -560,6 +682,12 @@ namespace Order_Manager.mainForms
             serviceCombobox.Items.Add("Xpresspost");
             serviceCombobox.Items.Add("Priority");
             serviceCombobox.SelectedIndex = 0;
+
+            // adding items to reason combobox
+            reasonCombobox.Items.Clear();
+            reasonCombobox.Items.Add("Select Reason");
+            reasonCombobox.Items.Add("Out of Stock");
+            reasonCombobox.SelectedIndex = 0;
 
             // initialize field for sku detail -> [0] weight, [1] length, [2] width, [3] height
             decimal[] skuDetail = { 0, 0, 0, 0 };

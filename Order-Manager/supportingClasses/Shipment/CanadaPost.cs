@@ -1,5 +1,6 @@
 ﻿using Order_Manager.channel.shop.ca;
 using System;
+using System.Data.SqlClient;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -20,9 +21,18 @@ namespace Order_Manager.supportingClasses.Shipment
         public CanadaPost()
         {
             // get credentials from database
-            USER_ID = "f21c6233fa3b2a4a";
-            PASSWORD = "ea6213b27c90e3e4951115";
-            CUSTOMER_NUMBER = "0008422954";
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.ASCMcs))
+            {
+                SqlCommand command = new SqlCommand("SELECT Field1_Value, Field2_Value, Field3_Value FROM ASCM_Credentials WHERE Source = 'Canada Post' and Client = 'ASHLIN-BPG MARKETING Inc.'", connection);
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                reader.Read();
+
+                // allocate data
+                USER_ID = reader.GetString(0);
+                PASSWORD = reader.GetString(1);
+                CUSTOMER_NUMBER = reader.GetString(2);
+            }
         }
 
         #region Posting Methods
@@ -49,8 +59,8 @@ namespace Order_Manager.supportingClasses.Shipment
             string serviceCode;
             switch (package.Service)
             {
-                case "Expedited Parcel":
-                    serviceCode = "DOM.EP";
+                case "Regular Parcel":
+                    serviceCode = "DOM.RP";
                     break;
                 case "Xpresspost":
                     serviceCode = "DOM.XP";
@@ -59,7 +69,7 @@ namespace Order_Manager.supportingClasses.Shipment
                     serviceCode = "DOM.PC";
                     break;
                 default:
-                    serviceCode = "DOM.RP";
+                    serviceCode = "DOM.EP";
                     break;
             }
             textXML +=
@@ -93,11 +103,11 @@ namespace Order_Manager.supportingClasses.Shipment
                 "</option>" +
                 "</options>" +
                 "<parcel-characteristics>" +
-                "<weight>" + package.Weight + "</weight>" +
+                "<weight>" + Math.Round(package.Weight, 3) + "</weight>" +
                 "<dimensions>" +
-                "<length>" + package.Length + "</length>" +
-                "<width>" + package.Width + "</width>" +
-                "<height>" + package.Height + "</height>" +
+                "<length>" + Math.Round(package.Length, 2) + "</length>" +
+                "<width>" + Math.Round(package.Width, 2) + "</width>" +
+                "<height>" + Math.Round(package.Height, 2) + "</height>" +
                 "</dimensions>" +
                 "</parcel-characteristics>" +
                 "<preferences>" +
@@ -219,8 +229,14 @@ namespace Order_Manager.supportingClasses.Shipment
         /* a method that turn binary string into pdf file */
         public void exportLabel(byte[] binary, string orderId, bool preview)
         {
-            // byte to pdf file and save it
+            // create path
             string file = savePathShopCa + "\\" + orderId + ".pdf";
+
+            // check if the save directory exist -> if not create it
+            if (!File.Exists(savePathShopCa))
+                Directory.CreateDirectory(savePathShopCa);
+
+            // save pdf
             File.WriteAllBytes(file, binary);
 
             // show the pdf if user want to preview

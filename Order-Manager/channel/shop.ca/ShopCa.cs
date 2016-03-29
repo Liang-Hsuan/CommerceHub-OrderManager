@@ -195,7 +195,7 @@ namespace Order_Manager.channel.shop.ca
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET TrackingNumber = \'" + trackingNumber + "\', RefundLink = \'" + refundLink + "\', LabelLink = \'" + labelLink + "\' "
-                                                  + "WHERE TransactionId = \'" + orderId + "\';", connection);
+                                                  + "WHERE OrderId = \'" + orderId + "\';", connection);
                 connection.Open();
                 command.ExecuteNonQuery();
             }
@@ -212,7 +212,7 @@ namespace Order_Manager.channel.shop.ca
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 // for entire order cancellation
-                SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET TrackingNumber = '', RefundLink = '', LableLine = '' WHERE OrderId IN " + candidate, connection);
+                SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET TrackingNumber = '', RefundLink = '', LableLink = '' WHERE OrderId IN " + candidate, connection);
                 connection.Open();
                 command.ExecuteNonQuery();
             }

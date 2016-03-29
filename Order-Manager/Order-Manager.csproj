@@ -75,6 +75,7 @@
     <Compile Include="channel\brightpearl\BPconnect.cs" />
     <Compile Include="channel\brightpearl\BPvalues.cs" />
     <Compile Include="channel\shop.ca\ShopCa.cs" />
+    <Compile Include="channel\shop.ca\ShopCaPackingSlip.cs" />
     <Compile Include="channel\shop.ca\ShopCaValues.cs" />
     <Compile Include="Login.cs">
       <SubType>Form</SubType>

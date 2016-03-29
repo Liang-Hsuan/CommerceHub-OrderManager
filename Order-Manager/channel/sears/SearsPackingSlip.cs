@@ -11,21 +11,11 @@ namespace Order_Manager.channel.sears
      */
     public class SearsPackingSlip
     {
-        // field for pdf generation
-        private Document doc;
-
         // boolearn flag to track error
         public bool Error { get; private set; }
 
         /* get the save path of the sears packing slip */
         public string SavePath { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_PackingSlip";
-
-        /* constructor that create the path for saving pdf */
-        public SearsPackingSlip()
-        {
-            if (!Directory.Exists(SavePath))
-                Directory.CreateDirectory(SavePath);
-        }
 
         /* a method that save the packing slip pdf */
         public void createPackingSlip(SearsValues value, int[] cancelIndex, bool preview)
@@ -51,7 +41,7 @@ namespace Order_Manager.channel.sears
                 if (!cancelled)
                 {
                     // initialize PdfWriter object
-                    doc = new Document(PageSize.LETTER, 10, 10, 42, 35);
+                    Document doc = new Document(PageSize.LETTER, 0, 0, 0, 35);
                     string file = SavePath + "\\" + value.TransactionID + "_" + (i + 1) + ".pdf";
                     PdfWriter writer;
                     try

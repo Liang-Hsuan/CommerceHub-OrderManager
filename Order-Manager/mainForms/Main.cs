@@ -108,28 +108,51 @@ namespace Order_Manager.mainForms
                 return;
             }
 
-            // initialize printing objects
-            SearsPackingSlip searsPS = new SearsPackingSlip();
-
             // fields for message
-            string message = "Packing Slip have successfully exported to\n";
-            bool channel = false;
+            string message = "Packing Slip have successfully exported to";
+            bool[] channel = { false, false };  // [0] sears, [1] shop.ca
 
-            // check the user check item and get the selected transaction id for exportin packing slip
-            foreach (SearsValues value in from ListViewItem item in listview.CheckedItems where item.SubItems[0].Text == "Sears" select item.SubItems[4].Text into transaction select sears.GenerateValue(transaction))
+            // fields for packking slip
+            SearsPackingSlip searsPS = new SearsPackingSlip();
+            ShopCaPackingSlip shopCaPS = new ShopCaPackingSlip();
+
+            foreach (ListViewItem item in listview.CheckedItems)
             {
-                searsPS.createPackingSlip(value, new int[0], false);
-                if (searsPS.Error)
+                Order order = new Order();
+                order.source = item.SubItems[0].Text;
+                order.transactionId = item.SubItems[4].Text;
+
+                if (order.source == "Sears")
                 {
-                    MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    // the case if it is sears order
+                    SearsValues value = sears.GenerateValue(order.transactionId);
+                    searsPS.createPackingSlip(value, new int[0], false);
+                    if (searsPS.Error)
+                    {
+                        MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    channel[0] = true;
                 }
-                channel = true;
+                else if (order.source == "Shop.ca")
+                {
+                    // the case if it is shop.ca order
+                    ShopCaValues value = shopCa.GenerateValue(order.transactionId);
+                    shopCaPS.createPackingSlip(value, new int[0], false);
+                    if (shopCaPS.Error)
+                    {
+                        MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    channel[1] = true;
+                }
             }
 
             // create message
-            if (channel)
-                message += searsPS.SavePath;
+            if (channel[0])
+                message += "\n" + searsPS.SavePath;
+            if (channel[1])
+                message += "\n" + shopCaPS.SavePath;
 
             MessageBox.Show(message, "Congratulation");
         }
