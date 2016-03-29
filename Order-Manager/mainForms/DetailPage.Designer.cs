@@ -414,7 +414,6 @@
             // 
             // logoPicturebox
             // 
-            this.logoPicturebox.Image = ((System.Drawing.Image)(resources.GetObject("logoPicturebox.Image")));
             this.logoPicturebox.Location = new System.Drawing.Point(12, 12);
             this.logoPicturebox.Name = "logoPicturebox";
             this.logoPicturebox.Size = new System.Drawing.Size(120, 50);

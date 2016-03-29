@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Order_Manager.channel.sears;
+using Order_Manager.channel.shop.ca;
 using Order_Manager.supportingClasses.Shipment;
 
 namespace Order_Manager.mainForms
@@ -12,8 +13,9 @@ namespace Order_Manager.mainForms
      */
     public partial class ShipmentPage : Form
     {
-        // field for commerce hub order
+        // field for online shopping channels' order
         private readonly Sears sears = new Sears();
+        private readonly  ShopCa shopCa = new ShopCa();
 
         // field for UPS connection
         private readonly UPS ups = new UPS();
@@ -40,7 +42,8 @@ namespace Order_Manager.mainForms
             // first clear the listview
             listview.Items.Clear();
 
-            // get shipped items from channels
+            #region Sears
+            // get shipped items from sears
             SearsValues[] searsValue = sears.GetAllShippedOrder();
 
             // show shipped item to list view
@@ -54,6 +57,24 @@ namespace Order_Manager.mainForms
 
                 listview.Items.Add(item);
             }
+            #endregion
+
+            #region Shop.ca
+            // get shipped items from shop.ca
+            ShopCaValues[] shopCaValue = shopCa.GetAllShippedOrder();
+
+            // shor shipped item to list view 
+            foreach (ShopCaValues value in shopCaValue)
+            {
+                ListViewItem item = new ListViewItem("Sears");
+
+                item.SubItems.Add(value.OrderId);
+                item.SubItems.Add(value.Package.TrackingNumber);
+                item.SubItems.Add(value.Package.RefundLink);
+
+                listview.Items.Add(item);
+            }
+            #endregion
         }
 
         #region Top Buttons

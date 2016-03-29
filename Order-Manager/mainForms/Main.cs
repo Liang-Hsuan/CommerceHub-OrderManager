@@ -161,15 +161,19 @@ namespace Order_Manager.mainForms
 
             if (channel == "Sears")
             {
-                // the case if it is sears order
-                SearsValues value = sears.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
-                new DetailPage(value).ShowDialog(this);
+                {
+                    // the case if it is sears order
+                    SearsValues value = sears.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
+                    new DetailPage(value).ShowDialog(this);
+                }
             }
             else if (channel == "Shop.ca")
             {
-                // the case if it is shopl.ca order
-                ShopCaValues value = shopCa.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
-                new DetailPage(value).ShowDialog(this);
+                {
+                    // the case if it is shopl.ca order
+                    ShopCaValues value = shopCa.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
+                    new DetailPage(value).ShowDialog(this);
+                }
             }
         }
         #endregion

@@ -181,16 +181,21 @@ namespace Order_Manager.channel.sears
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 SqlCommand command = new SqlCommand("SELECT TransactionId, TrackingNumber, ShipmentIdentificationNumber FROM Sears_Order " +
-                                                    "WHERE TrackingNumber != '' AND CompleteDate > \'" + DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd") + "\';", connection);
+                                                    "WHERE TrackingNumber != '' AND CompleteDate > \'" + DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd") + "\';", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 
                 while (reader.Read())
                 {
-                    SearsValues value = new SearsValues();
-                    value.TransactionID = reader.GetString(0);
-                    value.Package.TrackingNumber = reader.GetString(1);
-                    value.Package.IdentificationNumber = reader.GetString(2);
+                    SearsValues value = new SearsValues
+                    {
+                        TransactionID = reader.GetString(0),
+                        Package =
+                        {
+                            TrackingNumber = reader.GetString(1),
+                            IdentificationNumber = reader.GetString(2)
+                        }
+                    };
 
                     list.Add(value);
                 }

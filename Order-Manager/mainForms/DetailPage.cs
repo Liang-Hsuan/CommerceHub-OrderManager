@@ -401,6 +401,8 @@ namespace Order_Manager.mainForms
         /* a method that show the information of the given SearsValues object */
         private void showResult(SearsValues value)
         {
+            // title bar set up
+            logoPicturebox.Image = Image.FromFile(@"..\..\image\sears.png");
             topOrderNumberTextbox.Text = value.TransactionID;
 
             #region Order Summary
@@ -449,6 +451,7 @@ namespace Order_Manager.mainForms
             serviceCombobox.Items.Add("UPS Express");
             serviceCombobox.Items.Add("UPS 3 Day Select");
             serviceCombobox.Items.Add("UPS Worldwide Express");
+            serviceCombobox.SelectedIndex = 0;
 
             // ups details
             switch (value.ServiceLevel)
@@ -510,6 +513,8 @@ namespace Order_Manager.mainForms
         /* a method that show the information of the given ShopCaValues object */
         private void showResult(ShopCaValues value)
         {
+            // title bar set up
+            logoPicturebox.Image = Image.FromFile(@"..\..\image\shopca.png");
             topOrderNumberTextbox.Text = value.OrderId;
 
             #region Order Summary
@@ -554,6 +559,7 @@ namespace Order_Manager.mainForms
             serviceCombobox.Items.Add("Regular Parcel");
             serviceCombobox.Items.Add("Xpresspost");
             serviceCombobox.Items.Add("Priority");
+            serviceCombobox.SelectedIndex = 0;
 
             // initialize field for sku detail -> [0] weight, [1] length, [2] width, [3] height
             decimal[] skuDetail = { 0, 0, 0, 0 };

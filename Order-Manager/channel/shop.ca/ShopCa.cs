@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using Tamir.SharpSsh;
 
@@ -152,8 +153,42 @@ namespace Order_Manager.channel.shop.ca
 
             return list.ToArray();
         }
+
+        /* a method that return all shipped order */
+        public ShopCaValues[] GetAllShippedOrder()
+        {
+            // local field for storing shipment value 
+            List<ShopCaValues> list = new List<ShopCaValues>();
+
+            // grab all shipped 
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            {
+                SqlCommand command = new SqlCommand("SELECT OrderId, TrackingNumber, RefundLink FROM ShopCa_Order " +
+                                                    "WHERE TrackingNumber != '' AND CompleteDate > \'" + DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd") + "\';", connection);
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    ShopCaValues value = new ShopCaValues
+                    {
+                        OrderId = reader.GetString(0),
+                        Package =
+                        {
+                            TrackingNumber = reader.GetString(1),
+                            RefundLink = reader.GetString(2)
+                        }
+                    };
+
+                    list.Add(value);
+                }
+            }
+
+            return list.ToArray();
+        }
         #endregion
 
+        #region Ship and Void
         /* a method that mark the order as shipped but not posting a confirm order to shop.ca only for local reference */
         public void PostShip(string trackingNumber, string refundLink, string labelLink, string orderId)
         {
@@ -165,6 +200,24 @@ namespace Order_Manager.channel.shop.ca
                 command.ExecuteNonQuery();
             }
         }
+
+        /* a method that mark the order as cancelled but not posting a cancel order to shop.ca only for local reference */
+        public void PostVoid(string[] orderId)
+        {
+            // generate the range 
+            string candidate = orderId.Aggregate("(", (current, id) => current + ('\'' + id + "\',"));
+            candidate = candidate.Remove(candidate.Length - 1) + ')';
+
+            // update to not shipped 
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            {
+                // for entire order cancellation
+                SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET TrackingNumber = '', RefundLink = '', LableLine = '' WHERE OrderId IN " + candidate, connection);
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
+        #endregion
 
         #region Number of Orders and Shipments
         /* methods that return the number of order and shipment from the given date */
@@ -219,7 +272,7 @@ namespace Order_Manager.channel.shop.ca
         }
 
         /* method that get the shipment order file name from sftp server */
-        private string[] getOrderName(string serverDir)
+        private IEnumerable<string> getOrderName(string serverDir)
         {
             // connection to sftp server and read all the list of file
             sftp.Connect();
@@ -227,11 +280,7 @@ namespace Order_Manager.channel.shop.ca
             sftp.Close();
 
             // retrieve all the files name to the list
-            List<string> fileList = new List<string>();
-            foreach (var item in list)
-                fileList.Add(item.ToString());
-
-            return fileList.ToArray();
+            return (from object item in list select item.ToString()).ToArray();
         }
 
         /* method that get all the order in the file with the given dictionary <filePath, text> and return dictionary <orderId, filepath> */
@@ -265,11 +314,7 @@ namespace Order_Manager.channel.shop.ca
             FileInfo[] filesLocal = dirInfo.GetFiles("*.xml");       // getting all file that have been on local
 
             // read all the text of the file in the local directory and add the path for the file
-            Dictionary<string, string> textXml = new Dictionary<string, string>();
-            foreach (FileInfo file in filesLocal)
-                textXml.Add(newOrderDir + "\\" + file, File.ReadAllText(newOrderDir + "\\" + file));
-
-            return textXml;
+            return filesLocal.ToDictionary(file => newOrderDir + "\\" + file, file => File.ReadAllText(newOrderDir + "\\" + file));
         }
         #endregion
 
@@ -280,33 +325,12 @@ namespace Order_Manager.channel.shop.ca
             // get all order file on local
             DirectoryInfo dirInfo = new DirectoryInfo(newOrderDir);
             FileInfo[] filesLocal = dirInfo.GetFiles("*.xml");       // getting all file that have been on local
-            List<string> neworderList = new List<string>();
 
             // get all order file on server
-            string[] fileOnServer = getOrderName(SHIPMENT_DIR);
+            IEnumerable<string> fileOnServer = getOrderName(SHIPMENT_DIR);
 
             // check the number of new order on the server compare to ones on the computer
-            foreach (string file1 in fileOnServer)
-            {
-                // local bool flag to indicate if new order has beed found or not
-                bool found = false;
-
-                // starting checking if there is duplicate
-                foreach (FileInfo file2 in filesLocal)
-                {
-                    if (file1 == file2.ToString())
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-
-                // if there is no duplicate write the new file and increment the number
-                if (!found)
-                    neworderList.Add(file1);
-            }
-
-            return neworderList.ToArray();
+            return (from file1 in fileOnServer let found = filesLocal.Any(file2 => file1 == file2.ToString()) where !found select file1).ToArray();
         }
 
         /* a method that receive all the current order and check the duplicate then only return the ones that have not been processed 
@@ -325,28 +349,7 @@ namespace Order_Manager.channel.shop.ca
             }
 
             // compare allOrderList's order id with the completeOrderList's order id
-            Dictionary<string, string> newOrderList = new Dictionary<string, string>();
-            foreach (KeyValuePair<string,string> keyValue in allOrderList)
-            {
-                // local bool flag to indicate if new order has beed found or not
-                bool found = false;
-
-                // starting checking if there is duplicate
-                foreach (string completeOrder in completeOrderList)
-                {
-                    if (keyValue.Key == completeOrder)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-
-                // if there is no duplicate add the new file
-                if (!found)
-                    newOrderList.Add(keyValue.Key, keyValue.Value);
-            }
-
-            return newOrderList;
+            return (from keyValue in allOrderList let found = completeOrderList.Any(completeOrder => keyValue.Key == completeOrder) where !found select keyValue).ToDictionary(keyValue => keyValue.Key, keyValue => keyValue.Value);
         }
         #endregion
 
