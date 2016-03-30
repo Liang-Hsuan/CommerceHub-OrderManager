@@ -37,6 +37,8 @@
             this.selectAllCheckbox = new System.Windows.Forms.CheckBox();
             this.voidShipmentButton = new System.Windows.Forms.Button();
             this.backButton = new System.Windows.Forms.Button();
+            this.endOfDayButton = new System.Windows.Forms.Button();
+            this.backgroundWorkerEndofDay = new System.ComponentModel.BackgroundWorker();
             this.SuspendLayout();
             // 
             // listview
@@ -54,7 +56,7 @@
             this.listview.Location = new System.Drawing.Point(11, 52);
             this.listview.Name = "listview";
             this.listview.Size = new System.Drawing.Size(486, 332);
-            this.listview.TabIndex = 0;
+            this.listview.TabIndex = 3;
             this.listview.UseCompatibleStateImageBehavior = false;
             this.listview.View = System.Windows.Forms.View.Details;
             this.listview.ColumnWidthChanging += new System.Windows.Forms.ColumnWidthChangingEventHandler(this.listview_ColumnWidthChanging);
@@ -82,7 +84,7 @@
             // selectAllCheckbox
             // 
             this.selectAllCheckbox.AutoSize = true;
-            this.selectAllCheckbox.Location = new System.Drawing.Point(16, 57);
+            this.selectAllCheckbox.Location = new System.Drawing.Point(15, 57);
             this.selectAllCheckbox.Name = "selectAllCheckbox";
             this.selectAllCheckbox.Size = new System.Drawing.Size(15, 14);
             this.selectAllCheckbox.TabIndex = 1;
@@ -111,12 +113,31 @@
             this.backButton.FlatAppearance.BorderSize = 0;
             this.backButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.backButton.Image = ((System.Drawing.Image)(resources.GetObject("backButton.Image")));
-            this.backButton.Location = new System.Drawing.Point(11, 12);
+            this.backButton.Location = new System.Drawing.Point(11, 11);
             this.backButton.Name = "backButton";
             this.backButton.Size = new System.Drawing.Size(57, 34);
-            this.backButton.TabIndex = 3;
+            this.backButton.TabIndex = 0;
             this.backButton.UseVisualStyleBackColor = false;
             this.backButton.Click += new System.EventHandler(this.backButton_Click);
+            // 
+            // endOfDayButton
+            // 
+            this.endOfDayButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.endOfDayButton.BackColor = System.Drawing.Color.Transparent;
+            this.endOfDayButton.FlatAppearance.BorderSize = 0;
+            this.endOfDayButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.endOfDayButton.Image = ((System.Drawing.Image)(resources.GetObject("endOfDayButton.Image")));
+            this.endOfDayButton.Location = new System.Drawing.Point(305, 11);
+            this.endOfDayButton.Name = "endOfDayButton";
+            this.endOfDayButton.Size = new System.Drawing.Size(47, 34);
+            this.endOfDayButton.TabIndex = 1;
+            this.endOfDayButton.UseVisualStyleBackColor = false;
+            this.endOfDayButton.Click += new System.EventHandler(this.endOfDayButton_Click);
+            // 
+            // backgroundWorkerEndofDay
+            // 
+            this.backgroundWorkerEndofDay.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorkerEndofDay_DoWork);
+            this.backgroundWorkerEndofDay.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorkerEndofDay_RunWorkerCompleted);
             // 
             // ShipmentPage
             // 
@@ -124,6 +145,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(245)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(511, 396);
+            this.Controls.Add(this.endOfDayButton);
             this.Controls.Add(this.backButton);
             this.Controls.Add(this.voidShipmentButton);
             this.Controls.Add(this.selectAllCheckbox);
@@ -148,5 +170,7 @@
         private System.Windows.Forms.Button voidShipmentButton;
         private System.Windows.Forms.ColumnHeader IdentificationHeader;
         private System.Windows.Forms.Button backButton;
+        private System.Windows.Forms.Button endOfDayButton;
+        private System.ComponentModel.BackgroundWorker backgroundWorkerEndofDay;
     }
 }

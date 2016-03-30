@@ -24,7 +24,7 @@ namespace Order_Manager.supportingClasses.Shipment
         // field for identification
         public string TrackingNumber { get; set; }
         public string IdentificationNumber { get; set; }    // for ups shipment void
-        public string RefundLink { get; set; }              // for canada post refund
+        public string SelfLink { get; set; }                // for canada post shipment void
         public string LabelLink { get; set; }               // for canada post label recovery
 
         /* first constructor that take no argument */
@@ -40,7 +40,7 @@ namespace Order_Manager.supportingClasses.Shipment
 
             TrackingNumber = "";
             IdentificationNumber = "";
-            RefundLink = "";
+            SelfLink = "";
             LabelLink = "";
         }
 
@@ -87,13 +87,13 @@ namespace Order_Manager.supportingClasses.Shipment
 
             // service is set to default
             Service = "Expedited Parcel";
-            RefundLink = "";
+            SelfLink = "";
             LabelLink = "";
         }
 
         /* third constructor that take all parameters */
         public Package(decimal weight, decimal length, decimal width, decimal height, string packageType, string service, string trackingNumber, 
-                       string identificationNumber, string refundLink, string labelLink)
+                       string identificationNumber, string selfLink, string labelLink)
         {
             Weight = weight;
             Length = length;
@@ -105,7 +105,7 @@ namespace Order_Manager.supportingClasses.Shipment
 
             TrackingNumber = trackingNumber;
             IdentificationNumber = identificationNumber;
-            RefundLink = refundLink;
+            SelfLink = selfLink;
             LabelLink = labelLink;
         }
 

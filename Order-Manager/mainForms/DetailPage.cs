@@ -313,8 +313,8 @@ namespace Order_Manager.mainForms
                 // initialize field for shipment
                 CanadaPost canadaPost = new CanadaPost();
 
-                // post shipment confirm to canada post
-                string[] result = canadaPost.postShipmentConfirm(shopCaValues, shopCaValues.Package);
+                // create shipment for canada post
+                string[] result = canadaPost.createShipment(shopCaValues, shopCaValues.Package);
 
                 // error checking
                 if (canadaPost.Error)
@@ -326,15 +326,15 @@ namespace Order_Manager.mainForms
 
                 // retrieve tracking number, refund link and label link
                 shopCaValues.Package.TrackingNumber = result[0];
-                shopCaValues.Package.RefundLink = result[1];
+                shopCaValues.Package.SelfLink = result[1];
                 shopCaValues.Package.LabelLink = result[2];
 
                 // update database set the order's tracking number refund link and label link
-                new ShopCa().PostShip(shopCaValues.Package.TrackingNumber, shopCaValues.Package.RefundLink, shopCaValues.Package.LabelLink, shopCaValues.OrderId);
+                new ShopCa().PostShip(shopCaValues.Package.TrackingNumber, shopCaValues.Package.SelfLink, shopCaValues.Package.LabelLink, shopCaValues.OrderId);
 
                 // get artifect
                 Thread.Sleep(5000);
-                byte[] artifect = canadaPost.getAritifect(result[2]);
+                byte[] artifect = canadaPost.getArtifact(result[2]);
 
                 // error checking
                 if (canadaPost.Error)
@@ -345,7 +345,7 @@ namespace Order_Manager.mainForms
                 }
 
                 // get the shipment label and show it
-                canadaPost.exportLabel(artifect, shopCaValues.OrderId, true);
+                canadaPost.exportLabel(artifect, shopCaValues.OrderId, true, true);
 
                 // set bool flag to false
                 e.Result = false;
@@ -407,6 +407,11 @@ namespace Order_Manager.mainForms
 
                     // mark transaction as not shipped
                     new Sears().PostVoid(new[] { searsValues.TransactionID });
+
+                    // set tracking and identification to nothing
+                    searsValues.Package.IdentificationNumber = "";
+                    searsValues.Package.TrackingNumber = "";
+
                     break;
                     #endregion
 
@@ -415,7 +420,7 @@ namespace Order_Manager.mainForms
                     #region Canada Post
                     // post void shipment request and get the response
                     CanadaPost canadaPost = new CanadaPost();
-                    canadaPost.postShipmentVoid(shopCaValues.Package.RefundLink);
+                    canadaPost.deleteShipment(shopCaValues.Package.SelfLink);
 
                     // the cas if is bad request
                     if (canadaPost.Error)
@@ -426,6 +431,12 @@ namespace Order_Manager.mainForms
 
                     // mar order as not shipped
                     new ShopCa().PostVoid(new[] { shopCaValues.OrderId });
+
+                    // set tracking, self link, label link to nothing
+                    shopCaValues.Package.TrackingNumber = "";
+                    shopCaValues.Package.SelfLink = "";
+                    shopCaValues.Package.LabelLink = "";
+
                     break;
                     #endregion
             }
@@ -433,11 +444,7 @@ namespace Order_Manager.mainForms
             // mark cancel as invisible, set tracking number text to not shipped, and enable create label button
             voidShipmentButton.Visible = false;
             trackingNumberTextbox.Text = "Not Shipped";
-            createLabelButton.Enabled = true;
-
-            // set tracking and identification to nothing
-            searsValues.Package.IdentificationNumber = "";
-            searsValues.Package.TrackingNumber = "";
+            createLabelButton.Enabled = true;        
         }
 
         #region Shipment Confirm
@@ -470,7 +477,13 @@ namespace Order_Manager.mainForms
                     cancelList.Add(i, reason);
                 }
 
-                if (cancelList.Count < searsValues.LineCount && searsValues.Package.TrackingNumber == "")
+                // error check for non shipped items
+                if (CHANNEL == "Sears" && cancelList.Count < searsValues.LineCount && searsValues.Package.TrackingNumber == "")
+                {
+                    MessageBox.Show("There are items that are not shipped", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                else if (CHANNEL == "Shop.ca" && cancelList.Count < shopCaValues.OrderItemId.Count && shopCaValues.Package.TrackingNumber == "")
                 {
                     MessageBox.Show("There are items that are not shipped", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
@@ -487,13 +500,25 @@ namespace Order_Manager.mainForms
         {
             simulate(1, 40);
 
-            // export xml file
-            new Sears().GenerateXML(searsValues, cancelList);
+            if (CHANNEL == "Sears")
+            {
+                // sears case
+                // export xml file
+                new Sears().GenerateXML(searsValues, cancelList);
 
-            simulate(40, 70);
+                simulate(40, 70);
 
-            // post order to brightpearl
-            bp.postOrder(searsValues, new List<int>(cancelList.Keys).ToArray());
+                // post order to brightpearl
+                bp.postOrder(searsValues, new List<int>(cancelList.Keys).ToArray());
+            }
+            else if (CHANNEL == "Shop.ca")
+            {
+                // shop.ca case
+                // export csv file
+                new ShopCa().GenerateCSV(shopCaValues, cancelList);
+
+                simulate(40, 70);
+            }
 
             simulate(70, 100);
         }
@@ -701,7 +726,12 @@ namespace Order_Manager.mainForms
             // adding items to reason combobox
             reasonCombobox.Items.Clear();
             reasonCombobox.Items.Add("Select Reason");
+            reasonCombobox.Items.Add("Carrier cannot deliver");
+            reasonCombobox.Items.Add("Discontinued");
+            reasonCombobox.Items.Add("Incomplete Address");
+            reasonCombobox.Items.Add("Out of delivery area");
             reasonCombobox.Items.Add("Out of Stock");
+            reasonCombobox.Items.Add("Other");
             reasonCombobox.SelectedIndex = 0;
 
             // initialize field for sku detail -> [0] weight, [1] length, [2] width, [3] height

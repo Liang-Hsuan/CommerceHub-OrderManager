@@ -5,6 +5,9 @@ using System.Windows.Forms;
 using Order_Manager.channel.sears;
 using Order_Manager.channel.shop.ca;
 using Order_Manager.supportingClasses.Shipment;
+using Order_Manager.supportingClasses;
+using System.Threading;
+using System.Globalization;
 
 namespace Order_Manager.mainForms
 {
@@ -17,8 +20,9 @@ namespace Order_Manager.mainForms
         private readonly Sears sears = new Sears();
         private readonly  ShopCa shopCa = new ShopCa();
 
-        // field for UPS connection
+        // field for carrier connection
         private readonly UPS ups = new UPS();
+        private readonly CanadaPost canadaPost = new CanadaPost();
 
         // field for storing data
         private struct Order
@@ -70,7 +74,7 @@ namespace Order_Manager.mainForms
 
                 item.SubItems.Add(value.OrderId);
                 item.SubItems.Add(value.Package.TrackingNumber);
-                item.SubItems.Add(value.Package.RefundLink);
+                item.SubItems.Add(value.Package.SelfLink);
 
                 listview.Items.Add(item);
             }
@@ -78,6 +82,88 @@ namespace Order_Manager.mainForms
         }
 
         #region Top Buttons
+        /* end of day event */
+        private void endOfDayButton_Click(object sender, EventArgs e)
+        {
+            // check all the items that can be end of day
+            foreach (ListViewItem item in listview.Items)
+            {
+                if (item.SubItems[0].Text == "Shop.ca")
+                    item.Checked = true;
+            }
+
+            // get confirmation from the user
+            ConfirmPanel confirm = new ConfirmPanel("Are you sure you want to do the end of day for all the shipment for Canada Post?");
+            confirm.ShowDialog(this);
+
+            // the case if user not conifrm or there is no shipment to end of day -> return
+            if (confirm.DialogResult != DialogResult.OK || listview.CheckedItems.Count < 1) return;
+
+            // set end of day button to disabled
+            endOfDayButton.Enabled = false;
+
+            // down to business -> call background worker
+            if (!backgroundWorkerEndofDay.IsBusy)
+                backgroundWorkerEndofDay.RunWorkerAsync();
+        }
+        private void backgroundWorkerEndofDay_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            // get all the manifest links
+            string groupId = DateTime.Today.ToString("yyyyMMdd");
+            string[] list = canadaPost.transmitShipments(groupId);
+
+            // error check 1
+            if (canadaPost.Error)
+            {
+                MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                e.Result = true;
+                return;
+            }
+
+            Thread.Sleep(5000);
+
+            // confirm each manifest and get artifact link
+            List<string> manifestList = new List<string>();
+            foreach (string manifest in list)
+            {
+                manifestList.Add(canadaPost.getManifest(manifest));
+
+                // error check 2
+                if (canadaPost.Error)
+                {
+                    MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    e.Result = true;
+                    return;
+                }
+            }
+
+            Thread.Sleep(5000);
+
+            // get artifact and save as pdf
+            for (int i = 0; i < manifestList.Count; i++)
+            {
+                byte[] binary = canadaPost.getArtifact(manifestList[i]);
+                canadaPost.exportLabel(binary, groupId + '_' + (i + 1), false, false);
+            }
+
+            // set end of day to true in database
+            shopCa.PostShip(true, DateTime.ParseExact(groupId, "yyyyMMdd", CultureInfo.InvariantCulture));
+
+            e.Result = false;
+        }
+        private void backgroundWorkerEndofDay_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        {
+            // show to the user that the process has completed -> if there is no error occur during the process
+            if (!(bool)e.Result)
+                 MessageBox.Show("Manifests have been successfully exported to\n" + canadaPost.SavePathManifestShopCa, "Congratulation");
+
+            // show the new result
+            showResult();
+
+            // set end of day button to enabled
+            endOfDayButton.Enabled = true;
+        }
+
         /* cancel shipment button click that mark the selected order to cancelled in database */
         private void cancelShipmentButton_Click(object sender, EventArgs e)
         {
@@ -88,8 +174,9 @@ namespace Order_Manager.mainForms
                 return;
             }
 
-            // local fields for storing data
-            List<string> list = new List<string>();
+            // local fields for storing data -> [0] sears, [1] shop.ca
+            List<string>[] list = { new List<string>(), new List<string>() };
+            bool[] channel = { false, false };
 
             // adding cancel order list and post shipment void
             List<Order> cancelList = (from ListViewItem item in listview.CheckedItems
@@ -97,21 +184,41 @@ namespace Order_Manager.mainForms
                 {
                     source = item.SubItems[0].Text,
                     transactionId = item.SubItems[1].Text,
-                    shipmentIdentificationNumber = item.SubItems[2].Text
+                    shipmentIdentificationNumber = item.SubItems[3].Text
                 }).ToList();
 
-            // sears cancellation
-            foreach (Order cancelledOrder in cancelList.Where(cancelledOrder => cancelledOrder.source == "Sears"))
+            // cancellation to carriers
+            foreach (Order cancelledOrder in cancelList)
             {
-                list.Add(cancelledOrder.transactionId);
-                ups.postShipmentVoid(cancelledOrder.shipmentIdentificationNumber);
-                if (ups.Error)
+                if (cancelledOrder.source == "Sears")
                 {
-                    MessageBox.Show(ups.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    list[0].Add(cancelledOrder.transactionId);
+                    ups.postShipmentVoid(cancelledOrder.shipmentIdentificationNumber);
+                    if (ups.Error)
+                    {
+                        MessageBox.Show(ups.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    channel[0] = true;
+                }
+                else if (cancelledOrder.source == "Shop.ca")
+                {
+                    list[1].Add(cancelledOrder.transactionId);
+                    canadaPost.deleteShipment(cancelledOrder.shipmentIdentificationNumber);
+                    if (canadaPost.Error)
+                    {
+                        MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    channel[1] = true;
                 }
             }
-            sears.PostVoid(list.ToArray());
+
+            // cancellation to database
+            if (channel[0])
+                sears.PostVoid(list[0].ToArray());
+            if (channel[1])
+                shopCa.PostVoid(list[1].ToArray());
 
             // show new result
             showResult();
