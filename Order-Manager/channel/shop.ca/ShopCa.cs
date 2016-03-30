@@ -164,7 +164,7 @@ namespace Order_Manager.channel.shop.ca
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 SqlCommand command = new SqlCommand("SELECT OrderId, TrackingNumber, RefundLink FROM ShopCa_Order " +
-                                                    "WHERE TrackingNumber != '' AND CompleteDate > \'" + DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd") + "\';", connection);
+                                                    "WHERE TrackingNumber != '' AND CompleteDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\';", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 

@@ -46,20 +46,11 @@ namespace Order_Manager.supportingClasses
         /* a supportin class for deleting file */
         private class UInfo : UserInfo
         {
-            string passwd = string.Empty;
-
-            public UInfo() { passwd = string.Empty; }
+            private readonly string passwd = string.Empty;
 
             public UInfo(string pwd) { passwd = pwd; }
 
             public string getPassword() { return passwd; }
-
-            public string Password
-            {
-                set { passwd = value; }
-
-                get { return passwd; }
-            }
 
             #region Dummy Implementations
             public bool promptYesNo(string str) { return true; }

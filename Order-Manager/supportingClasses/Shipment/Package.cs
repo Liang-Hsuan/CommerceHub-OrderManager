@@ -86,7 +86,7 @@ namespace Order_Manager.supportingClasses.Shipment
             Height = skuDetail[3];
 
             // service is set to default
-            Service = "Regular Parcel";
+            Service = "Expedited Parcel";
             RefundLink = "";
             LabelLink = "";
         }

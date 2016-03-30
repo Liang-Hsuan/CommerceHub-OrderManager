@@ -62,21 +62,26 @@ namespace Order_Manager.mainForms
             // get all cancel index and print the packing slip that are not cancelled
             int[] cancelIndex = getCancelIndex();
 
-            if (CHANNEL == "Sears")
+            switch (CHANNEL)
             {
-                // ths case if the order is from sears
-                SearsPackingSlip packingSlip = new SearsPackingSlip();
-                packingSlip.createPackingSlip(searsValues, cancelIndex, true);
-                if (packingSlip.Error)
-                    MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else if (CHANNEL == "Shop.ca")
-            {
-                // the case if the order is from shop.ca
-                ShopCaPackingSlip packingSlip = new ShopCaPackingSlip();
-                packingSlip.createPackingSlip(shopCaValues, cancelIndex, true);
-                if (packingSlip.Error)
-                    MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                case "Sears":
+                {
+                    // ths case if the order is from sears
+                    SearsPackingSlip packingSlip = new SearsPackingSlip();
+                    packingSlip.createPackingSlip(searsValues, cancelIndex, true);
+                    if (packingSlip.Error)
+                        MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                    break;
+                case "Shop.ca":
+                {
+                    // the case if the order is from shop.ca
+                    ShopCaPackingSlip packingSlip = new ShopCaPackingSlip();
+                    packingSlip.createPackingSlip(shopCaValues, cancelIndex, true);
+                    if (packingSlip.Error)
+                        MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                    break;
             }
         }
 
@@ -84,10 +89,15 @@ namespace Order_Manager.mainForms
         private void verifyButton_Click(object sender, EventArgs e)
         {
             bool flag = true;
-            if (CHANNEL == "Sears")
-                flag = AddressValidation.validate(searsValues.ShipTo);
-            else if (CHANNEL == "Shop.ca")
-                flag = AddressValidation.validate(shopCaValues.ShipTo);
+            switch (CHANNEL)
+            {
+                case "Sears":
+                    flag = AddressValidation.validate(searsValues.ShipTo);
+                    break;
+                case "Shop.ca":
+                    flag = AddressValidation.validate(shopCaValues.ShipTo);
+                    break;
+            }
 
             if (flag)
             {
@@ -171,33 +181,34 @@ namespace Order_Manager.mainForms
             decimal[] skuDetail = { 0, 0, 0, 0 };
 
             // change the details of package
-            if (CHANNEL == "Sears")
+            switch (CHANNEL)
             {
-                for (int i = 0; i < searsValues.LineCount; i++)
-                {
-                    if (listview.Items[i].SubItems[5].Text != "") continue;
-                    decimal[] detailList = Package.getSkuDetail(searsValues.TrxVendorSKU[i]);
-
-                    if (detailList != null)
+                case "Sears":
+                    for (int i = 0; i < searsValues.LineCount; i++)
                     {
-                        for (int j = 0; j < 4; j++)
-                            skuDetail[j] += detailList[j];
-                    }
-                }
-            }
-            else if (CHANNEL == "Shop.ca")
-            {
-                for (int i = 0; i < shopCaValues.OrderItemId.Count; i++)
-                {
-                    if (listview.Items[i].SubItems[5].Text != "") continue;
-                    decimal[] detailList = Package.getSkuDetail(shopCaValues.Sku[i]);
+                        if (listview.Items[i].SubItems[5].Text != "") continue;
+                        decimal[] detailList = Package.getSkuDetail(searsValues.TrxVendorSKU[i]);
 
-                    if (detailList != null)
-                    {
-                        for (int j = 0; j < 4; j++)
-                            skuDetail[j] += detailList[j];
+                        if (detailList != null)
+                        {
+                            for (int j = 0; j < 4; j++)
+                                skuDetail[j] += detailList[j];
+                        }
                     }
-                }
+                    break;
+                case "Shop.ca":
+                    for (int i = 0; i < shopCaValues.OrderItemId.Count; i++)
+                    {
+                        if (listview.Items[i].SubItems[5].Text != "") continue;
+                        decimal[] detailList = Package.getSkuDetail(shopCaValues.Sku[i]);
+
+                        if (detailList != null)
+                        {
+                            for (int j = 0; j < 4; j++)
+                                skuDetail[j] += detailList[j];
+                        }
+                    }
+                    break;
             }
 
             // show result to shipping info
@@ -378,41 +389,45 @@ namespace Order_Manager.mainForms
         /* void shipment button that void the current shipment for the order */
         private void voidShipmentButton_Click(object sender, EventArgs e)
         {
-            if (CHANNEL == "Sears")
+            switch (CHANNEL)
             {
-                #region UPS
-                // post void shipment request and get the response
-                UPS ups = new UPS();
-                ups.postShipmentVoid(searsValues.Package.IdentificationNumber);
+                case "Sears":
 
-                // the case if is bad request
-                if (ups.Error)
-                {
-                    MessageBox.Show(ups.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+                    #region UPS
+                    // post void shipment request and get the response
+                    UPS ups = new UPS();
+                    ups.postShipmentVoid(searsValues.Package.IdentificationNumber);
 
-                // mark transaction as not shipped
-                new Sears().PostVoid(new[] { searsValues.TransactionID });
-                #endregion
-            }
-            else if (CHANNEL == "Shop.ca")
-            {
-                #region Canada Post
-                // post void shipment request and get the response
-                CanadaPost canadaPost = new CanadaPost();
-                canadaPost.postShipmentVoid(shopCaValues.Package.RefundLink);
+                    // the case if is bad request
+                    if (ups.Error)
+                    {
+                        MessageBox.Show(ups.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
 
-                // the cas if is bad request
-                if (canadaPost.Error)
-                {
-                    MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+                    // mark transaction as not shipped
+                    new Sears().PostVoid(new[] { searsValues.TransactionID });
+                    break;
+                    #endregion
 
-                // mar order as not shipped
-                new ShopCa().PostVoid(new[] { shopCaValues.OrderId });
-                #endregion
+                case "Shop.ca":
+
+                    #region Canada Post
+                    // post void shipment request and get the response
+                    CanadaPost canadaPost = new CanadaPost();
+                    canadaPost.postShipmentVoid(shopCaValues.Package.RefundLink);
+
+                    // the cas if is bad request
+                    if (canadaPost.Error)
+                    {
+                        MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // mar order as not shipped
+                    new ShopCa().PostVoid(new[] { shopCaValues.OrderId });
+                    break;
+                    #endregion
             }
 
             // mark cancel as invisible, set tracking number text to not shipped, and enable create label button
@@ -782,21 +797,22 @@ namespace Order_Manager.mainForms
             else
             {
                 string addressNew = shipToCombineTextbox.Text;
-                if (CHANNEL == "Sears")
+                switch (CHANNEL)
                 {
-                    searsValues.ShipTo.City = addressNew.Substring(0, addressNew.IndexOf(','));
-                    addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
-                    searsValues.ShipTo.State = addressNew.Substring(0, addressNew.IndexOf(','));
-                    addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
-                    searsValues.ShipTo.PostalCode = addressNew.Substring(0);
-                }
-                else if (CHANNEL == "Shop.ca")
-                {
-                    shopCaValues.ShipTo.City = addressNew.Substring(0, addressNew.IndexOf(','));
-                    addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
-                    shopCaValues.ShipTo.State = addressNew.Substring(0, addressNew.IndexOf(','));
-                    addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
-                    shopCaValues.ShipTo.PostalCode = addressNew.Substring(0);
+                    case "Sears":
+                        searsValues.ShipTo.City = addressNew.Substring(0, addressNew.IndexOf(','));
+                        addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
+                        searsValues.ShipTo.State = addressNew.Substring(0, addressNew.IndexOf(','));
+                        addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
+                        searsValues.ShipTo.PostalCode = addressNew.Substring(0);
+                        break;
+                    case "Shop.ca":
+                        shopCaValues.ShipTo.City = addressNew.Substring(0, addressNew.IndexOf(','));
+                        addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
+                        shopCaValues.ShipTo.State = addressNew.Substring(0, addressNew.IndexOf(','));
+                        addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
+                        shopCaValues.ShipTo.PostalCode = addressNew.Substring(0);
+                        break;
                 }
             }
         }

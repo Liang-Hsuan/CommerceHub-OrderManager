@@ -122,29 +122,34 @@ namespace Order_Manager.mainForms
                 order.source = item.SubItems[0].Text;
                 order.transactionId = item.SubItems[4].Text;
 
-                if (order.source == "Sears")
+                switch (order.source)
                 {
-                    // the case if it is sears order
-                    SearsValues value = sears.GenerateValue(order.transactionId);
-                    searsPS.createPackingSlip(value, new int[0], false);
-                    if (searsPS.Error)
+                    case "Sears":
                     {
-                        MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
+                        // the case if it is sears order
+                        SearsValues value = sears.GenerateValue(order.transactionId);
+                        searsPS.createPackingSlip(value, new int[0], false);
+                        if (searsPS.Error)
+                        {
+                            MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                        channel[0] = true;
                     }
-                    channel[0] = true;
-                }
-                else if (order.source == "Shop.ca")
-                {
-                    // the case if it is shop.ca order
-                    ShopCaValues value = shopCa.GenerateValue(order.transactionId);
-                    shopCaPS.createPackingSlip(value, new int[0], false);
-                    if (shopCaPS.Error)
+                        break;
+                    case "Shop.ca":
                     {
-                        MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
+                        // the case if it is shop.ca order
+                        ShopCaValues value = shopCa.GenerateValue(order.transactionId);
+                        shopCaPS.createPackingSlip(value, new int[0], false);
+                        if (shopCaPS.Error)
+                        {
+                            MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                        channel[1] = true;
                     }
-                    channel[1] = true;
+                        break;
                 }
             }
 
@@ -182,21 +187,22 @@ namespace Order_Manager.mainForms
 
             string channel = listview.CheckedItems[0].SubItems[0].Text;
 
-            if (channel == "Sears")
+            switch (channel)
             {
+                case "Sears":
                 {
                     // the case if it is sears order
                     SearsValues value = sears.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
                     new DetailPage(value).ShowDialog(this);
                 }
-            }
-            else if (channel == "Shop.ca")
-            {
+                    break;
+                case "Shop.ca":
                 {
                     // the case if it is shopl.ca order
                     ShopCaValues value = shopCa.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
                     new DetailPage(value).ShowDialog(this);
                 }
+                    break;
             }
         }
         #endregion
