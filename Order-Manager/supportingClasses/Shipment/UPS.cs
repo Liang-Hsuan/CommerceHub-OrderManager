@@ -51,7 +51,7 @@ namespace Order_Manager.supportingClasses.Shipment
             Error = false;
 
             const string shipmentConfirmUri = "https://wwwcie.ups.com/ups.app/xml/ShipConfirm";
-            // string shipmentConfirmUri = "https://onlinetools.ups.com/ups.app/xml/ShipConfirm";
+            // const string shipmentConfirmUri = "https://onlinetools.ups.com/ups.app/xml/ShipConfirm";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentConfirmUri);
             request.Method = "POST";
@@ -238,7 +238,7 @@ namespace Order_Manager.supportingClasses.Shipment
             Error = false;
 
             const string shipmentAcceptmUri = "https://wwwcie.ups.com/ups.app/xml/ShipAccept";
-            // string shipmentAcceptmUri = "https://onlinetools.ups.com/ups.app/xml/ShipAccept";
+            // const string shipmentAcceptmUri = "https://onlinetools.ups.com/ups.app/xml/ShipAccept";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentAcceptmUri);
             request.Method = "POST";
@@ -305,7 +305,7 @@ namespace Order_Manager.supportingClasses.Shipment
             Error = false;
 
             const string shipmentVoidUri = "https://wwwcie.ups.com/ups.app/xml/Void";
-            // string shipmentVoidUri = "https://onlinetools.ups.com/ups.app/xml/Void";
+            // const string shipmentVoidUri = "https://onlinetools.ups.com/ups.app/xml/Void";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentVoidUri);
             request.Method = "POST";

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using Order_Manager.channel.sears;
 using Order_Manager.supportingClasses.Address;
+using Order_Manager.channel.shop.ca;
 
 namespace Order_Manager.channel.brightpearl
 {
@@ -53,10 +54,10 @@ namespace Order_Manager.channel.brightpearl
 
             // post order
             string orderId = post.postOrderRequest("2854", orderValue);
-            Status = "Getting order ID";
+            Status = "Getting order ID - Sears";
             if (orderId == "Error")
             {
-                Status = "Error occur during order post";
+                Status = "Error occur during order post - Sears";
                 do
                 {
                     Thread.Sleep(5000);
@@ -67,11 +68,8 @@ namespace Order_Manager.channel.brightpearl
             // calculate the total amount when excluding the cancelled items
             for (int i = 0; i < value.LineCount; i++)
             {
-                // boolean flag to see if the item is cancelled
-                bool cancelled = cancelList.Where(j => j == i).Any();
-
                 // the case if not cancel post it to brightpearl
-                if (cancelled) continue;
+                if (cancelList.Where(j => j == i).Any()) continue;
 
                 // price calculation ( no use rigth now )
                 // double tax = value.GST_HST_Extended[i] + value.PST_Extended[i] + value.GST_HST_Total[i] + value.PST_Total[i];
@@ -85,7 +83,7 @@ namespace Order_Manager.channel.brightpearl
                 Status = "Getting order row ID";
                 if (orderRowId == "Error")
                 {
-                    Status = "Error occur during order row post " + i;
+                    Status = "Error occur during order row post " + i + " - Sears";
                     do
                     {
                         Thread.Sleep(5000);
@@ -94,16 +92,16 @@ namespace Order_Manager.channel.brightpearl
                 }
 
                 // post reservation
-                string reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
+                post.postReservationRequest(orderId, orderRowId, itemValue);
                 Status = "Posting reservation request " + i;
-                if (reservation == "503")
+                if (post.HasError)
                 {
-                    Status = "Error occur during reservation post " + i;
+                    Status = "Error occur during reservation post " + i + "- Sears";
                     do
                     {
                         Thread.Sleep(5000);
-                        reservation = post.postReservationRequest(orderId, orderRowId, itemValue);
-                    } while (reservation == "503");
+                        post.postReservationRequest(orderId, orderRowId, itemValue);
+                    } while (post.HasError);
                 }
             }
 
@@ -123,6 +121,68 @@ namespace Order_Manager.channel.brightpearl
                     post.postReceipt(orderId, "2854", orderValue);
                 } while (post.HasError);
             } */
+            #endregion
+        }
+
+        /* a method that post shop.ca order to brightpearl on shop.ca account */
+        public void postOrder(ShopCaValues value, int[] cancelList)
+        {
+            // check if the order is cancelled entirely -> if it is just return no need to post it
+            if (cancelList.Length >= value.OrderItemId.Count)
+                return;
+
+            #region Posting Order to Shop.ca Account on BP
+            // initialize order BPvalues object
+            BPvalues orderValue = new BPvalues(value.ShipTo, value.OrderId, value.OrderCreateDate, 15, 1, null, null, 0, 0, 0, 0);
+
+            // post order
+            string orderId = post.postOrderRequest("2897", orderValue);
+            Status = "Getting order ID";
+            if (post.HasError)
+            {
+                Status = "Error occur during order post - Shop.ca";
+                do
+                {
+                    Thread.Sleep(5000);
+                    orderId = post.postOrderRequest("2897", orderValue);
+                } while (post.HasError);
+            }
+
+            // calculate the total amount when excluding the cancelled items
+            for (int i = 0; i < value.OrderItemId.Count; i++)
+            {
+                // the case if not cancel post it to brightpearl
+                if (cancelList.Where(j => j == i).Any()) continue;
+
+                // initialize BPvalues object -> no need tax and total paid ( this is unit cost & no recipt )
+                BPvalues itemValue = new BPvalues(value.ShipTo, null, DateTime.Today, 1, 7, value.Sku[i], value.Title[i], value.Quantity[i], Convert.ToDouble(value.ExtendedItemPrice[i]), Convert.ToDouble(value.ItemTax[i]), 0);
+
+                // post order row
+                string orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                Status = "Getting order row ID";
+                if (post.HasError)
+                {
+                    Status = "Error occur during order row post " + i + "- Shop.ca";
+                    do
+                    {
+                        Thread.Sleep(5000);
+                        orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                    } while (post.HasError);
+                }
+
+                // post reservation
+                post.postReservationRequest(orderId, orderRowId, itemValue);
+                Status = "Posting reservation request " + i;
+                if (post.HasError)
+                {
+                    Status = "Error occur during reservation post " + i + "- Shop.ca";
+                    do
+                    {
+                        Thread.Sleep(5000);
+                        post.postReservationRequest(orderId, orderRowId, itemValue);
+                    } while (post.HasError);
+                }
+            }
             #endregion
         }
 
@@ -384,6 +444,9 @@ namespace Order_Manager.channel.brightpearl
             /* post new order to API */
             public string postOrderRequest(string contactID, BPvalues value)
             {
+                // reset boolean flag to false 
+                HasError = false;
+
                 string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/order-service/order";
 
                 request = (HttpWebRequest)WebRequest.Create(uri);
@@ -410,6 +473,7 @@ namespace Order_Manager.channel.brightpearl
                 }
                 catch    // HTTP response 500
                 {
+                    HasError = true;
                     return "Error";    // cannot post order, return error instead
                 }
 
@@ -424,6 +488,9 @@ namespace Order_Manager.channel.brightpearl
             /* post new order row to API */
             public string postOrderRowRequest(string orderID, BPvalues value)
             {
+                // reset boolean flag to false 
+                HasError = false;
+
                 // get product id
                 string productId = new GetRequest(appRef, appToken).getProductId(value.SKU);
 
@@ -507,6 +574,7 @@ namespace Order_Manager.channel.brightpearl
                 }
                 catch
                 {
+                    HasError = true;
                     return "Error";     // 503 Server Unabailable
                 }
 
@@ -519,8 +587,11 @@ namespace Order_Manager.channel.brightpearl
             }
 
             /* post reservation request to API return the message*/
-            public string postReservationRequest(string orderID, string orderRowID, BPvalues value)
+            public void postReservationRequest(string orderID, string orderRowID, BPvalues value)
             {
+                // reset boolean flag to false 
+                HasError = false;
+
                 // get product id
                 GetRequest get = new GetRequest(appRef, appToken);
                 string productId = get.getProductId(value.SKU);
@@ -537,7 +608,7 @@ namespace Order_Manager.channel.brightpearl
                 if (productId != null)
                     textJSON = "{\"products\": [{\"productId\": \"" + productId + "\",\"salesOrderRowId\": \"" + orderRowID + "\",\"quantity\":\"" + value.Quantity + "\"}]}";
                 else
-                    return null;
+                    return;
 
                 // turn request string into a byte stream
                 byte[] postBytes = Encoding.UTF8.GetBytes(textJSON);
@@ -557,11 +628,9 @@ namespace Order_Manager.channel.brightpearl
                     {
                         response = e.Response as HttpWebResponse;
                         if ((int)response.StatusCode == 503)
-                            return "Error";    // web server 503 server unavailable
+                            HasError = true;    // web server 503 server unavailable
                     }
                 }
-
-                return null;
             }
 
             /* post receipt to API */
@@ -596,9 +665,6 @@ namespace Order_Manager.channel.brightpearl
                     HasError = true;
                     return;
                 }
-
-                // reset has error to false just in case
-                HasError = false;
             }
         }
     }

@@ -58,3 +58,6 @@ C:\Users\Intern1001\Desktop\F15_Intern\Visual Studio project\workplace\Order-Man
 V:\Project\Real Projects\Order-Manager\Order-Manager\bin\Debug\Order-Manager.exe.config
 V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order-Manager.exe
 V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order-Manager.pdb
+E:\Project\Real Projects\Order-Manager\Order-Manager\bin\Debug\Order-Manager.exe.config
+E:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order-Manager.exe
+E:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order-Manager.pdb

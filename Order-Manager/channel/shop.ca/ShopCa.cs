@@ -374,6 +374,8 @@ namespace Order_Manager.channel.shop.ca
 
             // fields for database update
             SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs);
+            SqlCommand command = new SqlCommand();
+            command.Connection = connection;
             connection.Open();
 
             // start adding content to the csv file
@@ -383,39 +385,44 @@ namespace Order_Manager.channel.shop.ca
                 csv += value.SupplierId + "\t" + value.StoreName + "\t" + value.OrderId + "\t" + value.OrderItemId[i] + "\t";
 
                 #region CSV Generation and Database Item Update
-                SqlCommand command;
                 if (cancelList.Keys.Contains(i))
                 {
                     // the case if the item is cancelled -> show the cancel reason
                     csv += "Cancelled\t" + DateTime.Today.ToString("yyyy-MM-dd") + "\t\t\t\t\t\t" + cancelList[i] + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n";
 
                     // update item to cancelled to database
-                    command = new SqlCommand("UPDATE ShopCa_Order_Item SET Cancelled = 'True' WHERE OrderItemId = \'" + value.OrderItemId[i] + "\';", connection);
+                    command.CommandText = "UPDATE ShopCa_Order_Item SET Cancelled = 'True' WHERE OrderItemId = \'" + value.OrderItemId[i] + "\'";
                     command.ExecuteNonQuery();
                 }
                 else
                 {
                     // the case if the item is shipped -> show the shipping info
-                    csv += "Shipped\t" + DateTime.Today.ToString("yyyy-MM-dd") + "\t" + "" + "\tCanada Post\t" + value.Package.Service + "\t" + value.Package.TrackingNumber + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n";
+                    csv += "Shipped\t" + DateTime.Today.ToString("yyyy-MM-dd") + "\tCP\tCanada Post\t" + value.Package.Service + "\t" + value.Package.TrackingNumber + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n";
 
                     // update item to cancelled to database
-                    command = new SqlCommand("UPDATE ShopCa_Order_Item SET Cancelled = 'True' WHERE OrderItemId = \'" + value.OrderItemId[i] + "\';", connection);
+                    command.CommandText = "UPDATE ShopCa_Order_Item SET Shipped = 'True' WHERE OrderItemId = \'" + value.OrderItemId[i] + "\'";
                     command.ExecuteNonQuery();
                 }
-
-                // convert txt to xsd file
-                string path = completeOrderDir + "\\" + value.OrderId + ".txt";
-                StreamWriter writer = new StreamWriter(path);
-                writer.WriteLine(csv);
-                writer.Close();
                 #endregion
-
-                // master database update
-                command = new SqlCommand("UPDATE ShopCa_Order SET TrackingNumber = \'" + value.Package.TrackingNumber + "\', CompleteDate = \'" + DateTime.Today.ToString("yyyy-MM-dd HH:mm:ss") + "\', SelfLink = \'" + value.Package.SelfLink + "\', LabelLink = \'" + value.Package.LabelLink + "\', " 
-                                       + "Complete = 'True' WHERE OrderId = \'" + value.OrderId + "\';", connection);
-                command.ExecuteNonQuery();
-                connection.Close();
             }
+
+            // convert txt to xsd file
+            string path = completeOrderDir + "\\" + value.OrderId + ".txt";
+            StreamWriter writer = new StreamWriter(path);
+            writer.WriteLine(csv);
+            writer.Close();
+
+
+            // master database update
+            command.CommandText = "UPDATE ShopCa_Order SET TrackingNumber = \'" + value.Package.TrackingNumber + "\', CompleteDate = \'" + DateTime.Today.ToString("yyyy-MM-dd HH:mm:ss") + "\', SelfLink = \'" + value.Package.SelfLink + "\', LabelLink = \'" + value.Package.LabelLink + "\', "
+                                + "Complete = 'True' WHERE OrderId = \'" + value.OrderId + "\'";
+            command.ExecuteNonQuery();
+            connection.Close();
+
+            // upload file to sftp server
+            // sftp.Connect();
+            // sftp.Put(path, CONFIRM_DIR);
+            // sftp.Close();
         }
 
         /* a method that generate ShopCaValues object for the given order number (first version -> take from local) */
@@ -690,10 +697,10 @@ namespace Order_Manager.channel.shop.ca
                 // add each item for the order to database
                 for (int i = 0; i < value.OrderItemId.Count; i++)
                 {
-                    command = new SqlCommand("INSERT INTO ShopCa_Order_Item " +
-                                             "(OrderId, OrderItemId, Sku, Title, Ssrp, SsrpTax, Quantity, ItemPrice, ExtendedItemPrice, ItemTax, ItemShippingCost, ItemDiscount, Shipped, Cancelled) Values" +
-                                             "(\'" + value.OrderId + "\',\'" + value.OrderItemId[i] + "\',\'" + value.Sku[i] + "\',\'" + value.Title[i].Replace("'", "''") + "\'," + value.Ssrp[i] + "," + value.SsrpTax[i] + "," + value.Quantity[i] + "," +
-                                             value.ItemPrice[i] + "," + value.ExtendedItemPrice[i] + "," + value.ItemTax[i] + "," + value.ItemShippingCost[i] + "," + value.ItemDiscount[i] + ",\'False\',\'False\')", connection);
+                    command.CommandText = "INSERT INTO ShopCa_Order_Item " +
+                                          "(OrderId, OrderItemId, Sku, Title, Ssrp, SsrpTax, Quantity, ItemPrice, ExtendedItemPrice, ItemTax, ItemShippingCost, ItemDiscount, Shipped, Cancelled) Values" +
+                                          "(\'" + value.OrderId + "\',\'" + value.OrderItemId[i] + "\',\'" + value.Sku[i] + "\',\'" + value.Title[i].Replace("'", "''") + "\'," + value.Ssrp[i] + "," + value.SsrpTax[i] + "," + value.Quantity[i] + "," +
+                                          value.ItemPrice[i] + "," + value.ExtendedItemPrice[i] + "," + value.ItemTax[i] + "," + value.ItemShippingCost[i] + "," + value.ItemDiscount[i] + ",\'False\',\'False\')";
                     command.ExecuteNonQuery();
                 }
             }

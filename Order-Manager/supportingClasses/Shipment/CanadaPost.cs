@@ -41,7 +41,7 @@ namespace Order_Manager.supportingClasses.Shipment
 
         #region API Methods
         /* a method that create shipment and return [0] tracking pin, [1] self link, [2] label link */
-        public string[] createShipment(ShopCaValues value, Package package)
+        public string[] createShipment(ShopCaValues value)
         {
             // set error to false
             Error = false;
@@ -63,7 +63,7 @@ namespace Order_Manager.supportingClasses.Shipment
                 "<requested-shipping-point>L5J4S7</requested-shipping-point>" +
                 "<delivery-spec>";
             string serviceCode;
-            switch (package.Service)
+            switch (value.Package.Service)
             {
                 case "Regular Parcel":
                     serviceCode = "DOM.RP";
@@ -112,6 +112,9 @@ namespace Order_Manager.supportingClasses.Shipment
                  "<height>" + value.Package.Height + "</height>" +
                  "</dimensions>" +
                  "</parcel-characteristics>" +
+                 "<print-preferences>" +
+                 "<output-format>4x6</output-format>" +
+                 "</print-preferences>" +
                  "<preferences>" +
                  "<show-packing-instructions>true</show-packing-instructions>" +
                  "</preferences>" +
@@ -201,7 +204,6 @@ namespace Order_Manager.supportingClasses.Shipment
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(selfLink);
             request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(USER_ID + ":" + PASSWORD)));
             request.Method = "DELETE";
-            request.Accept = "application/vnd.cpc.shipment-v8+xml";
 
             // get the response from the server
             try

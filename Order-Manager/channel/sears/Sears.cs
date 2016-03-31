@@ -384,7 +384,8 @@ namespace Order_Manager.channel.sears
 
             // fields for database update
             SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs);
-            SqlCommand command;
+            SqlCommand command = new SqlCommand();
+            command.Connection = connection;
             connection.Open();
 
             #region XML Generation and Item Database Update
@@ -465,8 +466,8 @@ namespace Order_Manager.channel.sears
                         "<actionCode>" + reason + "</actionCode>";
 
                     // update item to cancelled to database
-                    command = new SqlCommand("UPDATE Sears_Order_Item SET Cancelled = 'True' WHERE TransactionId = \'" + value.TransactionID +
-                                             "\' AND MerchantLineNumber = \'" + value.MerchantLineNumber[j] + "\';", connection);
+                    command.CommandText = "UPDATE Sears_Order_Item SET Cancelled = 'True' WHERE TransactionId = \'" + value.TransactionID +
+                                             "\' AND MerchantLineNumber = \'" + value.MerchantLineNumber[j] + "\'";
                     command.ExecuteNonQuery();
 
                     isCancelled = true;
@@ -479,8 +480,8 @@ namespace Order_Manager.channel.sears
                     "<hubAction>" +
                     "<action>v_ship</action>";
 
-                    command = new SqlCommand("UPDATE Sears_Order_Item SET Shipped = 'True' WHERE TransactionId = \'" + value.TransactionID +
-                                             "\' AND MerchantLineNumber = \'" + value.MerchantLineNumber[i - 1] + "\';", connection);
+                    command.CommandText = "UPDATE Sears_Order_Item SET Shipped = 'True' WHERE TransactionId = \'" + value.TransactionID +
+                                          "\' AND MerchantLineNumber = \'" + value.MerchantLineNumber[i - 1] + "\'";
                     command.ExecuteNonQuery();
                 }
                 xml +=
@@ -519,8 +520,8 @@ namespace Order_Manager.channel.sears
             #endregion
 
             // master database update
-            command = new SqlCommand("UPDATE Sears_Order SET VendorInvoiceNumber = \'" + value.VendorInvoiceNumber + "\', PakageDetailId = \'" + value.PackageDetailID + "\', TrackingNumber = \'" + value.Package.TrackingNumber + "\', CompleteDate = \'" +
-                                     DateTime.Today.ToString("yyyy-MM-dd HH:mm:ss") + "\', ShipmentIdentificationNumber = \'" + value.Package.IdentificationNumber + "\', Complete = 'True' WHERE TransactionId = \'" + value.TransactionID + "\';", connection);
+            command.CommandText = "UPDATE Sears_Order SET VendorInvoiceNumber = \'" + value.VendorInvoiceNumber + "\', PakageDetailId = \'" + value.PackageDetailID + "\', TrackingNumber = \'" + value.Package.TrackingNumber + "\', CompleteDate = \'" +
+                                   DateTime.Today.ToString("yyyy-MM-dd HH:mm:ss") + "\', ShipmentIdentificationNumber = \'" + value.Package.IdentificationNumber + "\', Complete = 'True' WHERE TransactionId = \'" + value.TransactionID + "\'";
             command.ExecuteNonQuery();
             connection.Close();
 
@@ -966,10 +967,10 @@ namespace Order_Manager.channel.sears
                 // add each item for the order to database
                 for (int i = 0; i < value.LineCount; i++)
                 {
-                    command = new SqlCommand("INSERT INTO Sears_Order_Item " +
-                                             "(TransactionId, LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, LineHandling, ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions, Shipped, Cancelled) Values" +
-                                             "(\'" + value.TransactionID + "\'," + value.LineBalanceDue[i] + "," + value.MerchantLineNumber[i] + ",\'"+ value.TrxVendorSKU[i] + "\',\'" + value.TrxMerchantSKU[i] + "\',\'" + value.UPC[i] + "\'," + value.TrxQty[i] + "," + value.TrxUnitCost[i] + ",\'" + value.Description[i].Replace("'","''") + "\',\'" + value.Description2[i].Replace("'", "''") +
-                                             "\'," + value.UnitPrice[i] + "," + value.LineHandling[i] + ",\'" + value.ExpectedShipDate[i].ToString("yyyy-MM-dd") + "\',\'" + value.GST_HST_Extended[i] + "\',\'" + value.PST_Extended[i] + "\',\'" + value.GST_HST_Total[i] + "\',\'" + value.PST_Total[i] + "\',\'" + value.EncodedPrice[i] + "\',\'" + value.ReceivingInstructions[i] + "\',\'False\',\'False\')", connection);
+                    command.CommandText = "INSERT INTO Sears_Order_Item " +
+                                          "(TransactionId, LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, LineHandling, ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions, Shipped, Cancelled) Values" +
+                                          "(\'" + value.TransactionID + "\'," + value.LineBalanceDue[i] + "," + value.MerchantLineNumber[i] + ",\'" + value.TrxVendorSKU[i] + "\',\'" + value.TrxMerchantSKU[i] + "\',\'" + value.UPC[i] + "\'," + value.TrxQty[i] + "," + value.TrxUnitCost[i] + ",\'" + value.Description[i].Replace("'", "''") + "\',\'" + value.Description2[i].Replace("'", "''") +
+                                          "\'," + value.UnitPrice[i] + "," + value.LineHandling[i] + ",\'" + value.ExpectedShipDate[i].ToString("yyyy-MM-dd") + "\',\'" + value.GST_HST_Extended[i] + "\',\'" + value.PST_Extended[i] + "\',\'" + value.GST_HST_Total[i] + "\',\'" + value.PST_Total[i] + "\',\'" + value.EncodedPrice[i] + "\',\'" + value.ReceivingInstructions[i] + "\',\'False\',\'False\')";
                     command.ExecuteNonQuery();
                 }
             }

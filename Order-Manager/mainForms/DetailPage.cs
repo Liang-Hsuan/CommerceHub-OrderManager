@@ -327,7 +327,7 @@ namespace Order_Manager.mainForms
                     CanadaPost canadaPost = new CanadaPost();
 
                     // create shipment for canada post
-                    string[] result = canadaPost.createShipment(shopCaValues, shopCaValues.Package);
+                    string[] result = canadaPost.createShipment(shopCaValues);
 
                     // error checking
                     if (canadaPost.Error)
@@ -535,6 +535,7 @@ namespace Order_Manager.mainForms
 
                     // post order to brightpearl
                     bp.postOrder(searsValues, new List<int>(cancelList.Keys).ToArray());
+
                     break;
                 case "Shop.ca":
                     // shop.ca case
@@ -542,6 +543,10 @@ namespace Order_Manager.mainForms
                     new ShopCa().GenerateCSV(shopCaValues, cancelList);
 
                     simulate(40, 70);
+
+                    // post order to brightpearl
+                    bp.postOrder(shopCaValues, new List<int>(cancelList.Keys).ToArray());
+
                     break;
             }
 
