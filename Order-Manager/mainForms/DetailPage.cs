@@ -65,22 +65,26 @@ namespace Order_Manager.mainForms
             switch (CHANNEL)
             {
                 case "Sears":
-                {
                     // ths case if the order is from sears
-                    SearsPackingSlip packingSlip = new SearsPackingSlip();
-                    packingSlip.createPackingSlip(searsValues, cancelIndex, true);
-                    if (packingSlip.Error)
-                        MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                    try
+                    {
+                        SearsPackingSlip.createPackingSlip(searsValues, cancelIndex, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                     break;
                 case "Shop.ca":
-                {
                     // the case if the order is from shop.ca
-                    ShopCaPackingSlip packingSlip = new ShopCaPackingSlip();
-                    packingSlip.createPackingSlip(shopCaValues, cancelIndex, true);
-                    if (packingSlip.Error)
-                        MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                    try
+                    {
+                        ShopCaPackingSlip.createPackingSlip(shopCaValues, cancelIndex, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                     break;
             }
         }
@@ -254,10 +258,15 @@ namespace Order_Manager.mainForms
                 timerShip.Start();
 
                 // initialize field for shipment package
-                if (CHANNEL == "Sears")
-                    searsValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
-                else if (CHANNEL == "Shop.ca")
-                    shopCaValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
+                switch (CHANNEL)
+                {
+                    case "Sears":
+                        searsValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
+                        break;
+                    case "Shop.ca":
+                        shopCaValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
+                        break;
+                }
 
                 if (!backgroundWorkerShip.IsBusy)
                     backgroundWorkerShip.RunWorkerAsync();
@@ -265,105 +274,120 @@ namespace Order_Manager.mainForms
         }
         private void backgroundWorkerShip_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            if (CHANNEL == "Sears")
+            switch (CHANNEL)
             {
-                #region UPS
-                // initialize field for shipment
-                UPS ups = new UPS();
+                case "Sears":
 
-                // post shipment confirm and get the digest string from response
-                string[] digest = ups.postShipmentConfirm(searsValues);
+                    #region UPS
+                    // initialize field for shipment
+                    UPS ups = new UPS();
 
-                // error checking
-                if (ups.Error)
-                {
-                    MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    e.Result = true;
-                    return;
-                }
+                    // post shipment confirm and get the digest string from response
+                    string[] digest = ups.postShipmentConfirm(searsValues);
 
-                // post shipment accept and get tracking number and image 
-                string[] acceptResult = ups.postShipmentAccept(digest[1]);
+                    // error checking
+                    if (ups.Error)
+                    {
+                        MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        e.Result = true;
+                        return;
+                    }
 
-                // error checking
-                if (ups.Error)
-                {
-                    MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    e.Result = true;
-                    return;
-                }
+                    // post shipment accept and get tracking number and image 
+                    string[] acceptResult = ups.postShipmentAccept(digest[1]);
 
-                // retrieve identification number and tracking number
-                searsValues.Package.IdentificationNumber = digest[0];
-                searsValues.Package.TrackingNumber = acceptResult[0];
+                    // error checking
+                    if (ups.Error)
+                    {
+                        MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        e.Result = true;
+                        return;
+                    }
 
-                // update database set the order's tracking number and identification number
-                new Sears().PostShip(searsValues.Package.TrackingNumber, searsValues.Package.IdentificationNumber, searsValues.TransactionID);
+                    // retrieve identification number and tracking number
+                    searsValues.Package.IdentificationNumber = digest[0];
+                    searsValues.Package.TrackingNumber = acceptResult[0];
 
-                // get the shipment label and show it
-                ups.exportLabel(acceptResult[1], searsValues.TransactionID, true);
+                    // update database set the order's tracking number and identification number
+                    new Sears().PostShip(searsValues.Package.TrackingNumber, searsValues.Package.IdentificationNumber, searsValues.TransactionID);
 
-                // set bool flag to false
-                e.Result = false;
-                #endregion
-            }
-            else if (CHANNEL == "Shop.ca")
-            {
-                #region Canada Post
-                // initialize field for shipment
-                CanadaPost canadaPost = new CanadaPost();
+                    // get the shipment label and show it
+                    ups.exportLabel(acceptResult[1], searsValues.TransactionID, true);
 
-                // create shipment for canada post
-                string[] result = canadaPost.createShipment(shopCaValues, shopCaValues.Package);
+                    // set bool flag to false
+                    e.Result = false;
+                    break;
 
-                // error checking
-                if (canadaPost.Error)
-                {
-                    MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    e.Result = true;
-                    return;
-                }
+                    #endregion
 
-                // retrieve tracking number, refund link and label link
-                shopCaValues.Package.TrackingNumber = result[0];
-                shopCaValues.Package.SelfLink = result[1];
-                shopCaValues.Package.LabelLink = result[2];
+                case "Shop.ca":
 
-                // update database set the order's tracking number refund link and label link
-                new ShopCa().PostShip(shopCaValues.Package.TrackingNumber, shopCaValues.Package.SelfLink, shopCaValues.Package.LabelLink, shopCaValues.OrderId);
+                    #region Canada Post
+                    // initialize field for shipment
+                    CanadaPost canadaPost = new CanadaPost();
 
-                // get artifect
-                Thread.Sleep(5000);
-                byte[] artifect = canadaPost.getArtifact(result[2]);
+                    // create shipment for canada post
+                    string[] result = canadaPost.createShipment(shopCaValues, shopCaValues.Package);
 
-                // error checking
-                if (canadaPost.Error)
-                {
-                    MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    e.Result = true;
-                    return;
-                }
+                    // error checking
+                    if (canadaPost.Error)
+                    {
+                        MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        e.Result = true;
+                        return;
+                    }
 
-                // get the shipment label and show it
-                canadaPost.exportLabel(artifect, shopCaValues.OrderId, true, true);
+                    // retrieve tracking number, refund link and label link
+                    shopCaValues.Package.TrackingNumber = result[0];
+                    shopCaValues.Package.SelfLink = result[1];
+                    shopCaValues.Package.LabelLink = result[2];
 
-                // set bool flag to false
-                e.Result = false;
-                #endregion
+                    // update database set the order's tracking number refund link and label link
+                    new ShopCa().PostShip(shopCaValues.Package.TrackingNumber, shopCaValues.Package.SelfLink, shopCaValues.Package.LabelLink, shopCaValues.OrderId);
+
+                    // get artifect
+                    Thread.Sleep(5000);
+                    byte[] artifect = canadaPost.getArtifact(result[2]);
+
+                    // error checking
+                    if (canadaPost.Error)
+                    {
+                        MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        e.Result = true;
+                        return;
+                    }
+
+                    // get the shipment label and show it
+                    canadaPost.exportLabel(artifect, shopCaValues.OrderId, true, true);
+
+                    // set bool flag to false
+                    e.Result = false;
+                    break;
+
+                    #endregion
             }
         }
+
         private void backgroundWorkerShip_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             // stop the timer and show the tracking number
             timerShip.Stop();
-            if (CHANNEL == "Sears")
-                trackingNumberTextbox.Text = searsValues.Package.TrackingNumber;
-            else if (CHANNEL == "Shop.ca")
-                trackingNumberTextbox.Text = shopCaValues.Package.TrackingNumber;
+            switch (CHANNEL)
+            {
+                case "Sears":
+                    trackingNumberTextbox.Text = searsValues.Package.TrackingNumber;
+                    break;
+                case "Shop.ca":
+                    trackingNumberTextbox.Text = shopCaValues.Package.TrackingNumber;
+                    break;
+            }
 
             // if error occur enable button else diable it and show shipment cancel button
             if ((bool) e.Result)
+            {
+                trackingNumberTextbox.Text = "Error";
                 createLabelButton.Enabled = true;
+            }
             else
                 voidShipmentButton.Visible = true;
 
@@ -483,7 +507,7 @@ namespace Order_Manager.mainForms
                     MessageBox.Show("There are items that are not shipped", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
-                else if (CHANNEL == "Shop.ca" && cancelList.Count < shopCaValues.OrderItemId.Count && shopCaValues.Package.TrackingNumber == "")
+                if (CHANNEL == "Shop.ca" && cancelList.Count < shopCaValues.OrderItemId.Count && shopCaValues.Package.TrackingNumber == "")
                 {
                     MessageBox.Show("There are items that are not shipped", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
@@ -500,24 +524,25 @@ namespace Order_Manager.mainForms
         {
             simulate(1, 40);
 
-            if (CHANNEL == "Sears")
+            switch (CHANNEL)
             {
-                // sears case
-                // export xml file
-                new Sears().GenerateXML(searsValues, cancelList);
+                case "Sears":
+                    // sears case
+                    // export xml file
+                    new Sears().GenerateXML(searsValues, cancelList);
 
-                simulate(40, 70);
+                    simulate(40, 70);
 
-                // post order to brightpearl
-                bp.postOrder(searsValues, new List<int>(cancelList.Keys).ToArray());
-            }
-            else if (CHANNEL == "Shop.ca")
-            {
-                // shop.ca case
-                // export csv file
-                new ShopCa().GenerateCSV(shopCaValues, cancelList);
+                    // post order to brightpearl
+                    bp.postOrder(searsValues, new List<int>(cancelList.Keys).ToArray());
+                    break;
+                case "Shop.ca":
+                    // shop.ca case
+                    // export csv file
+                    new ShopCa().GenerateCSV(shopCaValues, cancelList);
 
-                simulate(40, 70);
+                    simulate(40, 70);
+                    break;
             }
 
             simulate(70, 100);

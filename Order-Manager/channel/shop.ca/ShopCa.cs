@@ -374,7 +374,6 @@ namespace Order_Manager.channel.shop.ca
 
             // fields for database update
             SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs);
-            SqlCommand command;
             connection.Open();
 
             // start adding content to the csv file
@@ -384,6 +383,7 @@ namespace Order_Manager.channel.shop.ca
                 csv += value.SupplierId + "\t" + value.StoreName + "\t" + value.OrderId + "\t" + value.OrderItemId[i] + "\t";
 
                 #region CSV Generation and Database Item Update
+                SqlCommand command;
                 if (cancelList.Keys.Contains(i))
                 {
                     // the case if the item is cancelled -> show the cancel reason

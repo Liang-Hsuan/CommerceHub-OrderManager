@@ -149,7 +149,7 @@
             this.orderSummaryPanel.Location = new System.Drawing.Point(12, 103);
             this.orderSummaryPanel.Name = "orderSummaryPanel";
             this.orderSummaryPanel.Size = new System.Drawing.Size(439, 257);
-            this.orderSummaryPanel.TabIndex = 0;
+            this.orderSummaryPanel.TabIndex = 5;
             // 
             // moneyPicturebox
             // 
@@ -170,7 +170,7 @@
             this.totalOrderTextbox.Name = "totalOrderTextbox";
             this.totalOrderTextbox.ReadOnly = true;
             this.totalOrderTextbox.Size = new System.Drawing.Size(100, 13);
-            this.totalOrderTextbox.TabIndex = 16;
+            this.totalOrderTextbox.TabIndex = 22;
             // 
             // totalLabel
             // 
@@ -179,7 +179,7 @@
             this.totalLabel.Location = new System.Drawing.Point(236, 207);
             this.totalLabel.Name = "totalLabel";
             this.totalLabel.Size = new System.Drawing.Size(71, 13);
-            this.totalLabel.TabIndex = 15;
+            this.totalLabel.TabIndex = 21;
             this.totalLabel.Text = "Total Order";
             // 
             // unitPriceTotalTextbox
@@ -204,7 +204,7 @@
             this.gsthstTextbox.Name = "gsthstTextbox";
             this.gsthstTextbox.ReadOnly = true;
             this.gsthstTextbox.Size = new System.Drawing.Size(100, 13);
-            this.gsthstTextbox.TabIndex = 13;
+            this.gsthstTextbox.TabIndex = 16;
             // 
             // pstTextbox
             // 
@@ -216,7 +216,7 @@
             this.pstTextbox.Name = "pstTextbox";
             this.pstTextbox.ReadOnly = true;
             this.pstTextbox.Size = new System.Drawing.Size(100, 13);
-            this.pstTextbox.TabIndex = 12;
+            this.pstTextbox.TabIndex = 18;
             // 
             // otherFeeTextbox
             // 
@@ -228,7 +228,7 @@
             this.otherFeeTextbox.Name = "otherFeeTextbox";
             this.otherFeeTextbox.ReadOnly = true;
             this.otherFeeTextbox.Size = new System.Drawing.Size(100, 13);
-            this.otherFeeTextbox.TabIndex = 11;
+            this.otherFeeTextbox.TabIndex = 20;
             // 
             // otherFeeLabel
             // 
@@ -237,7 +237,7 @@
             this.otherFeeLabel.Location = new System.Drawing.Point(244, 154);
             this.otherFeeLabel.Name = "otherFeeLabel";
             this.otherFeeLabel.Size = new System.Drawing.Size(63, 13);
-            this.otherFeeLabel.TabIndex = 10;
+            this.otherFeeLabel.TabIndex = 19;
             this.otherFeeLabel.Text = "Other Fee";
             // 
             // pstLabel
@@ -247,7 +247,7 @@
             this.pstLabel.Location = new System.Drawing.Point(243, 122);
             this.pstLabel.Name = "pstLabel";
             this.pstLabel.Size = new System.Drawing.Size(64, 13);
-            this.pstLabel.TabIndex = 9;
+            this.pstLabel.TabIndex = 17;
             this.pstLabel.Text = "PST Total";
             // 
             // hstgstLabel
@@ -257,7 +257,7 @@
             this.hstgstLabel.Location = new System.Drawing.Point(213, 91);
             this.hstgstLabel.Name = "hstgstLabel";
             this.hstgstLabel.Size = new System.Drawing.Size(94, 13);
-            this.hstgstLabel.TabIndex = 8;
+            this.hstgstLabel.TabIndex = 15;
             this.hstgstLabel.Text = "GST HST Total";
             // 
             // unitPriceTotalLabel
@@ -267,7 +267,7 @@
             this.unitPriceTotalLabel.Location = new System.Drawing.Point(211, 59);
             this.unitPriceTotalLabel.Name = "unitPriceTotalLabel";
             this.unitPriceTotalLabel.Size = new System.Drawing.Size(96, 13);
-            this.unitPriceTotalLabel.TabIndex = 7;
+            this.unitPriceTotalLabel.TabIndex = 13;
             this.unitPriceTotalLabel.Text = "Unit Price Total";
             // 
             // shipByDateTextbox
@@ -280,7 +280,7 @@
             this.shipByDateTextbox.Name = "shipByDateTextbox";
             this.shipByDateTextbox.ReadOnly = true;
             this.shipByDateTextbox.Size = new System.Drawing.Size(100, 13);
-            this.shipByDateTextbox.TabIndex = 6;
+            this.shipByDateTextbox.TabIndex = 12;
             // 
             // paidDateTextbox
             // 
@@ -292,7 +292,7 @@
             this.paidDateTextbox.Name = "paidDateTextbox";
             this.paidDateTextbox.ReadOnly = true;
             this.paidDateTextbox.Size = new System.Drawing.Size(100, 13);
-            this.paidDateTextbox.TabIndex = 5;
+            this.paidDateTextbox.TabIndex = 10;
             // 
             // orderDateTextbox
             // 
@@ -304,7 +304,7 @@
             this.orderDateTextbox.Name = "orderDateTextbox";
             this.orderDateTextbox.ReadOnly = true;
             this.orderDateTextbox.Size = new System.Drawing.Size(100, 13);
-            this.orderDateTextbox.TabIndex = 4;
+            this.orderDateTextbox.TabIndex = 8;
             // 
             // shipByDateLabel
             // 
@@ -313,7 +313,7 @@
             this.shipByDateLabel.Location = new System.Drawing.Point(18, 122);
             this.shipByDateLabel.Name = "shipByDateLabel";
             this.shipByDateLabel.Size = new System.Drawing.Size(81, 13);
-            this.shipByDateLabel.TabIndex = 3;
+            this.shipByDateLabel.TabIndex = 11;
             this.shipByDateLabel.Text = "Ship-By Date";
             // 
             // paidDateLabel
@@ -323,7 +323,7 @@
             this.paidDateLabel.Location = new System.Drawing.Point(36, 91);
             this.paidDateLabel.Name = "paidDateLabel";
             this.paidDateLabel.Size = new System.Drawing.Size(63, 13);
-            this.paidDateLabel.TabIndex = 2;
+            this.paidDateLabel.TabIndex = 9;
             this.paidDateLabel.Text = "Paid Date";
             // 
             // orderDateLabel
@@ -333,7 +333,7 @@
             this.orderDateLabel.Location = new System.Drawing.Point(30, 59);
             this.orderDateLabel.Name = "orderDateLabel";
             this.orderDateLabel.Size = new System.Drawing.Size(69, 13);
-            this.orderDateLabel.TabIndex = 1;
+            this.orderDateLabel.TabIndex = 7;
             this.orderDateLabel.Text = "Order Date";
             // 
             // orderSummaryLabel
@@ -344,7 +344,7 @@
             this.orderSummaryLabel.Location = new System.Drawing.Point(0, 0);
             this.orderSummaryLabel.Name = "orderSummaryLabel";
             this.orderSummaryLabel.Size = new System.Drawing.Size(438, 35);
-            this.orderSummaryLabel.TabIndex = 0;
+            this.orderSummaryLabel.TabIndex = 6;
             this.orderSummaryLabel.Text = "Order Summary";
             this.orderSummaryLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -361,7 +361,7 @@
             this.topPanel.Location = new System.Drawing.Point(0, 0);
             this.topPanel.Name = "topPanel";
             this.topPanel.Size = new System.Drawing.Size(1428, 74);
-            this.topPanel.TabIndex = 1;
+            this.topPanel.TabIndex = 0;
             // 
             // printPackingSlipButton
             // 
@@ -374,7 +374,7 @@
             this.printPackingSlipButton.Location = new System.Drawing.Point(1279, 17);
             this.printPackingSlipButton.Name = "printPackingSlipButton";
             this.printPackingSlipButton.Size = new System.Drawing.Size(137, 41);
-            this.printPackingSlipButton.TabIndex = 6;
+            this.printPackingSlipButton.TabIndex = 4;
             this.printPackingSlipButton.Text = "Print Packing Slip";
             this.printPackingSlipButton.UseVisualStyleBackColor = false;
             this.printPackingSlipButton.Click += new System.EventHandler(this.printPackingSlipButton_Click);
@@ -390,7 +390,7 @@
             this.topOrderNumberTextbox.Name = "topOrderNumberTextbox";
             this.topOrderNumberTextbox.ReadOnly = true;
             this.topOrderNumberTextbox.Size = new System.Drawing.Size(148, 16);
-            this.topOrderNumberTextbox.TabIndex = 5;
+            this.topOrderNumberTextbox.TabIndex = 2;
             // 
             // topStatusLabel
             // 
@@ -399,7 +399,7 @@
             this.topStatusLabel.Location = new System.Drawing.Point(149, 40);
             this.topStatusLabel.Name = "topStatusLabel";
             this.topStatusLabel.Size = new System.Drawing.Size(171, 17);
-            this.topStatusLabel.TabIndex = 2;
+            this.topStatusLabel.TabIndex = 3;
             this.topStatusLabel.Text = "Status: Awaiting Shipment";
             // 
             // topOrderLabel
@@ -442,7 +442,7 @@
             this.recipientPanel.Location = new System.Drawing.Point(506, 104);
             this.recipientPanel.Name = "recipientPanel";
             this.recipientPanel.Size = new System.Drawing.Size(416, 257);
-            this.recipientPanel.TabIndex = 2;
+            this.recipientPanel.TabIndex = 23;
             // 
             // soldToPhoneTextbox
             // 
@@ -454,7 +454,7 @@
             this.soldToPhoneTextbox.Name = "soldToPhoneTextbox";
             this.soldToPhoneTextbox.ReadOnly = true;
             this.soldToPhoneTextbox.Size = new System.Drawing.Size(206, 13);
-            this.soldToPhoneTextbox.TabIndex = 24;
+            this.soldToPhoneTextbox.TabIndex = 27;
             // 
             // housePicturebox
             // 
@@ -476,7 +476,7 @@
             this.verifyButton.Location = new System.Drawing.Point(295, 121);
             this.verifyButton.Name = "verifyButton";
             this.verifyButton.Size = new System.Drawing.Size(106, 32);
-            this.verifyButton.TabIndex = 22;
+            this.verifyButton.TabIndex = 35;
             this.verifyButton.Text = "Verify Address";
             this.verifyButton.UseVisualStyleBackColor = true;
             this.verifyButton.Click += new System.EventHandler(this.verifyButton_Click);
@@ -491,7 +491,7 @@
             this.shipToPhoneTextbox.Name = "shipToPhoneTextbox";
             this.shipToPhoneTextbox.ReadOnly = true;
             this.shipToPhoneTextbox.Size = new System.Drawing.Size(206, 13);
-            this.shipToPhoneTextbox.TabIndex = 21;
+            this.shipToPhoneTextbox.TabIndex = 33;
             // 
             // verifyTextbox
             // 
@@ -503,7 +503,7 @@
             this.verifyTextbox.Name = "verifyTextbox";
             this.verifyTextbox.ReadOnly = true;
             this.verifyTextbox.Size = new System.Drawing.Size(116, 13);
-            this.verifyTextbox.TabIndex = 20;
+            this.verifyTextbox.TabIndex = 34;
             // 
             // shipToCombineTextbox
             // 
@@ -514,7 +514,7 @@
             this.shipToCombineTextbox.MaxLength = 40;
             this.shipToCombineTextbox.Name = "shipToCombineTextbox";
             this.shipToCombineTextbox.Size = new System.Drawing.Size(206, 13);
-            this.shipToCombineTextbox.TabIndex = 19;
+            this.shipToCombineTextbox.TabIndex = 32;
             this.shipToCombineTextbox.TextChanged += new System.EventHandler(this.shipToCombineTextbox_TextChanged);
             this.shipToCombineTextbox.Enter += new System.EventHandler(this.shipToCombineTextbox_Enter);
             this.shipToCombineTextbox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.shipToCombineTextbox_KeyPress);
@@ -529,7 +529,7 @@
             this.shipToAddress2Textbox.Name = "shipToAddress2Textbox";
             this.shipToAddress2Textbox.ReadOnly = true;
             this.shipToAddress2Textbox.Size = new System.Drawing.Size(206, 13);
-            this.shipToAddress2Textbox.TabIndex = 18;
+            this.shipToAddress2Textbox.TabIndex = 31;
             // 
             // shipToAddress1Textbox
             // 
@@ -541,7 +541,7 @@
             this.shipToAddress1Textbox.Name = "shipToAddress1Textbox";
             this.shipToAddress1Textbox.ReadOnly = true;
             this.shipToAddress1Textbox.Size = new System.Drawing.Size(206, 13);
-            this.shipToAddress1Textbox.TabIndex = 17;
+            this.shipToAddress1Textbox.TabIndex = 39;
             // 
             // shipToNameTextbox
             // 
@@ -553,7 +553,7 @@
             this.shipToNameTextbox.Name = "shipToNameTextbox";
             this.shipToNameTextbox.ReadOnly = true;
             this.shipToNameTextbox.Size = new System.Drawing.Size(206, 13);
-            this.shipToNameTextbox.TabIndex = 16;
+            this.shipToNameTextbox.TabIndex = 29;
             // 
             // shipToLabel
             // 
@@ -562,7 +562,7 @@
             this.shipToLabel.Location = new System.Drawing.Point(30, 121);
             this.shipToLabel.Name = "shipToLabel";
             this.shipToLabel.Size = new System.Drawing.Size(51, 13);
-            this.shipToLabel.TabIndex = 15;
+            this.shipToLabel.TabIndex = 28;
             this.shipToLabel.Text = "Ship To";
             // 
             // soldToTextbox
@@ -575,7 +575,7 @@
             this.soldToTextbox.Name = "soldToTextbox";
             this.soldToTextbox.ReadOnly = true;
             this.soldToTextbox.Size = new System.Drawing.Size(206, 13);
-            this.soldToTextbox.TabIndex = 14;
+            this.soldToTextbox.TabIndex = 26;
             // 
             // soldToLabel
             // 
@@ -584,7 +584,7 @@
             this.soldToLabel.Location = new System.Drawing.Point(30, 65);
             this.soldToLabel.Name = "soldToLabel";
             this.soldToLabel.Size = new System.Drawing.Size(51, 13);
-            this.soldToLabel.TabIndex = 8;
+            this.soldToLabel.TabIndex = 25;
             this.soldToLabel.Text = "Sold To";
             // 
             // buyerLabel
@@ -597,7 +597,7 @@
             this.buyerLabel.Location = new System.Drawing.Point(0, 0);
             this.buyerLabel.Name = "buyerLabel";
             this.buyerLabel.Size = new System.Drawing.Size(415, 35);
-            this.buyerLabel.TabIndex = 1;
+            this.buyerLabel.TabIndex = 24;
             this.buyerLabel.Text = "Buyer / Recipient Info";
             this.buyerLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -618,10 +618,10 @@
             this.reasonHeader});
             this.listview.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listview.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.listview.Location = new System.Drawing.Point(13, 382);
+            this.listview.Location = new System.Drawing.Point(13, 407);
             this.listview.Name = "listview";
-            this.listview.Size = new System.Drawing.Size(909, 451);
-            this.listview.TabIndex = 3;
+            this.listview.Size = new System.Drawing.Size(909, 426);
+            this.listview.TabIndex = 37;
             this.listview.UseCompatibleStateImageBehavior = false;
             this.listview.View = System.Windows.Forms.View.Details;
             this.listview.ColumnWidthChanging += new System.Windows.Forms.ColumnWidthChangingEventHandler(this.listview_ColumnWidthChanging);
@@ -629,12 +629,12 @@
             // selectionHeader
             // 
             this.selectionHeader.Text = "";
-            this.selectionHeader.Width = 43;
+            this.selectionHeader.Width = 94;
             // 
             // itemHeader
             // 
             this.itemHeader.Text = "Item";
-            this.itemHeader.Width = 328;
+            this.itemHeader.Width = 391;
             // 
             // unitHeader
             // 
@@ -664,7 +664,7 @@
             // selectAllCheckbox
             // 
             this.selectAllCheckbox.AutoSize = true;
-            this.selectAllCheckbox.Location = new System.Drawing.Point(17, 387);
+            this.selectAllCheckbox.Location = new System.Drawing.Point(17, 413);
             this.selectAllCheckbox.Name = "selectAllCheckbox";
             this.selectAllCheckbox.Size = new System.Drawing.Size(15, 14);
             this.selectAllCheckbox.TabIndex = 4;
@@ -682,7 +682,7 @@
             this.markCancelButton.Location = new System.Drawing.Point(793, 382);
             this.markCancelButton.Name = "markCancelButton";
             this.markCancelButton.Size = new System.Drawing.Size(129, 23);
-            this.markCancelButton.TabIndex = 5;
+            this.markCancelButton.TabIndex = 39;
             this.markCancelButton.Text = "Mark as Cancelled";
             this.markCancelButton.UseVisualStyleBackColor = false;
             this.markCancelButton.Click += new System.EventHandler(this.markCancelButton_Click);
@@ -709,10 +709,10 @@
             "Out of Stock",
             "Product Has Been Discontinued",
             "Other"});
-            this.reasonCombobox.Location = new System.Drawing.Point(798, 441);
+            this.reasonCombobox.Location = new System.Drawing.Point(562, 383);
             this.reasonCombobox.Name = "reasonCombobox";
             this.reasonCombobox.Size = new System.Drawing.Size(121, 21);
-            this.reasonCombobox.TabIndex = 6;
+            this.reasonCombobox.TabIndex = 41;
             this.reasonCombobox.Text = "Select Reason";
             this.reasonCombobox.Visible = false;
             // 
@@ -724,10 +724,10 @@
             this.setReasonButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.setReasonButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.setReasonButton.ForeColor = System.Drawing.Color.White;
-            this.setReasonButton.Location = new System.Drawing.Point(809, 483);
+            this.setReasonButton.Location = new System.Drawing.Point(689, 382);
             this.setReasonButton.Name = "setReasonButton";
             this.setReasonButton.Size = new System.Drawing.Size(98, 23);
-            this.setReasonButton.TabIndex = 7;
+            this.setReasonButton.TabIndex = 40;
             this.setReasonButton.Text = "Set Reason";
             this.setReasonButton.UseVisualStyleBackColor = false;
             this.setReasonButton.Visible = false;
@@ -745,7 +745,7 @@
             this.shipmentConfirmButton.Location = new System.Drawing.Point(976, 766);
             this.shipmentConfirmButton.Name = "shipmentConfirmButton";
             this.shipmentConfirmButton.Size = new System.Drawing.Size(440, 67);
-            this.shipmentConfirmButton.TabIndex = 8;
+            this.shipmentConfirmButton.TabIndex = 62;
             this.shipmentConfirmButton.Text = "Shipment Confirm";
             this.shipmentConfirmButton.UseVisualStyleBackColor = false;
             this.shipmentConfirmButton.Click += new System.EventHandler(this.shipmentConfirmButton_Click);
@@ -765,7 +765,7 @@
             this.progressbar.Name = "progressbar";
             this.progressbar.Size = new System.Drawing.Size(440, 67);
             this.progressbar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.progressbar.TabIndex = 9;
+            this.progressbar.TabIndex = 63;
             this.progressbar.Visible = false;
             // 
             // shippingPanel
@@ -797,7 +797,7 @@
             this.shippingPanel.Location = new System.Drawing.Point(976, 103);
             this.shippingPanel.Name = "shippingPanel";
             this.shippingPanel.Size = new System.Drawing.Size(440, 640);
-            this.shippingPanel.TabIndex = 10;
+            this.shippingPanel.TabIndex = 42;
             // 
             // voidShipmentButton
             // 
@@ -810,7 +810,7 @@
             this.voidShipmentButton.Location = new System.Drawing.Point(174, 501);
             this.voidShipmentButton.Name = "voidShipmentButton";
             this.voidShipmentButton.Size = new System.Drawing.Size(174, 23);
-            this.voidShipmentButton.TabIndex = 28;
+            this.voidShipmentButton.TabIndex = 61;
             this.voidShipmentButton.Text = "Void Shipment";
             this.voidShipmentButton.UseVisualStyleBackColor = false;
             this.voidShipmentButton.Visible = false;
@@ -828,7 +828,7 @@
             this.trackingNumberTextbox.Name = "trackingNumberTextbox";
             this.trackingNumberTextbox.ReadOnly = true;
             this.trackingNumberTextbox.Size = new System.Drawing.Size(175, 64);
-            this.trackingNumberTextbox.TabIndex = 27;
+            this.trackingNumberTextbox.TabIndex = 60;
             this.trackingNumberTextbox.Text = "Not shipped";
             // 
             // shippingPicturebox
@@ -855,7 +855,7 @@
             this.createLabelButton.Location = new System.Drawing.Point(120, 337);
             this.createLabelButton.Name = "createLabelButton";
             this.createLabelButton.Size = new System.Drawing.Size(207, 38);
-            this.createLabelButton.TabIndex = 24;
+            this.createLabelButton.TabIndex = 59;
             this.createLabelButton.Text = "Create Label";
             this.createLabelButton.UseVisualStyleBackColor = false;
             this.createLabelButton.Click += new System.EventHandler(this.createLabelButton_Click);
@@ -876,7 +876,7 @@
             0});
             this.heightUpdown.Name = "heightUpdown";
             this.heightUpdown.Size = new System.Drawing.Size(54, 20);
-            this.heightUpdown.TabIndex = 22;
+            this.heightUpdown.TabIndex = 58;
             // 
             // widthUpdown
             // 
@@ -894,7 +894,7 @@
             0});
             this.widthUpdown.Name = "widthUpdown";
             this.widthUpdown.Size = new System.Drawing.Size(54, 20);
-            this.widthUpdown.TabIndex = 21;
+            this.widthUpdown.TabIndex = 57;
             // 
             // lengthUpdown
             // 
@@ -912,7 +912,7 @@
             0});
             this.lengthUpdown.Name = "lengthUpdown";
             this.lengthUpdown.Size = new System.Drawing.Size(54, 20);
-            this.lengthUpdown.TabIndex = 20;
+            this.lengthUpdown.TabIndex = 55;
             // 
             // sizeLabel
             // 
@@ -922,7 +922,7 @@
             this.sizeLabel.Location = new System.Drawing.Point(94, 267);
             this.sizeLabel.Name = "sizeLabel";
             this.sizeLabel.Size = new System.Drawing.Size(31, 13);
-            this.sizeLabel.TabIndex = 19;
+            this.sizeLabel.TabIndex = 54;
             this.sizeLabel.Text = "Size";
             // 
             // packageCombobox
@@ -939,7 +939,7 @@
             this.packageCombobox.Location = new System.Drawing.Point(131, 216);
             this.packageCombobox.Name = "packageCombobox";
             this.packageCombobox.Size = new System.Drawing.Size(239, 21);
-            this.packageCombobox.TabIndex = 18;
+            this.packageCombobox.TabIndex = 53;
             this.packageCombobox.Text = "Customer Supplied Package";
             // 
             // packageLabel
@@ -950,7 +950,7 @@
             this.packageLabel.Location = new System.Drawing.Point(68, 219);
             this.packageLabel.Name = "packageLabel";
             this.packageLabel.Size = new System.Drawing.Size(57, 13);
-            this.packageLabel.TabIndex = 17;
+            this.packageLabel.TabIndex = 52;
             this.packageLabel.Text = "Package";
             // 
             // serviceCombobox
@@ -962,7 +962,7 @@
             this.serviceCombobox.Location = new System.Drawing.Point(131, 169);
             this.serviceCombobox.Name = "serviceCombobox";
             this.serviceCombobox.Size = new System.Drawing.Size(239, 21);
-            this.serviceCombobox.TabIndex = 16;
+            this.serviceCombobox.TabIndex = 51;
             // 
             // serviceLabel
             // 
@@ -971,9 +971,9 @@
             this.serviceLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.serviceLabel.Location = new System.Drawing.Point(68, 172);
             this.serviceLabel.Name = "serviceLabel";
-            this.serviceLabel.Size = new System.Drawing.Size(57, 13);
-            this.serviceLabel.TabIndex = 15;
-            this.serviceLabel.Text = "Searvice";
+            this.serviceLabel.Size = new System.Drawing.Size(50, 13);
+            this.serviceLabel.TabIndex = 50;
+            this.serviceLabel.Text = "Service";
             // 
             // weightLbUpdown
             // 
@@ -991,7 +991,7 @@
             0});
             this.weightLbUpdown.Name = "weightLbUpdown";
             this.weightLbUpdown.Size = new System.Drawing.Size(66, 20);
-            this.weightLbUpdown.TabIndex = 13;
+            this.weightLbUpdown.TabIndex = 49;
             this.weightLbUpdown.ValueChanged += new System.EventHandler(this.weightLbUpdown_ValueChanged);
             // 
             // weightKgUpdown
@@ -1010,7 +1010,7 @@
             0});
             this.weightKgUpdown.Name = "weightKgUpdown";
             this.weightKgUpdown.Size = new System.Drawing.Size(66, 20);
-            this.weightKgUpdown.TabIndex = 12;
+            this.weightKgUpdown.TabIndex = 447;
             this.weightKgUpdown.ValueChanged += new System.EventHandler(this.weightKgUpdown_ValueChanged);
             // 
             // weightLabel
@@ -1021,7 +1021,7 @@
             this.weightLabel.Location = new System.Drawing.Point(78, 124);
             this.weightLabel.Name = "weightLabel";
             this.weightLabel.Size = new System.Drawing.Size(47, 13);
-            this.weightLabel.TabIndex = 11;
+            this.weightLabel.TabIndex = 46;
             this.weightLabel.Text = "Weight";
             // 
             // shipFromCombobox
@@ -1035,7 +1035,7 @@
             this.shipFromCombobox.Location = new System.Drawing.Point(131, 73);
             this.shipFromCombobox.Name = "shipFromCombobox";
             this.shipFromCombobox.Size = new System.Drawing.Size(192, 21);
-            this.shipFromCombobox.TabIndex = 10;
+            this.shipFromCombobox.TabIndex = 45;
             this.shipFromCombobox.Text = "ASHLIN WAREHOUSE";
             // 
             // shipFromLabel
@@ -1046,7 +1046,7 @@
             this.shipFromLabel.Location = new System.Drawing.Point(62, 76);
             this.shipFromLabel.Name = "shipFromLabel";
             this.shipFromLabel.Size = new System.Drawing.Size(63, 13);
-            this.shipFromLabel.TabIndex = 9;
+            this.shipFromLabel.TabIndex = 44;
             this.shipFromLabel.Text = "Ship From";
             // 
             // shippingInfoLabel
@@ -1058,7 +1058,7 @@
             this.shippingInfoLabel.Location = new System.Drawing.Point(0, 0);
             this.shippingInfoLabel.Name = "shippingInfoLabel";
             this.shippingInfoLabel.Size = new System.Drawing.Size(439, 35);
-            this.shippingInfoLabel.TabIndex = 2;
+            this.shippingInfoLabel.TabIndex = 43;
             this.shippingInfoLabel.Text = "Shipping Info (overall package detail)";
             this.shippingInfoLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -1069,7 +1069,7 @@
             this.weightUnitLabel.Location = new System.Drawing.Point(203, 123);
             this.weightUnitLabel.Name = "weightUnitLabel";
             this.weightUnitLabel.Size = new System.Drawing.Size(120, 12);
-            this.weightUnitLabel.TabIndex = 14;
+            this.weightUnitLabel.TabIndex = 48;
             this.weightUnitLabel.Text = "kg                                                 lb";
             // 
             // sizeUnitLabel
@@ -1079,7 +1079,7 @@
             this.sizeUnitLabel.Location = new System.Drawing.Point(187, 268);
             this.sizeUnitLabel.Name = "sizeUnitLabel";
             this.sizeUnitLabel.Size = new System.Drawing.Size(160, 12);
-            this.sizeUnitLabel.TabIndex = 23;
+            this.sizeUnitLabel.TabIndex = 56;
             this.sizeUnitLabel.Text = "x                                x                               (cm)";
             // 
             // backgroundWorkerShip

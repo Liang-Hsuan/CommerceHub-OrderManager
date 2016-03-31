@@ -112,26 +112,24 @@ namespace Order_Manager.mainForms
             string message = "Packing Slip have successfully exported to";
             bool[] channel = { false, false };  // [0] sears, [1] shop.ca
 
-            // fields for packking slip
-            SearsPackingSlip searsPS = new SearsPackingSlip();
-            ShopCaPackingSlip shopCaPS = new ShopCaPackingSlip();
-
-            foreach (ListViewItem item in listview.CheckedItems)
+            foreach (Order order in from ListViewItem item in listview.CheckedItems select new Order
             {
-                Order order = new Order();
-                order.source = item.SubItems[0].Text;
-                order.transactionId = item.SubItems[4].Text;
-
+                source = item.SubItems[0].Text,
+                transactionId = item.SubItems[4].Text
+            })
+            {
                 switch (order.source)
                 {
                     case "Sears":
                     {
                         // the case if it is sears order
-                        SearsValues value = sears.GenerateValue(order.transactionId);
-                        searsPS.createPackingSlip(value, new int[0], false);
-                        if (searsPS.Error)
+                        try
                         {
-                            MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            SearsPackingSlip.createPackingSlip(sears.GenerateValue(order.transactionId), new int[0], false);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
                         }
                         channel[0] = true;
@@ -140,11 +138,13 @@ namespace Order_Manager.mainForms
                     case "Shop.ca":
                     {
                         // the case if it is shop.ca order
-                        ShopCaValues value = shopCa.GenerateValue(order.transactionId);
-                        shopCaPS.createPackingSlip(value, new int[0], false);
-                        if (shopCaPS.Error)
+                        try
                         {
-                            MessageBox.Show("Error occurs during exporting packing slip:\nPlease check that the file is not opened during exporting.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            ShopCaPackingSlip.createPackingSlip(shopCa.GenerateValue(order.transactionId), new int[0], false);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
                         }
                         channel[1] = true;
@@ -155,9 +155,9 @@ namespace Order_Manager.mainForms
 
             // create message
             if (channel[0])
-                message += "\n" + searsPS.SavePath;
+                message += "\n" + SearsPackingSlip.SavePath;
             if (channel[1])
-                message += "\n" + shopCaPS.SavePath;
+                message += "\n" + ShopCaPackingSlip.SavePath;
 
             MessageBox.Show(message, "Congratulation");
         }
@@ -185,9 +185,7 @@ namespace Order_Manager.mainForms
                 return;
             }
 
-            string channel = listview.CheckedItems[0].SubItems[0].Text;
-
-            switch (channel)
+            switch (listview.CheckedItems[0].SubItems[0].Text)
             {
                 case "Sears":
                 {

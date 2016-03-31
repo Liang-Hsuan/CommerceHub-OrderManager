@@ -20,8 +20,8 @@ namespace Order_Manager.supportingClasses.Shipment
         private readonly string ACCOUNT_NUMBER;
         private readonly string SEARS_ACCOUNT_NUMBER;
 
-        // field for save image path
-        private readonly string savePathSears = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_ShippingLabel";
+        /* a Get for savepath for shipment label */
+        public string SavePathSears { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_ShippingLabel";
 
         /* constructor that initialize UPS credentials */
         public UPS()
@@ -50,7 +50,7 @@ namespace Order_Manager.supportingClasses.Shipment
             // set error to false
             Error = false;
 
-            string shipmentConfirmUri = "https://wwwcie.ups.com/ups.app/xml/ShipConfirm";
+            const string shipmentConfirmUri = "https://wwwcie.ups.com/ups.app/xml/ShipConfirm";
             // string shipmentConfirmUri = "https://onlinetools.ups.com/ups.app/xml/ShipConfirm";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentConfirmUri);
@@ -237,7 +237,7 @@ namespace Order_Manager.supportingClasses.Shipment
             // set error to false
             Error = false;
 
-            string shipmentAcceptmUri = "https://wwwcie.ups.com/ups.app/xml/ShipAccept";
+            const string shipmentAcceptmUri = "https://wwwcie.ups.com/ups.app/xml/ShipAccept";
             // string shipmentAcceptmUri = "https://onlinetools.ups.com/ups.app/xml/ShipAccept";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentAcceptmUri);
@@ -304,7 +304,7 @@ namespace Order_Manager.supportingClasses.Shipment
             // set error to false
             Error = false;
 
-            string shipmentVoidUri = "https://wwwcie.ups.com/ups.app/xml/Void";
+            const string shipmentVoidUri = "https://wwwcie.ups.com/ups.app/xml/Void";
             // string shipmentVoidUri = "https://onlinetools.ups.com/ups.app/xml/Void";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentVoidUri);
@@ -365,11 +365,11 @@ namespace Order_Manager.supportingClasses.Shipment
 
             // save image
             // check if the save directory exist -> if not create it
-            if (!File.Exists(savePathSears))
-                Directory.CreateDirectory(savePathSears);
+            if (!File.Exists(SavePathSears))
+                Directory.CreateDirectory(SavePathSears);
 
             // save the image
-            string file = savePathSears + "\\" + transactionId + ".gif";
+            string file = SavePathSears + "\\" + transactionId + ".gif";
             image.Save(file, System.Drawing.Imaging.ImageFormat.Gif);
 
             // show the image if user want to preview
@@ -379,8 +379,5 @@ namespace Order_Manager.supportingClasses.Shipment
                     System.Diagnostics.Process.Start(file);
             }
         }
-
-        /* a Get for savepath for shipment label */
-        public string SavePathSears => savePathSears;
     }
 }

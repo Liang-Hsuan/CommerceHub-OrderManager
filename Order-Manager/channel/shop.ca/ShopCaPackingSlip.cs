@@ -2,26 +2,21 @@
 using iTextSharp.text.pdf;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Order_Manager.channel.shop.ca
 {
     /*
      * A class that generate the packing slip for shop.ca order
      */
-    public class ShopCaPackingSlip
+    public static class ShopCaPackingSlip
     {
-        // boolearn flag to track error
-        public bool Error { get; private set; }
-
         /* get the save path of the sears packing slip */
-        public string SavePath { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ShopCa_PackingSlip";
+        public static string SavePath { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ShopCa_PackingSlip";
 
         /* a method that save the packing slip pdf */
-        public void createPackingSlip(ShopCaValues value, int[] cancelIndex, bool preview)
+        public static void createPackingSlip(ShopCaValues value, int[] cancelIndex, bool preview)
         {
-            // set error to false
-            Error = false;
-
             // the case if all of the items in the order are cancelled -> don't need to print the packing slip
             if (cancelIndex.Length >= value.OrderItemId.Count)
                 return;
@@ -33,20 +28,10 @@ namespace Order_Manager.channel.shop.ca
             // initialize fields
             Document doc = new Document(PageSize.LETTER, 0, 0, 0, 0);
             string file = SavePath + "\\" + value.OrderId + ".pdf"; ;
-            PdfWriter writer;
-            try
-            {
-                writer = PdfWriter.GetInstance(doc, new FileStream(file, FileMode.Create));
-            }
-            catch
-            {
-                Error = true;
-                return;
-            }
+            PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(file, FileMode.Create));
 
             // open the documents
             doc.Open();
-            PdfContentByte contentByte = writer.DirectContent;
 
             #region Logo and Lines Set Up
             // add shop.ca logo
@@ -169,18 +154,8 @@ namespace Order_Manager.channel.shop.ca
             // adding items
             for (int i = 0; i < value.OrderItemId.Count; i++)
             {
-                // boolean flag to check if the item index is cancelled or not
-                bool found = false;
-
-                // check if the item is cancelled
-                foreach (int j in cancelIndex)
-                {
-                    if (i == j)
-                        found = true;
-                }
-
                 // if the item is cancelled, skip this item
-                if (found) continue;
+                if (cancelIndex.Any(j => i == j)) continue;
 
                 // draw box
                 draw.MoveTo(40f, height);
@@ -318,6 +293,7 @@ namespace Order_Manager.channel.shop.ca
             }
 
             doc.Close();
+
         }
     }
 }

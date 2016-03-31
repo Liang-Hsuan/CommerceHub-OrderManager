@@ -16,9 +16,9 @@ namespace Order_Manager.supportingClasses.Shipment
         private readonly string CUSTOMER_NUMBER;
         private readonly string CONTRACT_NUMBER;
 
-        // field for save pdf path
-        private readonly string savePathLabelShopCa = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ShopCa_ShippingLabel";
-        private readonly string savePathManifestShopCa = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ShopCa_ShippingManifest";
+        /* Get for save path for shipment label and manifest */
+        public string SavePathLabelShopCa { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ShopCa_ShippingLabel";
+        public string SavePathManifestShopCa { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ShopCa_ShippingManifest";
 
         /* constructor that initialize Canada Post credentials */
         public CanadaPost()
@@ -347,20 +347,20 @@ namespace Order_Manager.supportingClasses.Shipment
             if (label)
             {
                 // label case
-                file = savePathLabelShopCa + "\\" + orderId + ".pdf";
+                file = SavePathLabelShopCa + "\\" + orderId + ".pdf";
 
                 // check if the save directory exist -> if not create it
-                if (!File.Exists(savePathLabelShopCa))
-                    Directory.CreateDirectory(savePathLabelShopCa);
+                if (!File.Exists(SavePathLabelShopCa))
+                    Directory.CreateDirectory(SavePathLabelShopCa);
             }
             else
             {
                 // manifest case
-                file = savePathManifestShopCa + "\\" + orderId + ".pdf";
+                file = SavePathManifestShopCa + "\\" + orderId + ".pdf";
 
                 // check if the save directory exist -> if not create it
-                if (!File.Exists(savePathManifestShopCa))
-                    Directory.CreateDirectory(savePathManifestShopCa);
+                if (!File.Exists(SavePathManifestShopCa))
+                    Directory.CreateDirectory(SavePathManifestShopCa);
             }
 
             // save pdf
@@ -373,9 +373,5 @@ namespace Order_Manager.supportingClasses.Shipment
                     System.Diagnostics.Process.Start(file);
             }
         }
-
-        /* a Get for savepath for shipment label */
-        public string SavePathLabelShopCa => savePathLabelShopCa;
-        public string SavePathManifestShopCa => savePathManifestShopCa;
     }
 }

@@ -190,27 +190,28 @@ namespace Order_Manager.mainForms
             // cancellation to carriers
             foreach (Order cancelledOrder in cancelList)
             {
-                if (cancelledOrder.source == "Sears")
+                switch (cancelledOrder.source)
                 {
-                    list[0].Add(cancelledOrder.transactionId);
-                    ups.postShipmentVoid(cancelledOrder.shipmentIdentificationNumber);
-                    if (ups.Error)
-                    {
-                        MessageBox.Show(ups.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                    channel[0] = true;
-                }
-                else if (cancelledOrder.source == "Shop.ca")
-                {
-                    list[1].Add(cancelledOrder.transactionId);
-                    canadaPost.deleteShipment(cancelledOrder.shipmentIdentificationNumber);
-                    if (canadaPost.Error)
-                    {
-                        MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                    channel[1] = true;
+                    case "Sears":
+                        list[0].Add(cancelledOrder.transactionId);
+                        ups.postShipmentVoid(cancelledOrder.shipmentIdentificationNumber);
+                        if (ups.Error)
+                        {
+                            MessageBox.Show(ups.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                        channel[0] = true;
+                        break;
+                    case "Shop.ca":
+                        list[1].Add(cancelledOrder.transactionId);
+                        canadaPost.deleteShipment(cancelledOrder.shipmentIdentificationNumber);
+                        if (canadaPost.Error)
+                        {
+                            MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                        channel[1] = true;
+                        break;
                 }
             }
 

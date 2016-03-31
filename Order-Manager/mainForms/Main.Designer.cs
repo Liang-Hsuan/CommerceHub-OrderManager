@@ -147,7 +147,7 @@
             this.listview.Location = new System.Drawing.Point(12, 378);
             this.listview.Name = "listview";
             this.listview.Size = new System.Drawing.Size(1404, 473);
-            this.listview.TabIndex = 2;
+            this.listview.TabIndex = 7;
             this.listview.UseCompatibleStateImageBehavior = false;
             this.listview.View = System.Windows.Forms.View.Details;
             // 
@@ -206,7 +206,7 @@
             this.shipmentConfirmButton.Location = new System.Drawing.Point(12, 338);
             this.shipmentConfirmButton.Name = "shipmentConfirmButton";
             this.shipmentConfirmButton.Size = new System.Drawing.Size(160, 34);
-            this.shipmentConfirmButton.TabIndex = 3;
+            this.shipmentConfirmButton.TabIndex = 2;
             this.shipmentConfirmButton.Text = "Confirm Shipment";
             this.shipmentConfirmButton.UseVisualStyleBackColor = false;
             this.shipmentConfirmButton.Click += new System.EventHandler(this.shipmentConfirmButton_Click);
@@ -219,7 +219,7 @@
             this.printButton.Location = new System.Drawing.Point(178, 338);
             this.printButton.Name = "printButton";
             this.printButton.Size = new System.Drawing.Size(106, 34);
-            this.printButton.TabIndex = 4;
+            this.printButton.TabIndex = 3;
             this.printButton.Text = "Print";
             this.printButton.UseVisualStyleBackColor = false;
             this.printButton.Click += new System.EventHandler(this.printButton_Click);
@@ -235,7 +235,7 @@
             this.detailButton.Location = new System.Drawing.Point(1256, 340);
             this.detailButton.Name = "detailButton";
             this.detailButton.Size = new System.Drawing.Size(160, 34);
-            this.detailButton.TabIndex = 5;
+            this.detailButton.TabIndex = 6;
             this.detailButton.Text = "More Details";
             this.detailButton.UseVisualStyleBackColor = false;
             this.detailButton.Click += new System.EventHandler(this.detailButton_Click);
@@ -246,7 +246,7 @@
             this.selectionAllCheckbox.Location = new System.Drawing.Point(16, 383);
             this.selectionAllCheckbox.Name = "selectionAllCheckbox";
             this.selectionAllCheckbox.Size = new System.Drawing.Size(15, 14);
-            this.selectionAllCheckbox.TabIndex = 6;
+            this.selectionAllCheckbox.TabIndex = 8;
             this.selectionAllCheckbox.UseVisualStyleBackColor = true;
             this.selectionAllCheckbox.CheckedChanged += new System.EventHandler(this.selectionAllCheckbox_CheckedChanged);
             // 
@@ -260,7 +260,7 @@
             this.refreshButton.Location = new System.Drawing.Point(1151, 339);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(47, 34);
-            this.refreshButton.TabIndex = 7;
+            this.refreshButton.TabIndex = 4;
             this.refreshButton.UseVisualStyleBackColor = false;
             this.refreshButton.Click += new System.EventHandler(this.refreshButton_Click);
             // 
@@ -291,7 +291,7 @@
             this.shipmentButton.Location = new System.Drawing.Point(1199, 339);
             this.shipmentButton.Name = "shipmentButton";
             this.shipmentButton.Size = new System.Drawing.Size(47, 34);
-            this.shipmentButton.TabIndex = 9;
+            this.shipmentButton.TabIndex = 5;
             this.shipmentButton.UseVisualStyleBackColor = false;
             this.shipmentButton.Click += new System.EventHandler(this.shipmentButton_Click);
             // 
