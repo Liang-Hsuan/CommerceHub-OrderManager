@@ -14,7 +14,7 @@ namespace Order_Manager.channel.shop.ca
     /*
      * A class that connect to Shop.ca sftp server and manage all the orders for Shop.ca
      */
-    public class ShopCa
+    public class ShopCa : ShoppingChannel
     {
         // fields for directory on sftp server
         private const string SHIPMENT_DIR = "toclient/order";
@@ -60,10 +60,10 @@ namespace Order_Manager.channel.shop.ca
 
         #region Public Get
         /* a method that get all new order on the server and update to the database */
-        public void GetOrder()
+        public override void GetOrder()
         {
             // get all the new file on the order directory to local new order storing directory
-            string[] orderCheck = checkOrderFile();
+            IEnumerable<string> orderCheck = checkOrderFile();
             getOrder(newOrderDir, orderCheck);
 
             // read all the text of the file in the local directory
@@ -232,7 +232,7 @@ namespace Order_Manager.channel.shop.ca
 
         #region Number of Orders and Shipments
         /* methods that return the number of order and shipment from the given date */
-        public int GetNumberOfOrder(DateTime time)
+        public override int GetNumberOfOrder(DateTime time)
         {
             int count;
 
@@ -246,7 +246,7 @@ namespace Order_Manager.channel.shop.ca
 
             return count;
         }
-        public int GetNumberOfShipped(DateTime time)
+        public override int GetNumberOfShipped(DateTime time)
         {
             int count;
 
@@ -264,7 +264,7 @@ namespace Order_Manager.channel.shop.ca
 
         #region Get Order Infomation
         /* method that get the new order from sftp server */
-        private void getOrder(string filePath, string[] fileList)
+        private void getOrder(string filePath, IEnumerable<string> fileList)
         {
             // connection to sftp server and read all the list of file
             sftp.Connect();
@@ -295,7 +295,7 @@ namespace Order_Manager.channel.shop.ca
         }
 
         /* method that get all the order in the file with the given dictionary <filePath, text> and return dictionary <orderId, filepath> */
-        public static Dictionary<string, string> getOrderId(Dictionary<string, string> fileText)
+        private static Dictionary<string, string> getOrderId(Dictionary<string, string> fileText)
         {
             // local field for storing data
             Dictionary<string, string> list = new Dictionary<string, string>();
@@ -331,7 +331,7 @@ namespace Order_Manager.channel.shop.ca
 
         #region Check Order Methods
         /* return all the new order file name on the server */
-        private string[] checkOrderFile()
+        private IEnumerable<string> checkOrderFile()
         {
             // get all order file on local
             DirectoryInfo dirInfo = new DirectoryInfo(newOrderDir);
@@ -346,7 +346,7 @@ namespace Order_Manager.channel.shop.ca
 
         /* a method that receive all the current order and check the duplicate then only return the ones that have not been processed 
         -> receive and return dictionary <orderId, filePath> */
-        public Dictionary<string, string> checkOrder(Dictionary<string, string> allOrderList)
+        private Dictionary<string, string> checkOrder(Dictionary<string, string> allOrderList)
         {
             // get all complete order id 
             List<string> completeOrderList = new List<string>();
@@ -705,23 +705,5 @@ namespace Order_Manager.channel.shop.ca
                 }
             }
         }
-
-        #region Supporting Methods
-        /* a method that substring the given string */
-        private static string substringMethod(string original, string startingString, int additionIndex)
-        {
-            return original.Substring(original.IndexOf(startingString) + additionIndex);
-        }
-
-        /* a method that get the next target token */
-        private static string getTarget(string text)
-        {
-            int i = 0;
-            while (text[i] != '<' && text[i] != '>' && text[i] != '"')
-                i++;
-
-            return text.Substring(0, i);
-        }
-        #endregion
     }
 }

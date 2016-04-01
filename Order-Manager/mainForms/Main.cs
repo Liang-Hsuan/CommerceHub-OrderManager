@@ -217,68 +217,73 @@ namespace Order_Manager.mainForms
             foreach (Order order in orderList)
             {
                 // for sears order
-                if (order.source == "Sears")
+                switch (order.source)
                 {
-                    #region Sears Order
-                    // first get the detail for the order
-                    SearsValues value = sears.GenerateValue(order.transactionId);
-                    value.Package = new Package(value);
-
-                    // second ship it
-                    string[] digest = ups.postShipmentConfirm(value);
-                    if (ups.Error)
+                    case "Sears":
                     {
-                        MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
+                        #region Sears Order
+                        // first get the detail for the order
+                        SearsValues value = sears.GenerateValue(order.transactionId);
+                        value.Package = new Package(value);
 
-                    string[] result = ups.postShipmentAccept(digest[1]);
-                    if (ups.Error)
+                        // second ship it
+                        string[] digest = ups.postShipmentConfirm(value);
+                        if (ups.Error)
+                        {
+                            MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        string[] result = ups.postShipmentAccept(digest[1]);
+                        if (ups.Error)
+                        {
+                            MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // get identification, tracking, label and shipment confirm with no cancellation of item
+                        value.Package.IdentificationNumber = digest[0];
+                        value.Package.TrackingNumber = result[0];
+                        ups.exportLabel(result[1], value.TransactionID, false);
+                        sears.GenerateXML(value, new System.Collections.Generic.Dictionary<int, string>());
+
+                        // post order to brightpearl with no cancellation
+                        bp.postOrder(value, new int[0]);
+                        #endregion
+                    }
+                        break;
+                    case "Shop.ca":
                     {
-                        MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
+                        #region Shop.ca Order
+                        // first get the detail for the order
+                        ShopCaValues value = shopCa.GenerateValue(order.transactionId);
+                        value.Package = new Package(value);
+
+                        // second ship it
+                        string[] links = canadaPost.createShipment(value);
+                        if (canadaPost.Error)
+                        {
+                            MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // get tracking, self link, label link and shipment confirm with no cancellation of item
+                        value.Package.TrackingNumber = links[0];
+                        value.Package.SelfLink = links[1];
+                        value.Package.LabelLink = links[2];
+                        shopCa.GenerateCSV(value, new System.Collections.Generic.Dictionary<int, string>());
+
+                        // post order to brightpearl with no cancellation
+                        bp.postOrder(value, new int[0]);
+
+                        System.Threading.Thread.Sleep(5000);
+
+                        // get artifact and export it
+                        byte[] binary = canadaPost.getArtifact(links[2]);
+                        canadaPost.exportLabel(binary, value.OrderId, true, false);
+                        #endregion
                     }
-
-                    // get identification, tracking, label and shipment confirm with no cancellation of item
-                    value.Package.IdentificationNumber = digest[0];
-                    value.Package.TrackingNumber = result[0];
-                    ups.exportLabel(result[1], value.TransactionID, false);
-                    sears.GenerateXML(value, new System.Collections.Generic.Dictionary<int, string>());
-
-                    // post order to brightpearl with no cancellation
-                    bp.postOrder(value, new int[0]);
-                    #endregion
-                }
-                else if (order.source == "Shop.ca")
-                {
-                    #region Shop.ca Order
-                    // first get the detail for the order
-                    ShopCaValues value = shopCa.GenerateValue(order.transactionId);
-                    value.Package = new Package(value);
-
-                    // second ship it
-                    string[] links = canadaPost.createShipment(value);
-                    if (canadaPost.Error)
-                    {
-                        MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    // get tracking, self link, label link and shipment confirm with no cancellation of item
-                    value.Package.TrackingNumber = links[0];
-                    value.Package.SelfLink = links[1];
-                    value.Package.LabelLink = links[2];
-                    shopCa.GenerateCSV(value, new System.Collections.Generic.Dictionary<int, string>());
-
-                    // post order to brightpearl with no cancellation
-                    bp.postOrder(value, new int[0]);
-
-                    System.Threading.Thread.Sleep(5000);
-
-                    // get artifact and export it
-                    byte[] binary = canadaPost.getArtifact(links[2]);
-                    canadaPost.exportLabel(binary, value.OrderId, true, false);
-                    #endregion
+                        break;
                 }
             }
         }

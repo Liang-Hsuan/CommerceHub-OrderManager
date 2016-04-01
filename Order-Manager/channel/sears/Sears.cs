@@ -14,7 +14,7 @@ namespace Order_Manager.channel.sears
     /*
      * A class that connect to Sears sftp server and manage all the orders for sears
      */
-    public class Sears
+    public class Sears : ShoppingChannel
     {
         // fields for directory on sftp server
         public const string SHIPMENT_DIR = "outgoing/orders/searscanada";
@@ -60,7 +60,7 @@ namespace Order_Manager.channel.sears
 
         #region Public Get
         /* a method that get all new order on the server and update to the database */
-        public void GetOrder()
+        public override void GetOrder()
         {
             // get all the new file on the order directory to local new order storing directory
             string[] orderCheck = checkOrderFile();
@@ -238,7 +238,7 @@ namespace Order_Manager.channel.sears
 
         #region Number of Orders and Shipments
         /* methods that return the number of order and shipment from the given date */
-        public int GetNumberOfOrder(DateTime time)
+        public override int GetNumberOfOrder(DateTime time)
         {
             int count;
 
@@ -252,7 +252,7 @@ namespace Order_Manager.channel.sears
 
             return count;
         }
-        public int GetNumberOfShipped(DateTime time)
+        public override int GetNumberOfShipped(DateTime time)
         {
             int count;
 
@@ -1007,22 +1007,6 @@ namespace Order_Manager.channel.sears
 
             iterator++;
             return "SearsPack" + DateTime.Today.ToString("ddMMyy") + iterator;
-        }
-
-        /* a method that substring the given string */
-        private static string substringMethod(string original, string startingString, int additionIndex)
-        {
-            return original.Substring(original.IndexOf(startingString) + additionIndex);
-        }
-
-        /* a method that get the next target token */
-        private static string getTarget(string text)
-        {
-            int i = 0;
-            while (text[i] != '<' && text[i] != '>' && text[i] != '"')
-                i++;
-
-            return text.Substring(0, i);
         }
         #endregion
     }
