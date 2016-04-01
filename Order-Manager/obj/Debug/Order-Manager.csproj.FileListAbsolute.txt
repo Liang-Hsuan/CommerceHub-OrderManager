@@ -61,3 +61,21 @@ V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order-Manager.pdb
 E:\Project\Real Projects\Order-Manager\Order-Manager\bin\Debug\Order-Manager.exe.config
 E:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order-Manager.exe
 E:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order-Manager.pdb
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\bin\Debug\Order-Manager.exe.config
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\obj\Debug\Order-Manager.exe
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\obj\Debug\Order-Manager.pdb
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\bin\Debug\Order-Manager.exe
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\bin\Debug\Order-Manager.pdb
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\bin\Debug\itextsharp.dll
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\bin\Debug\Tamir.SharpSSH.dll
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\bin\Debug\DiffieHellman.dll
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\bin\Debug\Org.Mentalis.Security.dll
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\bin\Debug\itextsharp.xml
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\obj\Debug\Order-Manager.csprojResolveAssemblyReference.cache
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\obj\Debug\Order_Manager.Login.resources
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\obj\Debug\Order_Manager.mainForms.DetailPage.resources
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\obj\Debug\Order_Manager.mainForms.Main.resources
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\obj\Debug\Order_Manager.Properties.Resources.resources
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\obj\Debug\Order_Manager.mainForms.ShipmentPage.resources
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\obj\Debug\Order_Manager.supportingClasses.ConfirmPanel.resources
+C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\obj\Debug\Order-Manager.csproj.GenerateResource.Cache

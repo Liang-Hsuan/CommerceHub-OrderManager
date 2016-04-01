@@ -6,6 +6,8 @@ using Order_Manager.channel.sears;
 using Order_Manager.supportingClasses;
 using Order_Manager.supportingClasses.Shipment;
 using Order_Manager.channel.shop.ca;
+using System.Drawing;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Order_Manager.mainForms
 {
@@ -43,6 +45,7 @@ namespace Order_Manager.mainForms
             this.parent = parent;
         }
 
+        #region Close Events
         /* save data when form close */
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -51,6 +54,14 @@ namespace Order_Manager.mainForms
 
             parent.Close();
         }
+
+        /* delete data that are too old after program is closed */
+        private void Main_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            sears.delete();
+            shopCa.delete();
+        }
+        #endregion
 
         #region Top Buttons
         /* ship and confirm the selected items */
@@ -112,43 +123,44 @@ namespace Order_Manager.mainForms
             string message = "Packing Slip have successfully exported to";
             bool[] channel = { false, false };  // [0] sears, [1] shop.ca
 
-            foreach (Order order in from ListViewItem item in listview.CheckedItems select new Order
-            {
-                source = item.SubItems[0].Text,
-                transactionId = item.SubItems[4].Text
-            })
+            foreach (Order order in from ListViewItem item in listview.CheckedItems
+                                    select new Order
+                                    {
+                                        source = item.SubItems[0].Text,
+                                        transactionId = item.SubItems[4].Text
+                                    })
             {
                 switch (order.source)
                 {
                     case "Sears":
-                    {
-                        // the case if it is sears order
-                        try
                         {
-                            SearsPackingSlip.createPackingSlip(sears.GenerateValue(order.transactionId), new int[0], false);
+                            // the case if it is sears order
+                            try
+                            {
+                                SearsPackingSlip.createPackingSlip(sears.GenerateValue(order.transactionId), new int[0], false);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                            channel[0] = true;
                         }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-                        channel[0] = true;
-                    }
                         break;
                     case "Shop.ca":
-                    {
-                        // the case if it is shop.ca order
-                        try
                         {
-                            ShopCaPackingSlip.createPackingSlip(shopCa.GenerateValue(order.transactionId), new int[0], false);
+                            // the case if it is shop.ca order
+                            try
+                            {
+                                ShopCaPackingSlip.createPackingSlip(shopCa.GenerateValue(order.transactionId), new int[0], false);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                            channel[1] = true;
                         }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-                        channel[1] = true;
-                    }
                         break;
                 }
             }
@@ -165,8 +177,14 @@ namespace Order_Manager.mainForms
         /* the event for refresh button clicks that refresh the order in listview and the chart */
         private void refreshButton_Click(object sender, EventArgs e)
         {
+            // set wait cursor for working
+            System.Windows.Forms.Cursor.Current = Cursors.WaitCursor;
+
             showResult();
             refreshGraph();
+
+            // set default cursor after complete
+            System.Windows.Forms.Cursor.Current = Cursors.Default;
         }
 
         /* tje evemt fpr shipment button click that show the shipment page */
@@ -188,18 +206,18 @@ namespace Order_Manager.mainForms
             switch (listview.CheckedItems[0].SubItems[0].Text)
             {
                 case "Sears":
-                {
-                    // the case if it is sears order
-                    SearsValues value = sears.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
-                    new DetailPage(value).ShowDialog(this);
-                }
+                    {
+                        // the case if it is sears order
+                        SearsValues value = sears.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
+                        new DetailPage(value).ShowDialog(this);
+                    }
                     break;
                 case "Shop.ca":
-                {
-                    // the case if it is shopl.ca order
-                    ShopCaValues value = shopCa.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
-                    new DetailPage(value).ShowDialog(this);
-                }
+                    {
+                        // the case if it is shopl.ca order
+                        ShopCaValues value = shopCa.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
+                        new DetailPage(value).ShowDialog(this);
+                    }
                     break;
             }
         }
@@ -220,69 +238,69 @@ namespace Order_Manager.mainForms
                 switch (order.source)
                 {
                     case "Sears":
-                    {
-                        #region Sears Order
-                        // first get the detail for the order
-                        SearsValues value = sears.GenerateValue(order.transactionId);
-                        value.Package = new Package(value);
-
-                        // second ship it
-                        string[] digest = ups.postShipmentConfirm(value);
-                        if (ups.Error)
                         {
-                            MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
+                            #region Sears Order
+                            // first get the detail for the order
+                            SearsValues value = sears.GenerateValue(order.transactionId);
+                            value.Package = new Package(value);
+
+                            // second ship it
+                            string[] digest = ups.postShipmentConfirm(value);
+                            if (ups.Error)
+                            {
+                                MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+
+                            string[] result = ups.postShipmentAccept(digest[1]);
+                            if (ups.Error)
+                            {
+                                MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+
+                            // get identification, tracking, label and shipment confirm with no cancellation of item
+                            value.Package.IdentificationNumber = digest[0];
+                            value.Package.TrackingNumber = result[0];
+                            ups.exportLabel(result[1], value.TransactionID, false);
+                            sears.GenerateXML(value, new System.Collections.Generic.Dictionary<int, string>());
+
+                            // post order to brightpearl with no cancellation
+                            bp.postOrder(value, new int[0]);
+                            #endregion
                         }
-
-                        string[] result = ups.postShipmentAccept(digest[1]);
-                        if (ups.Error)
-                        {
-                            MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-
-                        // get identification, tracking, label and shipment confirm with no cancellation of item
-                        value.Package.IdentificationNumber = digest[0];
-                        value.Package.TrackingNumber = result[0];
-                        ups.exportLabel(result[1], value.TransactionID, false);
-                        sears.GenerateXML(value, new System.Collections.Generic.Dictionary<int, string>());
-
-                        // post order to brightpearl with no cancellation
-                        bp.postOrder(value, new int[0]);
-                        #endregion
-                    }
                         break;
                     case "Shop.ca":
-                    {
-                        #region Shop.ca Order
-                        // first get the detail for the order
-                        ShopCaValues value = shopCa.GenerateValue(order.transactionId);
-                        value.Package = new Package(value);
-
-                        // second ship it
-                        string[] links = canadaPost.createShipment(value);
-                        if (canadaPost.Error)
                         {
-                            MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
+                            #region Shop.ca Order
+                            // first get the detail for the order
+                            ShopCaValues value = shopCa.GenerateValue(order.transactionId);
+                            value.Package = new Package(value);
+
+                            // second ship it
+                            string[] links = canadaPost.createShipment(value);
+                            if (canadaPost.Error)
+                            {
+                                MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+
+                            // get tracking, self link, label link and shipment confirm with no cancellation of item
+                            value.Package.TrackingNumber = links[0];
+                            value.Package.SelfLink = links[1];
+                            value.Package.LabelLink = links[2];
+                            shopCa.GenerateCSV(value, new System.Collections.Generic.Dictionary<int, string>());
+
+                            // post order to brightpearl with no cancellation
+                            bp.postOrder(value, new int[0]);
+
+                            System.Threading.Thread.Sleep(5000);
+
+                            // get artifact and export it
+                            byte[] binary = canadaPost.getArtifact(links[2]);
+                            canadaPost.exportLabel(binary, value.OrderId, true, false);
+                            #endregion
                         }
-
-                        // get tracking, self link, label link and shipment confirm with no cancellation of item
-                        value.Package.TrackingNumber = links[0];
-                        value.Package.SelfLink = links[1];
-                        value.Package.LabelLink = links[2];
-                        shopCa.GenerateCSV(value, new System.Collections.Generic.Dictionary<int, string>());
-
-                        // post order to brightpearl with no cancellation
-                        bp.postOrder(value, new int[0]);
-
-                        System.Threading.Thread.Sleep(5000);
-
-                        // get artifact and export it
-                        byte[] binary = canadaPost.getArtifact(links[2]);
-                        canadaPost.exportLabel(binary, value.OrderId, true, false);
-                        #endregion
-                    }
                         break;
                 }
             }
@@ -435,6 +453,74 @@ namespace Order_Manager.mainForms
 
             chart.Series["shipment"]["PointWidth"] = "0.1";
             chart.Series["point"].MarkerSize = 10;
+        }
+        #endregion
+
+        #region Chart Events
+        /* restore focus */
+        private void chart_MouseEnter(object sender, EventArgs e)
+        {
+            chart.Focus();
+        }
+
+        /* mouse move event for the chart that show the line of the current position */
+        private void chart_MouseMove(object sender, MouseEventArgs e)
+        {
+            chart.ChartAreas[0].CursorY.SetCursorPixelPosition(new Point(e.X, e.Y), true);
+        }
+
+        /* tooltip event for the chart that show the tooptip for the mouse value on */
+        private void chart_GetToolTipText(object sender, ToolTipEventArgs e)
+        {
+            //Check selected chart element is a data point and set tooltip text
+            if (e.HitTestResult.ChartElementType == ChartElementType.DataPoint)
+            {
+                //Get selected data point
+                DataPoint dataPoint = (DataPoint)e.HitTestResult.Object;
+
+                // point case
+                foreach (DataPoint point in chart.Series["point"].Points)
+                {
+                    if ((dataPoint.XValue >= point.XValue - 1 || dataPoint.XValue <= point.XValue + 1) && dataPoint.YValues.Equals(point.YValues))
+                        e.Text = "Daily Number of Orders: " + dataPoint.YValues[0];
+                }
+
+                // shipment case
+                foreach (DataPoint point in chart.Series["shipment"].Points)
+                {
+                    if ((dataPoint.XValue >= point.XValue - 1 || dataPoint.XValue <= point.XValue + 1) && dataPoint.YValues.Equals(point.YValues))
+                        e.Text = "Daily Number of Shipments: " + dataPoint.YValues[0];
+                }
+            }
+        }
+
+        /* mouse wheel event on the chart that zoom in and out */
+        private void chart_MouseWheel(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                if (e.Delta < 0)
+                {
+                    chart.ChartAreas[0].AxisX.ScaleView.ZoomReset();
+                    chart.ChartAreas[0].AxisY.ScaleView.ZoomReset();
+                }
+                else if (e.Delta > 0)
+                {
+                    double xMin = chart.ChartAreas[0].AxisX.ScaleView.ViewMinimum;
+                    double xMax = chart.ChartAreas[0].AxisX.ScaleView.ViewMaximum;
+                    double yMin = chart.ChartAreas[0].AxisY.ScaleView.ViewMinimum;
+                    double yMax = chart.ChartAreas[0].AxisY.ScaleView.ViewMaximum;
+
+                    double posXStart = chart.ChartAreas[0].AxisX.PixelPositionToValue(e.Location.X) - (xMax - xMin) / 3;
+                    double posXFinish = chart.ChartAreas[0].AxisX.PixelPositionToValue(e.Location.X) + (xMax - xMin) / 3;
+                    double posYStart = chart.ChartAreas[0].AxisY.PixelPositionToValue(e.Location.Y) - (yMax - yMin) / 2;
+                    double posYFinish = chart.ChartAreas[0].AxisY.PixelPositionToValue(e.Location.Y) + (yMax - yMin) / 2;
+
+                    chart.ChartAreas[0].AxisX.ScaleView.Zoom(posXStart, posXFinish);
+                    chart.ChartAreas[0].AxisY.ScaleView.Zoom(posYStart, posYFinish);
+                }
+            }
+            catch { }
         }
         #endregion
     }

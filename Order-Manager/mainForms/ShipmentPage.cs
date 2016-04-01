@@ -93,21 +93,17 @@ namespace Order_Manager.mainForms
             }
 
             // get confirmation from the user
-            ConfirmPanel confirm = new ConfirmPanel("Are you sure you want to do the end of day for all the shipment for Canada Post?");
+            ConfirmPanel confirm = new ConfirmPanel("Are you sure you want to do the end of day for Canada Post?");
             confirm.ShowDialog(this);
 
             // the case if user not conifrm or there is no shipment to end of day -> return
             if (confirm.DialogResult != DialogResult.OK || listview.CheckedItems.Count < 1) return;
 
-            // set end of day button to disabled
+            #region Real Work
+            // set end of day button to disabled and cursor to wait state
             endOfDayButton.Enabled = false;
+            Cursor.Current = Cursors.WaitCursor;
 
-            // down to business -> call background worker
-            if (!backgroundWorkerEndofDay.IsBusy)
-                backgroundWorkerEndofDay.RunWorkerAsync();
-        }
-        private void backgroundWorkerEndofDay_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
-        {
             // get all the manifest links
             string groupId = DateTime.Today.ToString("yyyyMMdd");
             string[] list = canadaPost.transmitShipments(groupId);
@@ -116,7 +112,6 @@ namespace Order_Manager.mainForms
             if (canadaPost.Error)
             {
                 MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                e.Result = true;
                 return;
             }
 
@@ -132,7 +127,6 @@ namespace Order_Manager.mainForms
                 if (canadaPost.Error)
                 {
                     MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    e.Result = true;
                     return;
                 }
             }
@@ -149,19 +143,14 @@ namespace Order_Manager.mainForms
             // set end of day to true in database
             shopCa.PostShip(true, DateTime.ParseExact(groupId, "yyyyMMdd", CultureInfo.InvariantCulture));
 
-            e.Result = false;
-        }
-        private void backgroundWorkerEndofDay_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
-        {
-            // show to the user that the process has completed -> if there is no error occur during the process
-            if (!(bool)e.Result)
-                 MessageBox.Show("Manifests have been successfully exported to\n" + canadaPost.SavePathManifestShopCa, "Congratulation");
-
             // show the new result
+            MessageBox.Show("Manifests have been successfully exported to\n" + canadaPost.SavePathManifestShopCa, "Congratulation");
             showResult();
 
-            // set end of day button to enabled
+            // set end of day button to enabled and cursor to default state
             endOfDayButton.Enabled = true;
+            Cursor.Current = Cursors.Default;
+            #endregion
         }
 
         /* cancel shipment button click that mark the selected order to cancelled in database */

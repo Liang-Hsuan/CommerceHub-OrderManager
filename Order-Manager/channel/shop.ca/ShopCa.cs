@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Order_Manager.supportingClasses;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -276,7 +277,7 @@ namespace Order_Manager.channel.shop.ca
                 sftp.Get(SHIPMENT_DIR + "/" + file, filePath + "\\" + file);
 
                 // after download the file delete it on the server (no need it anymore)
-                // ServerDelete.delete(sftp.Host, sftp.Username, sftp.Password, SHIPMENT_DIR + "/" + file);
+                ServerDelete.delete(sftp.Host, sftp.Username, sftp.Password, SHIPMENT_DIR + "/" + file);
             }
 
             sftp.Close();
@@ -420,9 +421,9 @@ namespace Order_Manager.channel.shop.ca
             connection.Close();
 
             // upload file to sftp server
-            // sftp.Connect();
-            // sftp.Put(path, CONFIRM_DIR);
-            // sftp.Close();
+            sftp.Connect();
+            sftp.Put(path, CONFIRM_DIR);
+            sftp.Close();
         }
 
         /* a method that generate ShopCaValues object for the given order number (first version -> take from local) */
@@ -704,6 +705,44 @@ namespace Order_Manager.channel.shop.ca
                     command.ExecuteNonQuery();
                 }
             }
+        }
+
+        /* a method that delete obsolete orders in database and clear all local files */
+        public void delete()
+        {
+            #region Database Delete
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            {
+                // get all the transaction id that are obsolete
+                SqlCommand command = new SqlCommand("SELECT OrderId FROM ShopCa_Order WHERE CompleteDate < \'" + DateTime.Today.AddDays(-120).ToString("yyyy-MM-dd") + "\';", connection);
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                // add transaction id range
+                string range = "(";
+                while (reader.Read())
+                    range += '\'' + reader.GetString(0) + "\',";
+                reader.Close();
+
+                // the case if nothing to delete
+                if (range == "(") return;
+
+                range = range.Remove(range.Length - 1) + ')';
+
+                // delete items
+                command.CommandText = "DELETE FROM ShopCa_Order_Item WHERE OrderId IN " + range;
+                command.ExecuteNonQuery();
+
+                // delete orders
+                command.CommandText = "DELETE FROM ShopCa_Order WHERE OrderId IN " + range;
+                command.ExecuteNonQuery();
+            }
+            #endregion
+
+            // Local Delete ( not implemented )
+            /* DirectoryInfo di = new DirectoryInfo(newOrderDir);
+            foreach (FileInfo file in di.GetFiles())
+                file.Delete(); */
         }
     }
 }

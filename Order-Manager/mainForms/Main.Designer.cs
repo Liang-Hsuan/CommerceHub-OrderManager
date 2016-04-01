@@ -123,6 +123,10 @@
             this.chart.Series.Add(series3);
             this.chart.Size = new System.Drawing.Size(1404, 255);
             this.chart.TabIndex = 1;
+            this.chart.GetToolTipText += new System.EventHandler<System.Windows.Forms.DataVisualization.Charting.ToolTipEventArgs>(this.chart_GetToolTipText);
+            this.chart.MouseEnter += new System.EventHandler(this.chart_MouseEnter);
+            this.chart.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart_MouseMove);
+            this.chart.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.chart_MouseWheel);
             // 
             // listview
             // 
@@ -316,6 +320,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Order Manager - Dashboard";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Main_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.chart)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

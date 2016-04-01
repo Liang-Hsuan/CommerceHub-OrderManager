@@ -526,9 +526,9 @@ namespace Order_Manager.channel.sears
             connection.Close();
 
             // upload file to sftp server
-            // sftp.Connect();
-            // sftp.Put(path, CONFIRM_DIR);
-            // sftp.Close();
+            sftp.Connect();
+            sftp.Put(path, CONFIRM_DIR);
+            sftp.Close();
         }
 
         /* a method that generate SearsValues object for the given transaction number (first version -> take from local) */
@@ -921,33 +921,35 @@ namespace Order_Manager.channel.sears
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 // get all the transaction id that are obsolete
-                SqlCommand command = new SqlCommand("SELECT TransactionId FROM Sears_Order WHERE CompleteDate < \'" + DateTime.Today.AddDays(-120).ToString("yyyy-MM-dd") + "\';");
+                SqlCommand command = new SqlCommand("SELECT TransactionId FROM Sears_Order WHERE CompleteDate < \'" + DateTime.Today.AddDays(-120).ToString("yyyy-MM-dd") + "\'", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 
-                // add transaction id to list
-                List<string> list = new List<string>();
+                // add transaction id range
+                string range = "(";
                 while (reader.Read())
-                    list.Add(reader.GetString(0));
+                    range += '\'' + reader.GetString(0) + "\',";
+                reader.Close();
 
-                // start deleting
-                foreach (string transaction in list)
-                {
-                    // delete items
-                    command.CommandText = "DELETE FROM Sears_Order_Item WHERE TransactionId = \'" + transaction + "\';";
-                    command.ExecuteNonQuery();
+                // the case if nothing to delete
+                if (range == "(") return;
 
-                    // delete orders
-                    command.CommandText = "DELETE FROM Sears_Order WHERE TransactionId = \'" + transaction + "\';";
-                    command.ExecuteNonQuery();
-                }
+                range = range.Remove(range.Length - 1) + ')';
+
+                // delete items
+                command.CommandText = "DELETE FROM Sears_Order_Item WHERE TransactionId IN " + range;
+                command.ExecuteNonQuery();
+
+                // delete orders
+                command.CommandText = "DELETE FROM Sears_Order WHERE TransactionId IN " + range;
+                command.ExecuteNonQuery();
             }
             #endregion
 
-            // Local Delete
-            DirectoryInfo di = new DirectoryInfo(newOrderDir);
+            // Local Delete ( not implemented )
+            /* DirectoryInfo di = new DirectoryInfo(newOrderDir);
             foreach (FileInfo file in di.GetFiles())
-                file.Delete();
+                file.Delete(); */
         }
 
         /* a method that add a new transaction order to database */

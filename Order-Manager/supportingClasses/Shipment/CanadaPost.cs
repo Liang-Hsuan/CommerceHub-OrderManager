@@ -46,8 +46,8 @@ namespace Order_Manager.supportingClasses.Shipment
             // set error to false
             Error = false;
 
-            string uri = "https://ct.soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/shipment";
-            // string uri = "https://soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/shipment";
+            // string uri = "https://ct.soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/shipment";
+            string uri = "https://soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/shipment";
 
             // create http post request
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
@@ -228,8 +228,8 @@ namespace Order_Manager.supportingClasses.Shipment
             // set error to false
             Error = false;
 
-            string uri = "https://ct.soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/manifest";
-            // string uri = "https://soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/manifest";
+            // string uri = "https://ct.soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/manifest";
+            string uri = "https://soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/manifest";
 
             // create http post request
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);

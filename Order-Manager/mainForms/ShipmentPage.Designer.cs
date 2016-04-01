@@ -38,7 +38,6 @@
             this.voidShipmentButton = new System.Windows.Forms.Button();
             this.backButton = new System.Windows.Forms.Button();
             this.endOfDayButton = new System.Windows.Forms.Button();
-            this.backgroundWorkerEndofDay = new System.ComponentModel.BackgroundWorker();
             this.SuspendLayout();
             // 
             // listview
@@ -134,11 +133,6 @@
             this.endOfDayButton.UseVisualStyleBackColor = false;
             this.endOfDayButton.Click += new System.EventHandler(this.endOfDayButton_Click);
             // 
-            // backgroundWorkerEndofDay
-            // 
-            this.backgroundWorkerEndofDay.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorkerEndofDay_DoWork);
-            this.backgroundWorkerEndofDay.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorkerEndofDay_RunWorkerCompleted);
-            // 
             // ShipmentPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -171,6 +165,5 @@
         private System.Windows.Forms.ColumnHeader IdentificationHeader;
         private System.Windows.Forms.Button backButton;
         private System.Windows.Forms.Button endOfDayButton;
-        private System.ComponentModel.BackgroundWorker backgroundWorkerEndofDay;
     }
 }

@@ -92,6 +92,9 @@ namespace Order_Manager.mainForms
         /* the event for verify button click that show the result of the address validity */
         private void verifyButton_Click(object sender, EventArgs e)
         {
+            // set wait cursor
+            Cursor.Current = Cursors.WaitCursor;
+
             bool flag = true;
             switch (CHANNEL)
             {
@@ -115,6 +118,9 @@ namespace Order_Manager.mainForms
             }
 
             verifyTextbox.Visible = true;
+
+            // set default cursor after complete
+            Cursor.Current = Cursors.Default;
         }
 
         #region ListView Events
