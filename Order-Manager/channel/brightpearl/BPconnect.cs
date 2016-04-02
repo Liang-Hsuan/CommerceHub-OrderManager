@@ -381,7 +381,7 @@ namespace Order_Manager.channel.brightpearl
             /* post new address to API */
             public string postAddressRequest(Address address)
             {
-                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/contact-service/postal-address";
+                const string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/contact-service/postal-address";
 
                 request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Method = "POST";
@@ -412,7 +412,7 @@ namespace Order_Manager.channel.brightpearl
             /* post new customer to API */
             public string postContactRequest(string addressID, BPvalues value)
             {
-                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/contact-service/contact";
+                const string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/contact-service/contact";
 
                 request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Method = "POST";
@@ -447,7 +447,7 @@ namespace Order_Manager.channel.brightpearl
                 // reset boolean flag to false 
                 HasError = false;
 
-                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/order-service/order";
+                const string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/order-service/order";
 
                 request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Method = "POST";
@@ -663,7 +663,6 @@ namespace Order_Manager.channel.brightpearl
                 catch
                 {
                     HasError = true;
-                    return;
                 }
             }
         }

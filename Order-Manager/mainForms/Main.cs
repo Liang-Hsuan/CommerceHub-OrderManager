@@ -58,8 +58,8 @@ namespace Order_Manager.mainForms
         /* delete data that are too old after program is closed */
         private void Main_FormClosed(object sender, FormClosedEventArgs e)
         {
-            sears.delete();
-            shopCa.delete();
+            sears.Delete();
+            shopCa.Delete();
         }
         #endregion
 
@@ -473,24 +473,23 @@ namespace Order_Manager.mainForms
         private void chart_GetToolTipText(object sender, ToolTipEventArgs e)
         {
             //Check selected chart element is a data point and set tooltip text
-            if (e.HitTestResult.ChartElementType == ChartElementType.DataPoint)
+            if (e.HitTestResult.ChartElementType != ChartElementType.DataPoint) return;
+
+            //Get selected data point
+            DataPoint dataPoint = (DataPoint)e.HitTestResult.Object;
+
+            // point case
+            foreach (DataPoint point in chart.Series["point"].Points)
             {
-                //Get selected data point
-                DataPoint dataPoint = (DataPoint)e.HitTestResult.Object;
+                if ((dataPoint.XValue >= point.XValue - 1 || dataPoint.XValue <= point.XValue + 1) && dataPoint.YValues.Equals(point.YValues))
+                    e.Text = "Daily Number of Orders: " + dataPoint.YValues[0];
+            }
 
-                // point case
-                foreach (DataPoint point in chart.Series["point"].Points)
-                {
-                    if ((dataPoint.XValue >= point.XValue - 1 || dataPoint.XValue <= point.XValue + 1) && dataPoint.YValues.Equals(point.YValues))
-                        e.Text = "Daily Number of Orders: " + dataPoint.YValues[0];
-                }
-
-                // shipment case
-                foreach (DataPoint point in chart.Series["shipment"].Points)
-                {
-                    if ((dataPoint.XValue >= point.XValue - 1 || dataPoint.XValue <= point.XValue + 1) && dataPoint.YValues.Equals(point.YValues))
-                        e.Text = "Daily Number of Shipments: " + dataPoint.YValues[0];
-                }
+            // shipment case
+            foreach (DataPoint point in chart.Series["shipment"].Points)
+            {
+                if ((dataPoint.XValue >= point.XValue - 1 || dataPoint.XValue <= point.XValue + 1) && dataPoint.YValues.Equals(point.YValues))
+                    e.Text = "Daily Number of Shipments: " + dataPoint.YValues[0];
             }
         }
 

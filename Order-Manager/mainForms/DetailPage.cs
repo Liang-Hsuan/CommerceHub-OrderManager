@@ -485,46 +485,46 @@ namespace Order_Manager.mainForms
             ConfirmPanel confirm = new ConfirmPanel("Are you sure you want to ship this order ?");
             confirm.ShowDialog(this);
 
-            if (confirm.DialogResult == DialogResult.OK)
+            // get user confirmation
+            if (confirm.DialogResult != DialogResult.OK) return;
+
+            // start timer
+            timerConfirm.Start();
+
+            // generate cancel list
+            cancelList = new Dictionary<int, string>();
+            for (int i = 0; i < listview.Items.Count; i++)
             {
-                // start timer
-                timerConfirm.Start();
+                if (listview.Items[i].SubItems[5].Text != "Cancelled") continue;
+                string reason = listview.Items[i].SubItems[6].Text;
 
-                // generate cancel list
-                cancelList = new Dictionary<int, string>();
-                for (int i = 0; i < listview.Items.Count; i++)
+                // the case if the user has not provide the reason for cancelling a item
+                if (reason == "")
                 {
-                    if (listview.Items[i].SubItems[5].Text != "Cancelled") continue;
-                    string reason = listview.Items[i].SubItems[6].Text;
-
-                    // the case if the user has not provide the reason for cancelling a item
-                    if (reason == "")
-                    {
-                        MessageBox.Show("Please provide the reason of cancellation", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-
-                    cancelList.Add(i, reason);
-                }
-
-                // error check for non shipped items
-                if (CHANNEL == "Sears" && cancelList.Count < searsValues.LineCount && searsValues.Package.TrackingNumber == "")
-                {
-                    MessageBox.Show("There are items that are not shipped", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-                if (CHANNEL == "Shop.ca" && cancelList.Count < shopCaValues.OrderItemId.Count && shopCaValues.Package.TrackingNumber == "")
-                {
-                    MessageBox.Show("There are items that are not shipped", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Please provide the reason of cancellation", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                progressbar.Visible = true;
-
-                // call background worker
-                if (!backgroundWorkerConfirm.IsBusy)
-                    backgroundWorkerConfirm.RunWorkerAsync();
+                cancelList.Add(i, reason);
             }
+
+            // error check for non shipped items
+            if (CHANNEL == "Sears" && cancelList.Count < searsValues.LineCount && searsValues.Package.TrackingNumber == "")
+            {
+                MessageBox.Show("There are items that are not shipped", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (CHANNEL == "Shop.ca" && cancelList.Count < shopCaValues.OrderItemId.Count && shopCaValues.Package.TrackingNumber == "")
+            {
+                MessageBox.Show("There are items that are not shipped", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            progressbar.Visible = true;
+
+            // call background worker
+            if (!backgroundWorkerConfirm.IsBusy)
+                backgroundWorkerConfirm.RunWorkerAsync();
         }
         private void backgroundWorkerConfirm_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {

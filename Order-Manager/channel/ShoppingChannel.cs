@@ -9,6 +9,7 @@ namespace Order_Manager.channel
     {
         /* inherent methods */
         public abstract void GetOrder();
+        public abstract void Delete();
         public abstract int GetNumberOfOrder(DateTime time);
         public abstract int GetNumberOfShipped(DateTime time);
 

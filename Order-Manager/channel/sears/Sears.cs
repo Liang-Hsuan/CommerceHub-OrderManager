@@ -915,7 +915,7 @@ namespace Order_Manager.channel.sears
         #endregion
 
         /* a method that delete obsolete orders in database and clear all local files */
-        public void delete()
+        public override void Delete()
         {
             #region Database Delete
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))

@@ -10,6 +10,9 @@ namespace Order_Manager.channel
         /* method that get all new order */
         void GetOrder();
 
+        /* method that delete old data */
+        void Delete();
+
         /* methods for getting number of order and shipment for a particular date */
         int GetNumberOfOrder(DateTime time);
         int GetNumberOfShipped(DateTime time);
