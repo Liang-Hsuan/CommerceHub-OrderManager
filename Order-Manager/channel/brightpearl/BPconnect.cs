@@ -8,6 +8,8 @@ using System.Threading;
 using Order_Manager.channel.sears;
 using Order_Manager.supportingClasses.Address;
 using Order_Manager.channel.shop.ca;
+using System.Web.Script.Serialization;
+using System.Collections.Generic;
 
 namespace Order_Manager.channel.brightpearl
 {
@@ -55,14 +57,14 @@ namespace Order_Manager.channel.brightpearl
             // post order
             string orderId = post.postOrderRequest("2854", orderValue);
             Status = "Getting order ID - Sears";
-            if (orderId == "Error")
+            if (post.HasError)
             {
                 Status = "Error occur during order post - Sears";
                 do
                 {
                     Thread.Sleep(5000);
                     orderId = post.postOrderRequest("2854", orderValue);
-                } while (orderId == "Error");
+                } while (post.HasError);
             }
 
             // calculate the total amount when excluding the cancelled items
@@ -71,24 +73,20 @@ namespace Order_Manager.channel.brightpearl
                 // the case if not cancel post it to brightpearl
                 if (cancelList.Where(j => j == i).Any()) continue;
 
-                // price calculation ( no use rigth now )
-                // double tax = value.GST_HST_Extended[i] + value.PST_Extended[i] + value.GST_HST_Total[i] + value.PST_Total[i];
-                // double netPrice = value.UnitPrice[i] * value.TrxQty[i];
-
                 // initialize BPvalues object -> no need tax and total paid ( this is unit cost & no recipt )
                 BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], value.TrxUnitCost[i], 0, 0);
 
                 // post order row
                 string orderRowId = post.postOrderRowRequest(orderId, itemValue);
                 Status = "Getting order row ID";
-                if (orderRowId == "Error")
+                if (post.HasError)
                 {
                     Status = "Error occur during order row post " + i + " - Sears";
                     do
                     {
                         Thread.Sleep(5000);
                         orderRowId = post.postOrderRowRequest(orderId, itemValue);
-                    } while (orderRowId == "Error");
+                    } while (post.HasError);
                 }
 
                 // post reservation
@@ -104,23 +102,6 @@ namespace Order_Manager.channel.brightpearl
                     } while (post.HasError);
                 }
             }
-
-            /* ( no need to post receipt for sears )
-            // set total paid to bp value
-            orderValue.TotalPaid = total;
-
-            // post receipt
-            post.postReceipt(orderId, "2854", orderValue);
-            Status = "Posting receipt";
-            if (post.HasError)
-            {
-                Status = "Error occur during receipt post";
-                do
-                {
-                    Thread.Sleep(5000);
-                    post.postReceipt(orderId, "2854", orderValue);
-                } while (post.HasError);
-            } */
             #endregion
         }
 
@@ -240,33 +221,24 @@ namespace Order_Manager.channel.brightpearl
                 response = (HttpWebResponse)request.GetResponse();
 
                 // read all the text from JSON response
-                string textJSON;
+                string textJson;
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-                    textJSON = streamReader.ReadToEnd();
+                    textJson = streamReader.ReadToEnd();
 
-                // check if there is result return or not
-                textJSON = substringMethod(textJSON, "resultsReturned", 17);
-                int number = Convert.ToInt32(getTarget(textJSON));
+                // deserialize json to key value
+                var info = new JavaScriptSerializer().Deserialize<Dictionary<string, dynamic>>(textJson);
 
-                // the case if there is no result found, just return 
+                // get the number of result
+                int number = info["response"]["metaData"]["resultsAvailable"];
+
+                // the case there is no customer exists
                 if (number < 1)
                     return null;
 
-                // start getting customer id
-                // this is for the first id
+                // start getting id
                 string[] list = new string[number];
-                textJSON = substringMethod(textJSON, "results\":", 11);
-                list[0] = getTarget(textJSON);
-                textJSON = substringMethod(textJSON, "],[", 3);
-
-                // proceed to next token and get the id (if have more than 1)
-                for (int i = 1; i < number; i++)
-                {
-                    list[i] = getTarget(textJSON);
-
-                    // proceed to next token
-                    textJSON = substringMethod(textJSON, "],[", 3);
-                }
+                for (int i = 0; i < number; i++)
+                    list[i] = info["response"]["results"][i][0].ToString();
                 #endregion
 
                 #region Postal Code Compare
@@ -277,8 +249,6 @@ namespace Order_Manager.channel.brightpearl
                     uri += list[i] + ',';
 
                 uri = uri.Remove(uri.LastIndexOf(',')) + "?includeOptional=customFields,postalAddresses";
-                Console.WriteLine(uri);
-                Console.ReadLine();
 
                 request = WebRequest.Create(uri);
                 request.Headers.Add("brightpearl-app-ref", appRef);
@@ -290,31 +260,21 @@ namespace Order_Manager.channel.brightpearl
 
                 // read all the text from JSON response
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-                    textJSON = streamReader.ReadToEnd();
+                    textJson = streamReader.ReadToEnd();
+
+                // deserialize json to key value
+                info = new JavaScriptSerializer().Deserialize<Dictionary<string, dynamic>>(textJson);
 
                 // looping through each customer's postal code to see if the cutomer exist in these IDs
                 for (int i = 0; i < number; i++)
                 {
-                    // cut the string to the cloest id 
-                    textJSON = substringMethod(textJSON, "\"contactId\":", 11);
+                    // get address id to get postal code
+                    string address = info["response"][i]["postAddressIds"]["DEF"].ToString();
 
-                    // get the text only for the current contact id
-                    string copy;
-                    if (textJSON.Contains("contactId"))
-                        copy = textJSON.Remove(textJSON.IndexOf("contactId"));
-                    else
-                        copy = textJSON;
+                    // get postal code
+                    address = info["response"][0]["postalAddresses"][address]["postalCode"];
 
-                    // postal code get
-                    if (copy.Contains("postalCode"))
-                    {
-                        copy = substringMethod(copy, "postalCode", 13);
-                        copy = getTarget(copy);
-                    }
-                    else
-                        copy = "";
-
-                    if (postalCode.Replace(" ", string.Empty) == copy.Replace(" ", string.Empty))
+                    if (string.Equals(postalCode.Replace(" ", string.Empty), address.Replace(" ", string.Empty), StringComparison.CurrentCultureIgnoreCase))
                         return list[i];
                 }
                 #endregion
@@ -337,19 +297,15 @@ namespace Order_Manager.channel.brightpearl
                 response = (HttpWebResponse)request.GetResponse();
 
                 // read all the text from JSON response
-                string textJSON;
+                string textJson;
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-                    textJSON = streamReader.ReadToEnd();
+                    textJson = streamReader.ReadToEnd();
 
-                // check if there is result return or not
-                textJSON = substringMethod(textJSON, "resultsReturned", 17);
-                if (Convert.ToInt32(getTarget(textJSON)) < 1)
-                    return null;
+                // deserialize json to key value
+                var info = new JavaScriptSerializer().Deserialize<Dictionary<string, dynamic>>(textJson);
 
-                // getting product id
-                textJSON = substringMethod(textJSON, "\"results\":", 12);
-
-                return getTarget(textJSON);
+                // the case there is no product exists
+                return info["response"]["metaData"]["resultsAvailable"] < 1 ? null : info["response"]["results"][0][0].ToString();
             }
         }
 

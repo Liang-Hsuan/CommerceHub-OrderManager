@@ -1,10 +1,11 @@
 ﻿using Order_Manager.channel.shop.ca;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
+using System.Xml;
 
 namespace Order_Manager.supportingClasses.Shipment
 {
@@ -158,20 +159,21 @@ namespace Order_Manager.supportingClasses.Shipment
 
             // get tracking pin, refund link and label link
             string[] returnString = new string[3];
+            doc.LoadXml(result);
 
             // tracking pin
-            result = substringMethod(result, "<tracking-pin>", 14);
-            returnString[0] = getTarget(result);
+            XmlNode node = doc.SelectSingleNode("/shipment-info");
+            returnString[0] = node["tracking-pin"].InnerText;
 
-            // refund link
-            result = substringMethod(result, "\"self\"", 6);
-            result = substringMethod(result, "href=", 6);
-            returnString[1] = getTarget(result);
-
-            // label link
-            result = substringMethod(result, "\"label\"", 7);
-            result = substringMethod(result, "href=", 6);
-            returnString[2] = getTarget(result);
+            // self and label links
+            node = doc.SelectSingleNode("/shipment-info/links");
+            foreach (XmlNode child in node)
+            {
+                if (child.Attributes["rel"].Value == "self")
+                    returnString[1] = child.Attributes["href"].Value;
+                else if (child.Attributes["rel"].Value == "label")
+                    returnString[2] = child.Attributes["href"].Value;
+            }
 
             return returnString;
         }
@@ -288,15 +290,11 @@ namespace Order_Manager.supportingClasses.Shipment
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 result = streamReader.ReadToEnd();
 
-            // declare list and starting collecting manifest links
-            List<string> list = new List<string>();
-            while (result.Contains("rel=\"manifest\""))
-            {
-                result = substringMethod(result, "href=", 6);
-                list.Add(getTarget(result));
-            } 
+            // read all the links in the xml
+            doc.LoadXml(result);
+            XmlNode node = doc.SelectSingleNode("/manifests");
 
-            return list.ToArray();
+            return (from XmlNode child in node select child.Attributes["href"].Value).ToArray();
         }
 
         /* a method that get artifact link for the given manifest link */
@@ -334,10 +332,11 @@ namespace Order_Manager.supportingClasses.Shipment
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 result = streamReader.ReadToEnd();
 
-            // get the artifact link and return it
-            result = substringMethod(result, "rel=\"artifact\"", 14);
-            result = substringMethod(result, "href=", 6);
-            return getTarget(result);
+            // read all the links
+            doc.LoadXml(result);
+            XmlNode node = doc.SelectSingleNode("/manifest/links");
+
+            return node.Cast<XmlNode>().Where(child => child.Attributes["rel"].Value == "artifact").Select(child => child.Attributes["href"].Value).FirstOrDefault();
         }
         #endregion
 

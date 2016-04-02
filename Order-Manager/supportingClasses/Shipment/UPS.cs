@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using Order_Manager.channel.sears;
+using System.Xml;
 
 namespace Order_Manager.supportingClasses.Shipment
 {
@@ -57,7 +58,7 @@ namespace Order_Manager.supportingClasses.Shipment
             request.Method = "POST";
             request.ContentType = "application/xml";
 
-            string textXML =
+            string textXml =
                 "<?xml version=\"1.0\"?>" +
                 "<AccessRequest xml:lang=\"en-US\">" +
                 "<AccessLicenseNumber>" + ACCESS_LISCENSE_NUMBER + "</AccessLicenseNumber>" +
@@ -89,8 +90,8 @@ namespace Order_Manager.supportingClasses.Shipment
                 "<Address>" +
                 "<AddressLine1>" + value.ShipTo.Address1 + "</AddressLine1>";
             if (value.ShipTo.Address2 != "")
-                textXML += "<AddressLine2>" + value.ShipTo.Address2 + "</AddressLine2>";
-            textXML +=
+                textXml += "<AddressLine2>" + value.ShipTo.Address2 + "</AddressLine2>";
+            textXml +=
             "<City>" + value.ShipTo.City + "</City>" +
             "<StateProvinceCode>" + value.ShipTo.State + "</StateProvinceCode>" +
             "<PostalCode>" + value.ShipTo.PostalCode + "</PostalCode>" +
@@ -129,7 +130,7 @@ namespace Order_Manager.supportingClasses.Shipment
                     break;
             }
 
-            textXML +=
+            textXml +=
             "<Code>" + code + "</Code>" +
             "</Service>" +
             "<Package>";
@@ -150,7 +151,7 @@ namespace Order_Manager.supportingClasses.Shipment
                     break;
             }
 
-            textXML +=
+            textXml +=
             "<PackagingType>" +
             "<Code>" + code + "</Code>" +
             "</PackagingType>" +
@@ -181,7 +182,7 @@ namespace Order_Manager.supportingClasses.Shipment
             "</ShipmentConfirmRequest>";
 
             // turn request string into a byte stream
-            byte[] postBytes = Encoding.UTF8.GetBytes(textXML);
+            byte[] postBytes = Encoding.UTF8.GetBytes(textXml);
 
             // send request
             using (Stream requestStream = request.GetRequestStream())
@@ -206,25 +207,27 @@ namespace Order_Manager.supportingClasses.Shipment
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 result = streamReader.ReadToEnd();
 
-            // get the response stattus
-            result = substringMethod(result, "ResponseStatusCode", 19);
-            string responseStatus = getTarget(result);
+            // read xml
+            doc.LoadXml(result);
+
+            // get status code
+            XmlNode node = doc.SelectSingleNode("/ShipmentConfirmResponse/Response");
+            string responseStatus = node["ResponseStatusCode"].InnerText;
 
             // get identification number and shipment digest
             string[] returnString = new string[2];
             if (responseStatus == "1")
             {
-                result = substringMethod(result, "ShipmentIdentificationNumber", 29);
-                returnString[0] = getTarget(result);
+                node = doc.SelectSingleNode("/ShipmentConfirmResponse");
 
-                result = substringMethod(result, "ShipmentDigest", 15);
-                returnString[1] = getTarget(result);
+                returnString[0] = node["ShipmentIdentificationNumber"].InnerText;
+                returnString[1] = node["ShipmentDigest"].InnerText;
             }
             else
             {
                 // the case if bad request -> set error indication
                 Error = true;
-                ErrorMessage = "Error: " + getTarget(substringMethod(result, "ErrorDescription", 17));
+                ErrorMessage = "Error: " + node["Error"]["ErrorDescription"].InnerText;
                 return null;
             }
 
@@ -244,7 +247,7 @@ namespace Order_Manager.supportingClasses.Shipment
             request.Method = "POST";
             request.ContentType = "application/xml";
 
-            string textXML =
+            string textXml =
                "<?xml version=\"1.0\"?>" +
                "<AccessRequest xml:lang=\"en-US\">" +
                "<AccessLicenseNumber>" + ACCESS_LISCENSE_NUMBER + "</AccessLicenseNumber>" +
@@ -260,7 +263,7 @@ namespace Order_Manager.supportingClasses.Shipment
                "</ShipmentDigest></ShipmentAcceptRequest>";
 
             // turn request string into a byte stream
-            byte[] postBytes = Encoding.UTF8.GetBytes(textXML);
+            byte[] postBytes = Encoding.UTF8.GetBytes(textXml);
 
             // send request
             using (Stream requestStream = request.GetRequestStream())
@@ -273,25 +276,27 @@ namespace Order_Manager.supportingClasses.Shipment
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 result = streamReader.ReadToEnd();
 
-            // get the response stattus
-            result = substringMethod(result, "ResponseStatusCode", 19);
-            string responseStatus = getTarget(result);
+            // read xml
+            doc.LoadXml(result);
+
+            // get status code
+            XmlNode node = doc.SelectSingleNode("/ShipmentAcceptResponse/Response");
+            string responseStatus = node["ResponseStatusCode"].InnerText;
 
             // get tracking number and image
             string[] text = new string[2];
             if (responseStatus == "1")
             {
-                result = substringMethod(result, "TrackingNumber", 15);
-                text[0] = getTarget(result);
+                node = doc.SelectSingleNode("/ShipmentAcceptResponse/ShipmentResults/PackageResults");
 
-                result = substringMethod(result, "GraphicImage", 13);
-                text[1] = getTarget(result);
+                text[0] = node["TrackingNumber"].InnerText;
+                text[1] = node["LabelImage"]["GraphicImage"].InnerText;
             }
             else
             {
                 // the case if server error -> set error indication
                 Error = true;
-                ErrorMessage = "Server Internal Error";
+                ErrorMessage = "Error: " + node["Error"]["ErrorDescription"].InnerText;
                 return null;
             }
 
@@ -311,7 +316,7 @@ namespace Order_Manager.supportingClasses.Shipment
             request.Method = "POST";
             request.ContentType = "application/xml";
 
-            string textXML =
+            string textXml =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<AccessRequest xml:lang=\"en-US\">" +
                 "<AccessLicenseNumber>" + ACCESS_LISCENSE_NUMBER + "</AccessLicenseNumber>" +
@@ -327,7 +332,7 @@ namespace Order_Manager.supportingClasses.Shipment
                 "</VoidShipmentRequest>";
 
             // turn request string into a byte stream
-            byte[] postBytes = Encoding.UTF8.GetBytes(textXML);
+            byte[] postBytes = Encoding.UTF8.GetBytes(textXml);
 
             // send request
             using (Stream requestStream = request.GetRequestStream())
@@ -340,14 +345,18 @@ namespace Order_Manager.supportingClasses.Shipment
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 result = streamReader.ReadToEnd();
 
-            // get the response stattus
-            result = substringMethod(result, "ResponseStatusCode", 19);
-            string responseStatus = getTarget(result);
+            // read xml
+            doc.LoadXml(result);
+
+            // get status code
+            XmlNode node = doc.SelectSingleNode("/VoidShipmentResponse/Response");
+            string responseStatus = node["ResponseStatusCode"].InnerText;
+
+            if (responseStatus == "1") return;
 
             // the case is bad request -> set error indication
-            if (responseStatus == "1") return;
             Error = true;
-            ErrorMessage =  "Error: " + getTarget(substringMethod(result, "ErrorDescription", 17));
+            ErrorMessage = "Error: " + node["Error"]["ErrorDescription"].InnerText;
         }
         #endregion
 
