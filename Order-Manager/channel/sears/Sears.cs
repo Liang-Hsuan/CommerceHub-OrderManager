@@ -46,10 +46,10 @@ namespace Order_Manager.channel.sears
             #endregion
 
             // get credentials for sears sftp log on and initialize the field
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.ASCMcs))
+            using (SqlConnection authCon = new SqlConnection(Properties.Settings.Default.ASCMcs))
             {
-                SqlCommand command = new SqlCommand("SELECT Field1_Value, Field2_Value, Field3_Value FROM ASCM_Credentials WHERE Source = 'CommerceHub' and Client = 'Sears';", connection);
-                connection.Open();
+                SqlCommand command = new SqlCommand("SELECT Field1_Value, Field2_Value, Field3_Value FROM ASCM_Credentials WHERE Source = 'CommerceHub' and Client = 'Sears';", authCon);
+                authCon.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 reader.Read();
 
@@ -244,7 +244,7 @@ namespace Order_Manager.channel.sears
 
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("SELECT COUNT(*) FROM Sears_Order WHERE CustOrderDate = \'" + time.ToString("yyyy-MM-dd") + "\';", connection);
+                SqlCommand command = new SqlCommand( "SELECT COUNT(*) FROM Sears_Order WHERE CustOrderDate = \'" + time.ToString("yyyy-MM-dd") + "\';", connection);
                 connection.Open();
 
                 count = (int) command.ExecuteScalar();
@@ -270,7 +270,7 @@ namespace Order_Manager.channel.sears
 
         #region Get Order Information
         /* method that get the new order from sftp server */
-        private void getOrder(string filePath, string[] fileList)
+        private void getOrder(string filePath, IEnumerable<string> fileList)
         {
             // connection to sftp server and read all the list of file
             sftp.Connect();
@@ -303,7 +303,7 @@ namespace Order_Manager.channel.sears
         }
 
         /* method that get all the transaction in the file */
-        private static string[] getTransactionId(string[] fileText)
+        private static string[] getTransactionId(IEnumerable<string> fileText)
         {
             // local field for storing data
             List<string> list = new List<string>();
@@ -356,8 +356,11 @@ namespace Order_Manager.channel.sears
         }
 
         /* a method that receive all the current transaction and check the duplicate then only return the ones that have not been added to the database */
-        private static string[] checkTransaction(string[] allTransactionList)
+        private string[] checkTransaction(string[] allTransactionList)
         {
+            // input error check
+            if (allTransactionList == null) throw new ArgumentNullException(nameof(allTransactionList));
+
             // get all complete transaction 
             List<string> completeTransactionList = new List<string>();
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
@@ -384,8 +387,7 @@ namespace Order_Manager.channel.sears
 
             // fields for database update
             SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs);
-            SqlCommand command = new SqlCommand();
-            command.Connection = connection;
+            SqlCommand command = new SqlCommand {Connection = connection};
             connection.Open();
 
             #region XML Generation and Item Database Update

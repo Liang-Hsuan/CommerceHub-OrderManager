@@ -472,24 +472,30 @@ namespace Order_Manager.mainForms
         /* tooltip event for the chart that show the tooptip for the mouse value on */
         private void chart_GetToolTipText(object sender, ToolTipEventArgs e)
         {
-            //Check selected chart element is a data point and set tooltip text
+            // Check selected chart element is a data point and set tooltip text
             if (e.HitTestResult.ChartElementType != ChartElementType.DataPoint) return;
 
-            //Get selected data point
+            // Get selected data point
             DataPoint dataPoint = (DataPoint)e.HitTestResult.Object;
 
             // point case
             foreach (DataPoint point in chart.Series["point"].Points)
             {
                 if ((dataPoint.XValue >= point.XValue - 1 || dataPoint.XValue <= point.XValue + 1) && dataPoint.YValues.Equals(point.YValues))
-                    e.Text = "Daily Number of Orders: " + dataPoint.YValues[0];
+                {
+                    DateTime time = DateTime.ParseExact(point.AxisLabel, "MM/dd/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                    e.Text = "Order\nSears: " + sears.GetNumberOfOrder(time) + ", Shop.ca: " + shopCa.GetNumberOfOrder(time);
+                }
             }
 
             // shipment case
             foreach (DataPoint point in chart.Series["shipment"].Points)
             {
                 if ((dataPoint.XValue >= point.XValue - 1 || dataPoint.XValue <= point.XValue + 1) && dataPoint.YValues.Equals(point.YValues))
-                    e.Text = "Daily Number of Shipments: " + dataPoint.YValues[0];
+                {
+                    DateTime time = DateTime.ParseExact(point.AxisLabel, "MM/dd/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                    e.Text = "Shipment\nSears" + sears.GetNumberOfShipped(time) + ", Shop.ca: " + shopCa.GetNumberOfOrder(time);
+                }
             }
         }
 
