@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.Windows.Forms;
 using Order_Manager.mainForms;
@@ -67,7 +68,7 @@ namespace Order_Manager
         }
 
         /* a supporting method that see if the connection is valid or not */
-        private bool isConnected(SqlConnection connection)
+        private static bool isConnected(IDbConnection connection)
         {
             try
             {

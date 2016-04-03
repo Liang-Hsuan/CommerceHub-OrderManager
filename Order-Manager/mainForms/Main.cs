@@ -472,31 +472,17 @@ namespace Order_Manager.mainForms
         /* tooltip event for the chart that show the tooptip for the mouse value on */
         private void chart_GetToolTipText(object sender, ToolTipEventArgs e)
         {
-            // Check selected chart element is a data point and set tooltip text
+            // check selected chart element is a data point and set tooltip text
             if (e.HitTestResult.ChartElementType != ChartElementType.DataPoint) return;
 
-            // Get selected data point
+            // get selected data point and its x-axis label
             DataPoint dataPoint = (DataPoint)e.HitTestResult.Object;
+            DateTime time = DateTime.ParseExact(dataPoint.AxisLabel, "MM/dd/yyyy", System.Globalization.CultureInfo.InvariantCulture);
 
-            // point case
-            foreach (DataPoint point in chart.Series["point"].Points)
-            {
-                if ((dataPoint.XValue >= point.XValue - 1 || dataPoint.XValue <= point.XValue + 1) && dataPoint.YValues.Equals(point.YValues))
-                {
-                    DateTime time = DateTime.ParseExact(point.AxisLabel, "MM/dd/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                    e.Text = "Order\nSears: " + sears.GetNumberOfOrder(time) + ", Shop.ca: " + shopCa.GetNumberOfOrder(time);
-                }
-            }
-
-            // shipment case
-            foreach (DataPoint point in chart.Series["shipment"].Points)
-            {
-                if ((dataPoint.XValue >= point.XValue - 1 || dataPoint.XValue <= point.XValue + 1) && dataPoint.YValues.Equals(point.YValues))
-                {
-                    DateTime time = DateTime.ParseExact(point.AxisLabel, "MM/dd/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                    e.Text = "Shipment\nSears" + sears.GetNumberOfShipped(time) + ", Shop.ca: " + shopCa.GetNumberOfOrder(time);
-                }
-            }
+            if (chart.Series["point"].Points.Contains(dataPoint))
+                e.Text = "Order\nSears: " + sears.GetNumberOfOrder(time) + ", Shop.ca: " + shopCa.GetNumberOfOrder(time);
+            else if (chart.Series["shipment"].Points.Contains(dataPoint))
+                e.Text = "Shipment\nSears" + sears.GetNumberOfShipped(time) + ", Shop.ca: " + shopCa.GetNumberOfOrder(time);
         }
 
         /* mouse wheel event on the chart that zoom in and out */

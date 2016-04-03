@@ -124,11 +124,10 @@ namespace Order_Manager.mainForms
                 manifestList.Add(canadaPost.getManifest(manifest));
 
                 // error check 2
-                if (canadaPost.Error)
-                {
-                    MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+                if (!canadaPost.Error) continue;
+
+                MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
             Thread.Sleep(5000);

@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Web.Script.Serialization;
 
 namespace Order_Manager.supportingClasses.Address
 {
@@ -16,7 +18,7 @@ namespace Order_Manager.supportingClasses.Address
         public static bool validate(Address address)
         {
             // generate uri
-            string uri = "https://maps.googleapis.com/maps/api/geocode/xml?address=";
+            string uri = "https://maps.googleapis.com/maps/api/geocode/json?address=";
 
             uri += address.Address1.Replace(' ', '+') + ",";
             uri += address.City.Replace(' ', '+') + ",";
@@ -35,22 +37,11 @@ namespace Order_Manager.supportingClasses.Address
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 result = streamReader.ReadToEnd();
 
-            // counting the number of result -> the count must be 1 in order to be valid
-            int count = 0;
-            while (result.Contains("<result>"))
-            {
-                count++;
-                result = substringMethod(result, "</result>", 8);
-            }
+            // deserialize json to key value
+            var info = new JavaScriptSerializer().Deserialize<Dictionary<string, dynamic>>(result);
 
             // only has 1 result will be the correct value
-            return count == 1;
-        }
-
-        /* a method that substring the given string */
-        private static string substringMethod(string original, string startingString, int additionIndex)
-        {
-            return  original.Substring(original.IndexOf(startingString) + additionIndex);
+            return info["results"].Count == 1;
         }
     }
 }

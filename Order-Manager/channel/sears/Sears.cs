@@ -541,291 +541,290 @@ namespace Order_Manager.channel.sears
 
             foreach (string text in textXml)
             {
+                if (!text.Contains(targetTransaction)) continue;
+
                 // field target text file that has the transaction
-                if (text.Contains(targetTransaction))
+                string copy = text;
+
+                // transaction id
+                copy = substringMethod(copy, targetTransaction, 0);
+                copy = copy.Remove(copy.IndexOf("/hubOrder>"));
+                value.TransactionID = getTarget(copy);
+
+                // line count
+                copy = substringMethod(copy, "lineCount", 10);
+                value.LineCount = Convert.ToInt32(getTarget(copy));
+
+                // po number
+                copy = substringMethod(copy, "poNumber", 9);
+                value.PoNumber = getTarget(copy);
+
+                // order date
+                copy = substringMethod(copy, "orderDate", 10);
+                value.OrderDate = DateTime.ParseExact(getTarget(copy), "yyyyMMdd", CultureInfo.InvariantCulture);
+
+                // payment method
+                copy = substringMethod(copy, "paymentMethod", 14);
+                value.PaymentMethod = getTarget(copy);
+
+                // ship to person place id
+                copy = substringMethod(copy, "shipTo personPlaceID", 22);
+                string shipToId = getTarget(copy);
+
+                // bill to person place id 
+                copy = substringMethod(copy, "billTo personPlaceID", 22);
+                string billToId = getTarget(copy);
+
+                // customer person place id 
+                copy = substringMethod(copy, "customer personPlaceID", 24);
+                string customerPlaceId = getTarget(copy);
+
+                // cust order number
+                copy = substringMethod(copy, "custOrderNumber", 16);
+                value.CustOrderNumber = getTarget(copy);
+
+                // cust order date
+                copy = substringMethod(copy, "custOrderDate", 14);
+                value.CustOrderDate = DateTime.ParseExact(getTarget(copy), "yyyyMMdd", CultureInfo.InvariantCulture);
+
+                // pack slip message
+                copy = substringMethod(copy, "packslipMessage", 16);
+                value.PackSlipMessage = getTarget(copy);
+
+                // get info for each line count
+                for (int i = 1; i <= value.LineCount; i++)
                 {
-                    string copy = text;
+                    // order line number
+                    copy = substringMethod(copy, "merchantLineNumber", 19);
+                    value.MerchantLineNumber.Add(Convert.ToInt32(getTarget(copy)));
 
-                    // transaction id
-                    copy = substringMethod(copy, targetTransaction, 0);
-                    copy = copy.Remove(copy.IndexOf("/hubOrder>"));
-                    value.TransactionID = getTarget(copy);
+                    // trx qty
+                    copy = substringMethod(copy, "qtyOrdered", 11);
+                    value.TrxQty.Add(Convert.ToInt32(getTarget(copy)));
 
-                    // line count
-                    copy = substringMethod(copy, "lineCount", 10);
-                    value.LineCount = Convert.ToInt32(getTarget(copy));
-
-                    // po number
-                    copy = substringMethod(copy, "poNumber", 9);
-                    value.PoNumber = getTarget(copy);
-
-                    // order date
-                    copy = substringMethod(copy, "orderDate", 10);
-                    value.OrderDate = DateTime.ParseExact(getTarget(copy), "yyyyMMdd", CultureInfo.InvariantCulture);
-
-                    // payment method
-                    copy = substringMethod(copy, "paymentMethod", 14);
-                    value.PaymentMethod = getTarget(copy);
-
-                    // ship to person place id
-                    copy = substringMethod(copy, "shipTo personPlaceID", 22);
-                    string shipToId = getTarget(copy);
-
-                    // bill to person place id 
-                    copy = substringMethod(copy, "billTo personPlaceID", 22);
-                    string billToId = getTarget(copy);
-
-                    // customer person place id 
-                    copy = substringMethod(copy, "customer personPlaceID", 24);
-                    string customerPlaceId = getTarget(copy);
-
-                    // cust order number
-                    copy = substringMethod(copy, "custOrderNumber", 16);
-                    value.CustOrderNumber = getTarget(copy);
-
-                    // cust order date
-                    copy = substringMethod(copy, "custOrderDate", 14);
-                    value.CustOrderDate = DateTime.ParseExact(getTarget(copy), "yyyyMMdd", CultureInfo.InvariantCulture);
-
-                    // pack slip message
-                    copy = substringMethod(copy, "packslipMessage", 16);
-                    value.PackSlipMessage = getTarget(copy);
-
-                    // get info for each line count
-                    for (int i = 1; i <= value.LineCount; i++)
+                    // upc
+                    if (copy.Contains("UPC"))
                     {
-                        // order line number
-                        copy = substringMethod(copy, "merchantLineNumber", 19);
-                        value.MerchantLineNumber.Add(Convert.ToInt32(getTarget(copy)));
+                        copy = substringMethod(copy, "UPC", 4);
+                        value.UPC.Add(getTarget(copy));
+                    }
+                    else
+                        value.UPC.Add("");
 
-                        // trx qty
-                        copy = substringMethod(copy, "qtyOrdered", 11);
-                        value.TrxQty.Add(Convert.ToInt32(getTarget(copy)));
+                    // description 
+                    copy = substringMethod(copy, "description", 12);
+                    value.Description.Add(getTarget(copy));
 
-                        // upc
-                        if (copy.Contains("UPC"))
-                        {
-                            copy = substringMethod(copy, "UPC", 4);
-                            value.UPC.Add(getTarget(copy));
-                        }
-                        else
-                            value.UPC.Add("");
+                    // description 2
+                    if (copy.Contains("description2"))
+                    {
+                        copy = substringMethod(copy, "description2", 13);
+                        value.Description2.Add(getTarget(copy));
+                    }
+                    else
+                        value.Description2.Add("");
 
-                        // description 
-                        copy = substringMethod(copy, "description", 12);
-                        value.Description.Add(getTarget(copy));
+                    // merchant sku
+                    copy = substringMethod(copy, "merchantSKU", 12);
+                    value.TrxMerchantSKU.Add(getTarget(copy));
 
-                        // description 2
-                        if (copy.Contains("description2"))
-                        {
-                            copy = substringMethod(copy, "description2", 13);
-                            value.Description2.Add(getTarget(copy));
-                        }
-                        else
-                            value.Description2.Add("");
+                    // vendor sku
+                    copy = substringMethod(copy, "vendorSKU", 10);
+                    value.TrxVendorSKU.Add(getTarget(copy));
 
-                        // merchant sku
-                        copy = substringMethod(copy, "merchantSKU", 12);
-                        value.TrxMerchantSKU.Add(getTarget(copy));
+                    // unit price
+                    copy = substringMethod(copy, "unitPrice", 10);
+                    value.UnitPrice.Add(Convert.ToDouble(getTarget(copy)));
 
-                        // vendor sku
-                        copy = substringMethod(copy, "vendorSKU", 10);
-                        value.TrxVendorSKU.Add(getTarget(copy));
+                    // unit price
+                    copy = substringMethod(copy, "unitCost", 9);
+                    value.TrxUnitCost.Add(Convert.ToDouble(getTarget(copy)));
 
-                        // unit price
-                        copy = substringMethod(copy, "unitPrice", 10);
-                        value.UnitPrice.Add(Convert.ToDouble(getTarget(copy)));
+                    // line handling
+                    if (copy.Contains("lineHandling"))
+                    {
+                        copy = substringMethod(copy, "lineHandling", 13);
+                        value.LineHandling.Add(Convert.ToDouble(getTarget(copy)));
+                    }
+                    else
+                        value.LineHandling.Add(0);
 
-                        // unit price
-                        copy = substringMethod(copy, "unitCost", 9);
-                        value.TrxUnitCost.Add(Convert.ToDouble(getTarget(copy)));
-
-                        // line handling
-                        if (copy.Contains("lineHandling"))
-                        {
-                            copy = substringMethod(copy, "lineHandling", 13);
-                            value.LineHandling.Add(Convert.ToDouble(getTarget(copy)));
-                        }
-                        else
-                            value.LineHandling.Add(0);
-
-                        if (i == 1)
-                        {
-                            // service level / shipping code
-                            copy = substringMethod(copy, "shippingCode", 13);
-                            value.ServiceLevel = getTarget(copy);
-                        }
-
-                        // trx balance due (plus line balance due)
-                        copy = substringMethod(copy, "lineTotal", 10);
-                        value.LineBalanceDue.Add(Convert.ToDouble(getTarget(copy)));
-                        value.TrxBalanceDue += Convert.ToDouble(getTarget(copy));
-
-                        // expected ship date
-                        copy = substringMethod(copy, "expectedShipDate", 17);
-                        value.ExpectedShipDate.Add(DateTime.ParseExact(getTarget(copy), "yyyyMMdd", CultureInfo.InvariantCulture));
-
-                        // gst and hst extended
-                        copy = substringMethod(copy, "GST_HST_Extended", 16);
-                        copy = substringMethod(copy, ">", 1);
-                        value.GST_HST_Extended.Add(Convert.ToDouble(getTarget(copy)));
-
-                        // pst extended
-                        copy = substringMethod(copy, "PST_Extended", 12);
-                        copy = substringMethod(copy, ">", 1);
-                        value.PST_Extended.Add(Convert.ToDouble(getTarget(copy)));
-
-                        // gst and hst
-                        copy = substringMethod(copy, "GST_HST_Total", 16);
-                        copy = substringMethod(copy, ">", 1);
-                        value.GST_HST_Total.Add(Convert.ToDouble(getTarget(copy)));
-
-                        // pst
-                        copy = substringMethod(copy, "PST_Total", 13);
-                        copy = substringMethod(copy, ">", 1);
-                        value.PST_Total.Add(Convert.ToDouble(getTarget(copy)));
-
-                        // encoded price 
-                        copy = substringMethod(copy, "encodedPrice", 13);
-                        value.EncodedPrice.Add(getTarget(copy));
-
-                        // ps receiving instructions
-                        copy = substringMethod(copy, "psReceivingInstructions", 24);
-                        value.ReceivingInstructions.Add(getTarget(copy));
+                    if (i == 1)
+                    {
+                        // service level / shipping code
+                        copy = substringMethod(copy, "shippingCode", 13);
+                        value.ServiceLevel = getTarget(copy);
                     }
 
-                    string copyCopy = copy;
+                    // trx balance due (plus line balance due)
+                    copy = substringMethod(copy, "lineTotal", 10);
+                    value.LineBalanceDue.Add(Convert.ToDouble(getTarget(copy)));
+                    value.TrxBalanceDue += Convert.ToDouble(getTarget(copy));
 
-                    #region Bill To Address
-                    // bill to name
-                    copyCopy = substringMethod(copyCopy, billToId, billToId.Length);
-                    copyCopy = substringMethod(copyCopy, "name1", 6);
-                    value.BillTo.Name = getTarget(copyCopy);
+                    // expected ship date
+                    copy = substringMethod(copy, "expectedShipDate", 17);
+                    value.ExpectedShipDate.Add(DateTime.ParseExact(getTarget(copy), "yyyyMMdd", CultureInfo.InvariantCulture));
 
-                    // bill to address
-                    copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
-                    copyCopy = substringMethod(copyCopy, "address1", 9);
-                    value.BillTo.Address1 = getTarget(copyCopy);
-                    if (copyCopy.Contains("address2"))
-                    {
-                        copyCopy = substringMethod(copyCopy, "address2", 9);
-                        value.BillTo.Address2 = getTarget(copyCopy);
-                    }
+                    // gst and hst extended
+                    copy = substringMethod(copy, "GST_HST_Extended", 16);
+                    copy = substringMethod(copy, ">", 1);
+                    value.GST_HST_Extended.Add(Convert.ToDouble(getTarget(copy)));
 
-                    // bill to city
-                    copyCopy = substringMethod(copyCopy, "city", 5);
-                    value.BillTo.City = getTarget(copyCopy);
+                    // pst extended
+                    copy = substringMethod(copy, "PST_Extended", 12);
+                    copy = substringMethod(copy, ">", 1);
+                    value.PST_Extended.Add(Convert.ToDouble(getTarget(copy)));
 
-                    // bill to state
-                    copyCopy = substringMethod(copyCopy, "state", 6);
-                    value.BillTo.State = getTarget(copyCopy);
+                    // gst and hst
+                    copy = substringMethod(copy, "GST_HST_Total", 16);
+                    copy = substringMethod(copy, ">", 1);
+                    value.GST_HST_Total.Add(Convert.ToDouble(getTarget(copy)));
 
-                    // bill to postal code
-                    copyCopy = substringMethod(copyCopy, "postalCode", 11);
-                    value.BillTo.PostalCode = getTarget(copyCopy);
+                    // pst
+                    copy = substringMethod(copy, "PST_Total", 13);
+                    copy = substringMethod(copy, ">", 1);
+                    value.PST_Total.Add(Convert.ToDouble(getTarget(copy)));
 
-                    // bill to phone
-                    copyCopy = substringMethod(copyCopy, "dayPhone", 9);
-                    value.BillTo.DayPhone = getTarget(copyCopy);
-                    #endregion
+                    // encoded price 
+                    copy = substringMethod(copy, "encodedPrice", 13);
+                    value.EncodedPrice.Add(getTarget(copy));
 
-                    copyCopy = copy;
-
-                    #region Recipient Address
-                    // recipient name
-                    copyCopy = substringMethod(copyCopy, customerPlaceId, billToId.Length);
-                    copyCopy = substringMethod(copyCopy, "name1", 6);
-                    value.Recipient.Name = getTarget(copyCopy);
-
-                    // recipient address
-                    copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
-                    copyCopy = substringMethod(copyCopy, "address1", 9);
-                    value.Recipient.Address1 = getTarget(copyCopy);
-                    if (copyCopy.Contains("address2"))
-                    {
-                        copyCopy = substringMethod(copyCopy, "address2", 9);
-                        value.Recipient.Address2 = getTarget(copyCopy);
-                    }
-
-                    // recipient city
-                    copyCopy = substringMethod(copyCopy, "city", 5);
-                    value.Recipient.City = getTarget(copyCopy);
-
-                    // recipient state
-                    copyCopy = substringMethod(copyCopy, "state", 6);
-                    value.Recipient.State = getTarget(copyCopy);
-
-                    // recipient postal code
-                    copyCopy = substringMethod(copyCopy, "postalCode", 11);
-                    value.Recipient.PostalCode = getTarget(copyCopy);
-
-                    // recipient phone
-                    copyCopy = substringMethod(copyCopy, "dayPhone", 9);
-                    value.Recipient.DayPhone = getTarget(copyCopy);
-                    #endregion
-
-                    copyCopy = copy;
-
-                    #region Ship To Address
-                    // ship to name
-                    copyCopy = substringMethod(copyCopy, shipToId, billToId.Length);
-                    copyCopy = substringMethod(copyCopy, "name1", 6);
-                    value.ShipTo.Name = getTarget(copyCopy);
-
-                    // ship to
-                    copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
-                    copyCopy = substringMethod(copyCopy, "address1", 9);
-                    value.ShipTo.Address1 = getTarget(copyCopy);
-                    if (copyCopy.Contains("address2"))
-                    {
-                        copyCopy = substringMethod(copyCopy, "address2", 9);
-                        value.ShipTo.Address2 = getTarget(copyCopy);
-                    }
-
-                    // ship to city
-                    copyCopy = substringMethod(copyCopy, "city", 5);
-                    value.ShipTo.City = getTarget(copyCopy);
-
-                    // ship to state
-                    copyCopy = substringMethod(copyCopy, "state", 6);
-                    value.ShipTo.State = getTarget(copyCopy);
-
-                    // ship to postal code
-                    copyCopy = substringMethod(copyCopy, "postalCode", 11);
-                    value.ShipTo.PostalCode = getTarget(copyCopy);
-
-                    // ship to day phone
-                    if (copyCopy.Contains("dayPhone"))
-                    {
-                        copyCopy = substringMethod(copyCopy, "dayPhone", 9);
-                        value.ShipTo.DayPhone = getTarget(copyCopy);
-                    }
-
-                    // ship to partner person place id
-                    if (copyCopy.Contains("partnerPersonPlaceId"))
-                    {
-                        copyCopy = substringMethod(copyCopy, "partnerPersonPlaceId", 21);
-                        value.PartnerPersonPlaceId = getTarget(copyCopy);
-                    }
-                    #endregion
-
-                    // freight lane & spur -> only if exist
-                    if (copyCopy.Contains("attnLine"))
-                    {
-                        copyCopy = substringMethod(copyCopy, "attnLine", 9);
-                        string attention = getTarget(copyCopy);
-
-                        int index = 0;
-                        while ((char.IsLetter(attention[index]) || char.IsNumber(attention[index])) && attention[index] != ' ' && attention[index] != '_')
-                            index++;
-                        value.FreightLane = attention.Substring(0, index);
-                        while (!char.IsNumber(attention[index]))
-                            index++;
-                        value.Spur = attention.Substring(index);
-                    }
-
-                    break;
+                    // ps receiving instructions
+                    copy = substringMethod(copy, "psReceivingInstructions", 24);
+                    value.ReceivingInstructions.Add(getTarget(copy));
                 }
+
+                string copyCopy = copy;
+
+                #region Bill To Address
+                // bill to name
+                copyCopy = substringMethod(copyCopy, billToId, billToId.Length);
+                copyCopy = substringMethod(copyCopy, "name1", 6);
+                value.BillTo.Name = getTarget(copyCopy);
+
+                // bill to address
+                copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
+                copyCopy = substringMethod(copyCopy, "address1", 9);
+                value.BillTo.Address1 = getTarget(copyCopy);
+                if (copyCopy.Contains("address2"))
+                {
+                    copyCopy = substringMethod(copyCopy, "address2", 9);
+                    value.BillTo.Address2 = getTarget(copyCopy);
+                }
+
+                // bill to city
+                copyCopy = substringMethod(copyCopy, "city", 5);
+                value.BillTo.City = getTarget(copyCopy);
+
+                // bill to state
+                copyCopy = substringMethod(copyCopy, "state", 6);
+                value.BillTo.State = getTarget(copyCopy);
+
+                // bill to postal code
+                copyCopy = substringMethod(copyCopy, "postalCode", 11);
+                value.BillTo.PostalCode = getTarget(copyCopy);
+
+                // bill to phone
+                copyCopy = substringMethod(copyCopy, "dayPhone", 9);
+                value.BillTo.DayPhone = getTarget(copyCopy);
+                #endregion
+
+                copyCopy = copy;
+
+                #region Recipient Address
+                // recipient name
+                copyCopy = substringMethod(copyCopy, customerPlaceId, customerPlaceId.Length);
+                copyCopy = substringMethod(copyCopy, "name1", 6);
+                value.Recipient.Name = getTarget(copyCopy);
+
+                // recipient address
+                copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
+                copyCopy = substringMethod(copyCopy, "address1", 9);
+                value.Recipient.Address1 = getTarget(copyCopy);
+                if (copyCopy.Contains("address2"))
+                {
+                    copyCopy = substringMethod(copyCopy, "address2", 9);
+                    value.Recipient.Address2 = getTarget(copyCopy);
+                }
+
+                // recipient city
+                copyCopy = substringMethod(copyCopy, "city", 5);
+                value.Recipient.City = getTarget(copyCopy);
+
+                // recipient state
+                copyCopy = substringMethod(copyCopy, "state", 6);
+                value.Recipient.State = getTarget(copyCopy);
+
+                // recipient postal code
+                copyCopy = substringMethod(copyCopy, "postalCode", 11);
+                value.Recipient.PostalCode = getTarget(copyCopy);
+
+                // recipient phone
+                copyCopy = substringMethod(copyCopy, "dayPhone", 9);
+                value.Recipient.DayPhone = getTarget(copyCopy);
+                #endregion
+
+                copyCopy = copy;
+
+                #region Ship To Address
+                // ship to name
+                copyCopy = substringMethod(copyCopy, shipToId, shipToId.Length);
+                copyCopy = substringMethod(copyCopy, "name1", 6);
+                value.ShipTo.Name = getTarget(copyCopy);
+
+                // ship to
+                copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
+                copyCopy = substringMethod(copyCopy, "address1", 9);
+                value.ShipTo.Address1 = getTarget(copyCopy);
+                if (copyCopy.Contains("address2"))
+                {
+                    copyCopy = substringMethod(copyCopy, "address2", 9);
+                    value.ShipTo.Address2 = getTarget(copyCopy);
+                }
+
+                // ship to city
+                copyCopy = substringMethod(copyCopy, "city", 5);
+                value.ShipTo.City = getTarget(copyCopy);
+
+                // ship to state
+                copyCopy = substringMethod(copyCopy, "state", 6);
+                value.ShipTo.State = getTarget(copyCopy);
+
+                // ship to postal code
+                copyCopy = substringMethod(copyCopy, "postalCode", 11);
+                value.ShipTo.PostalCode = getTarget(copyCopy);
+
+                // ship to day phone
+                if (copyCopy.Contains("dayPhone"))
+                {
+                    copyCopy = substringMethod(copyCopy, "dayPhone", 9);
+                    value.ShipTo.DayPhone = getTarget(copyCopy);
+                }
+
+                // ship to partner person place id
+                if (copyCopy.Contains("partnerPersonPlaceId"))
+                {
+                    copyCopy = substringMethod(copyCopy, "partnerPersonPlaceId", 21);
+                    value.PartnerPersonPlaceId = getTarget(copyCopy);
+                }
+                #endregion
+
+                // freight lane & spur -> only if exist
+                if (copyCopy.Contains("attnLine"))
+                {
+                    copyCopy = substringMethod(copyCopy, "attnLine", 9);
+                    string attention = getTarget(copyCopy);
+
+                    int index = 0;
+                    while ((char.IsLetter(attention[index]) || char.IsNumber(attention[index])) && attention[index] != ' ' && attention[index] != '_')
+                        index++;
+                    value.FreightLane = attention.Substring(0, index);
+                    while (!char.IsNumber(attention[index]))
+                        index++;
+                    value.Spur = attention.Substring(index);
+                }
+
+                break;
             }
 
             return value;

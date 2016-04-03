@@ -158,7 +158,7 @@
             // selectionHeader
             // 
             this.selectionHeader.Text = "";
-            this.selectionHeader.Width = 76;
+            this.selectionHeader.Width = 89;
             // 
             // ageHeader
             // 
@@ -168,17 +168,17 @@
             // itemNameHeader
             // 
             this.itemNameHeader.Text = "Item Name";
-            this.itemNameHeader.Width = 270;
+            this.itemNameHeader.Width = 322;
             // 
             // itemSkuHeader
             // 
             this.itemSkuHeader.Text = "Item SKU";
-            this.itemSkuHeader.Width = 198;
+            this.itemSkuHeader.Width = 175;
             // 
             // transactionNumberHeader
             // 
             this.transactionNumberHeader.Text = "Transaction ID #";
-            this.transactionNumberHeader.Width = 194;
+            this.transactionNumberHeader.Width = 175;
             // 
             // orderDateHeader
             // 
@@ -198,7 +198,7 @@
             // recipientHeader
             // 
             this.recipientHeader.Text = "Recipient";
-            this.recipientHeader.Width = 235;
+            this.recipientHeader.Width = 199;
             // 
             // shipmentConfirmButton
             // 

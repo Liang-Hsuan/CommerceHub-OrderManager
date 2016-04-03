@@ -271,9 +271,8 @@ namespace Order_Manager.channel.shop.ca
             sftp.Connect();
 
             // download the files from the given list
-            foreach (string file in fileList)
+            foreach (string file in fileList.Where(file => file != "." && file != ".."))
             {
-                if (file == "." || file == "..") continue;
                 sftp.Get(SHIPMENT_DIR + "/" + file, filePath + "\\" + file);
 
                 // after download the file delete it on the server (no need it anymore)
@@ -347,7 +346,7 @@ namespace Order_Manager.channel.shop.ca
 
         /* a method that receive all the current order and check the duplicate then only return the ones that have not been processed 
         -> receive and return dictionary <orderId, filePath> */
-        private Dictionary<string, string> checkOrder(Dictionary<string, string> allOrderList)
+        private static Dictionary<string, string> checkOrder(Dictionary<string, string> allOrderList)
         {
             // get all complete order id 
             List<string> completeOrderList = new List<string>();

@@ -199,11 +199,9 @@ namespace Order_Manager.mainForms
                         if (listview.Items[i].SubItems[5].Text != "") continue;
                         decimal[] detailList = Package.getSkuDetail(searsValues.TrxVendorSKU[i]);
 
-                        if (detailList != null)
-                        {
-                            for (int j = 0; j < 4; j++)
-                                skuDetail[j] += detailList[j];
-                        }
+                        if (detailList == null) continue;
+                        for (int j = 0; j < 4; j++)
+                            skuDetail[j] += detailList[j];
                     }
                     break;
                 case "Shop.ca":
@@ -212,11 +210,9 @@ namespace Order_Manager.mainForms
                         if (listview.Items[i].SubItems[5].Text != "") continue;
                         decimal[] detailList = Package.getSkuDetail(shopCaValues.Sku[i]);
 
-                        if (detailList != null)
-                        {
-                            for (int j = 0; j < 4; j++)
-                                skuDetail[j] += detailList[j];
-                        }
+                        if (detailList == null) continue;
+                        for (int j = 0; j < 4; j++)
+                            skuDetail[j] += detailList[j];
                     }
                     break;
             }
@@ -254,29 +250,28 @@ namespace Order_Manager.mainForms
             ConfirmPanel confirm = new ConfirmPanel("Are you sure you want to ship the package ?");
             confirm.ShowDialog(this);
 
-            if (confirm.DialogResult == DialogResult.OK)
+            if (confirm.DialogResult != DialogResult.OK) return;
+
+            trackingNumberTextbox.Text = "Shipping";
+            shipmentConfirmButton.Enabled = false;
+            createLabelButton.Enabled = false;
+
+            // start timer
+            timerShip.Start();
+
+            // initialize field for shipment package
+            switch (CHANNEL)
             {
-                trackingNumberTextbox.Text = "Shipping";
-                shipmentConfirmButton.Enabled = false;
-                createLabelButton.Enabled = false;
-
-                // start timer
-                timerShip.Start();
-
-                // initialize field for shipment package
-                switch (CHANNEL)
-                {
-                    case "Sears":
-                        searsValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
-                        break;
-                    case "Shop.ca":
-                        shopCaValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
-                        break;
-                }
-
-                if (!backgroundWorkerShip.IsBusy)
-                    backgroundWorkerShip.RunWorkerAsync();
+                case "Sears":
+                    searsValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
+                    break;
+                case "Shop.ca":
+                    shopCaValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
+                    break;
             }
+
+            if (!backgroundWorkerShip.IsBusy)
+                backgroundWorkerShip.RunWorkerAsync();
         }
         private void backgroundWorkerShip_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
@@ -323,7 +318,6 @@ namespace Order_Manager.mainForms
                     // set bool flag to false
                     e.Result = false;
                     break;
-
                     #endregion
 
                 case "Shop.ca":
@@ -369,7 +363,6 @@ namespace Order_Manager.mainForms
                     // set bool flag to false
                     e.Result = false;
                     break;
-
                     #endregion
             }
         }

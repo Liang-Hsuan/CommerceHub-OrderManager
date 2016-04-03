@@ -92,15 +92,14 @@ namespace Order_Manager.channel.brightpearl
                 // post reservation
                 post.postReservationRequest(orderId, orderRowId, itemValue);
                 Status = "Posting reservation request " + i;
-                if (post.HasError)
+                if (!post.HasError) continue;
+
+                Status = "Error occur during reservation post " + i + "- Sears";
+                do
                 {
-                    Status = "Error occur during reservation post " + i + "- Sears";
-                    do
-                    {
-                        Thread.Sleep(5000);
-                        post.postReservationRequest(orderId, orderRowId, itemValue);
-                    } while (post.HasError);
-                }
+                    Thread.Sleep(5000);
+                    post.postReservationRequest(orderId, orderRowId, itemValue);
+                } while (post.HasError);
             }
             #endregion
         }
@@ -154,15 +153,14 @@ namespace Order_Manager.channel.brightpearl
                 // post reservation
                 post.postReservationRequest(orderId, orderRowId, itemValue);
                 Status = "Posting reservation request " + i;
-                if (post.HasError)
+                if (!post.HasError) continue;
+
+                Status = "Error occur during reservation post " + i + "- Shop.ca";
+                do
                 {
-                    Status = "Error occur during reservation post " + i + "- Shop.ca";
-                    do
-                    {
-                        Thread.Sleep(5000);
-                        post.postReservationRequest(orderId, orderRowId, itemValue);
-                    } while (post.HasError);
-                }
+                    Thread.Sleep(5000);
+                    post.postReservationRequest(orderId, orderRowId, itemValue);
+                } while (post.HasError);
             }
             #endregion
         }
