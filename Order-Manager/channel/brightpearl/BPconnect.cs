@@ -73,8 +73,60 @@ namespace Order_Manager.channel.brightpearl
                 // the case if not cancel post it to brightpearl
                 if (cancelList.Where(j => j == i).Any()) continue;
 
+                #region Tax Determination
+                double tax;
+                switch (value.ShipTo.State)
+                {
+                    case "NB":
+                        tax = 0.13;
+                        break;
+                    case "NF":
+                        tax = 0.15;
+                        break;
+                    case "NL":
+                        tax = 0.15;
+                        break;
+                    case "NS":
+                        tax = 0.15;
+                        break;
+                    case "ON":
+                        tax = 0.13;
+                        break;
+                    case "PEI":
+                        tax = 0.14;
+                        break;
+                    case "BC":
+                        tax = 0.05;
+                        break;
+                    case "MAN":
+                        tax = 0.05;
+                        break;
+                    case "PQ":
+                        tax = 0.05;
+                        break;
+                    case "QC":
+                        tax = 0.05;
+                        break;
+                    case "SK":
+                        tax = 0.05;
+                        break;
+                    case "AB":
+                        tax = 0.05;
+                        break;
+                    case "NV":
+                        tax = 0.05;
+                        break;
+                    case "YK":
+                        tax = 0.05;
+                        break;
+                    default:
+                        tax = 0;
+                        break;
+                }
+                #endregion
+
                 // initialize BPvalues object -> no need tax and total paid ( this is unit cost & no recipt )
-                BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], value.TrxUnitCost[i], 0, 0);
+                BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], value.TrxUnitCost[i], value.TrxUnitCost[i] * tax, 0);
 
                 // post order row
                 string orderRowId = post.postOrderRowRequest(orderId, itemValue);

@@ -721,18 +721,19 @@ namespace Order_Manager.channel.shop.ca
                     range += '\'' + reader.GetString(0) + "\',";
                 reader.Close();
 
-                // the case if nothing to delete
-                if (range == "(") return;
+                // the case if has something to delete
+                if (range != "(")
+                {
+                    range = range.Remove(range.Length - 1) + ')';
 
-                range = range.Remove(range.Length - 1) + ')';
+                    // delete items
+                    command.CommandText = "DELETE FROM ShopCa_Order_Item WHERE OrderId IN " + range;
+                    command.ExecuteNonQuery();
 
-                // delete items
-                command.CommandText = "DELETE FROM ShopCa_Order_Item WHERE OrderId IN " + range;
-                command.ExecuteNonQuery();
-
-                // delete orders
-                command.CommandText = "DELETE FROM ShopCa_Order WHERE OrderId IN " + range;
-                command.ExecuteNonQuery();
+                    // delete orders
+                    command.CommandText = "DELETE FROM ShopCa_Order WHERE OrderId IN " + range;
+                    command.ExecuteNonQuery();
+                }
             }
             #endregion
 

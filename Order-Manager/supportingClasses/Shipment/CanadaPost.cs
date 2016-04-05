@@ -296,7 +296,7 @@ namespace Order_Manager.supportingClasses.Shipment
                 result = streamReader.ReadToEnd();
 
             // load xml
-            doc.Load(result);
+            doc.LoadXml(result);
 
             // get namespace
             var xmlns = doc.DocumentElement.Attributes["xmlns"];

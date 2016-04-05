@@ -402,7 +402,6 @@ namespace Order_Manager.mainForms
             {
                 trackingNumberTextbox.Text = "Shipping";
                 timeLeft = 4;
-                timerShip.Start();
             }
             else
                 trackingNumberTextbox.Text += ".";

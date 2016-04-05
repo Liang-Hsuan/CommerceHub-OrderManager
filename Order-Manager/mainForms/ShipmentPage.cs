@@ -112,6 +112,7 @@ namespace Order_Manager.mainForms
             if (canadaPost.Error)
             {
                 MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                endOfDayButton.Enabled = true;
                 return;
             }
 
@@ -127,6 +128,7 @@ namespace Order_Manager.mainForms
                 if (!canadaPost.Error) continue;
 
                 MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                endOfDayButton.Enabled = true;
                 return;
             }
 
