@@ -700,12 +700,12 @@ namespace Order_Manager.mainForms
             heightUpdown.Value = skuDetail[3];
 
             // shipment status -> the case if the order has already shipped
-            if (value.Package.TrackingNumber != "")
-            {
-                createLabelButton.Enabled = false;
-                trackingNumberTextbox.Text = value.Package.TrackingNumber;
-                voidShipmentButton.Visible = true;
-            }
+            if (value.Package.TrackingNumber == "") return;
+
+            createLabelButton.Enabled = false;
+            trackingNumberTextbox.Text = value.Package.TrackingNumber;
+            voidShipmentButton.Visible = true;
+
             #endregion
         }
 
@@ -810,12 +810,11 @@ namespace Order_Manager.mainForms
             heightUpdown.Value = skuDetail[3];
 
             // shipment status -> the case if the order has already shipped
-            if (value.Package.TrackingNumber != "")
-            {
-                createLabelButton.Enabled = false;
-                trackingNumberTextbox.Text = value.Package.TrackingNumber;
-                voidShipmentButton.Visible = true;
-            }
+            if (value.Package.TrackingNumber == "") return;
+
+            createLabelButton.Enabled = false;
+            trackingNumberTextbox.Text = value.Package.TrackingNumber;
+            voidShipmentButton.Visible = true;
             #endregion
         }
 

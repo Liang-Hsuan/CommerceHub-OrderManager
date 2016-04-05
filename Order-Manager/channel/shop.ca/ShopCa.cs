@@ -736,10 +736,8 @@ namespace Order_Manager.channel.shop.ca
             }
             #endregion
 
-            // Local Delete ( not implemented )
-            /* DirectoryInfo di = new DirectoryInfo(newOrderDir);
-            foreach (FileInfo file in di.GetFiles())
-                file.Delete(); */
+            // Local Delete
+            new DirectoryInfo(newOrderDir).Delete(true); 
         }
     }
 }

@@ -947,10 +947,8 @@ namespace Order_Manager.channel.sears
             }
             #endregion
 
-            // Local Delete ( not implemented )
-            /* DirectoryInfo di = new DirectoryInfo(newOrderDir);
-            foreach (FileInfo file in di.GetFiles())
-                file.Delete(); */
+            // Local Delete
+            new DirectoryInfo(newOrderDir).Delete(true);
         }
 
         /* a method that add a new transaction order to database */
