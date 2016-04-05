@@ -14,7 +14,7 @@ namespace Order_Manager.channel.sears
     /*
      * A class that connect to Sears sftp server and manage all the orders for sears
      */
-    public class Sears : ShoppingChannel
+    public class Sears : Channel
     {
         // fields for directory on sftp server
         public const string SHIPMENT_DIR = "outgoing/orders/searscanada";
@@ -60,7 +60,7 @@ namespace Order_Manager.channel.sears
 
         #region Public Get
         /* a method that get all new order on the server and update to the database */
-        public override void GetOrder()
+        public void GetOrder()
         {
             // get all the new file on the order directory to local new order storing directory
             string[] orderCheck = checkOrderFile();
@@ -181,7 +181,7 @@ namespace Order_Manager.channel.sears
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 SqlCommand command = new SqlCommand("SELECT TransactionId, TrackingNumber, ShipmentIdentificationNumber FROM Sears_Order " +
-                                                    "WHERE TrackingNumber != '' AND CompleteDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\';", connection);
+                                                    "WHERE ShipDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\';", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 
@@ -211,8 +211,8 @@ namespace Order_Manager.channel.sears
         {
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("UPDATE Sears_Order SET TrackingNumber = \'" + trackingNumber + "\', ShipmentIdentificationNumber = \'" + shipmentIdentificationNumber + "\' " 
-                                                  + "WHERE TransactionId = \'" + transactionId + "\';", connection);
+                SqlCommand command = new SqlCommand("UPDATE Sears_Order SET TrackingNumber = \'" + trackingNumber + "\', ShipmentIdentificationNumber = \'" + shipmentIdentificationNumber + "\', " 
+                                                  + "ShipDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\' WHERE TransactionId = \'" + transactionId + "\';", connection);
                 connection.Open();
                 command.ExecuteNonQuery();
             }
@@ -229,7 +229,7 @@ namespace Order_Manager.channel.sears
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 // for entire order cancellation
-                SqlCommand command = new SqlCommand("UPDATE Sears_Order SET TrackingNumber = '', ShipmentIdentificationNumber = '' WHERE TransactionId IN " + candidate, connection);
+                SqlCommand command = new SqlCommand("UPDATE Sears_Order SET TrackingNumber = '', ShipmentIdentificationNumber = '', ShipDate = NULL WHERE TransactionId IN " + candidate, connection);
                 connection.Open();
                 command.ExecuteNonQuery();
             }
@@ -238,7 +238,7 @@ namespace Order_Manager.channel.sears
 
         #region Number of Orders and Shipments
         /* methods that return the number of order and shipment from the given date */
-        public override int GetNumberOfOrder(DateTime time)
+        public int GetNumberOfOrder(DateTime time)
         {
             int count;
 
@@ -252,7 +252,7 @@ namespace Order_Manager.channel.sears
 
             return count;
         }
-        public override int GetNumberOfShipped(DateTime time)
+        public int GetNumberOfShipped(DateTime time)
         {
             int count;
 
@@ -916,7 +916,7 @@ namespace Order_Manager.channel.sears
         #endregion
 
         /* a method that delete obsolete orders in database and clear all local files */
-        public override void Delete()
+        public void Delete()
         {
             #region Database Delete
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
@@ -1010,6 +1010,22 @@ namespace Order_Manager.channel.sears
 
             iterator++;
             return "SearsPack" + DateTime.Today.ToString("ddMMyy") + iterator;
+        }
+
+        /* a method that substring the given string */
+        private static string substringMethod(string original, string startingString, int additionIndex)
+        {
+            return original.Substring(original.IndexOf(startingString) + additionIndex);
+        }
+
+        /* a method that get the next target token */
+        private static string getTarget(string text)
+        {
+            int i = 0;
+            while (text[i] != '<' && text[i] != '>' && text[i] != '"')
+                i++;
+
+            return text.Substring(0, i);
         }
         #endregion
     }

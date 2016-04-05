@@ -482,7 +482,7 @@ namespace Order_Manager.mainForms
             if (chart.Series["point"].Points.Contains(dataPoint))
                 e.Text = "Order\nSears: " + sears.GetNumberOfOrder(time) + ", Shop.ca: " + shopCa.GetNumberOfOrder(time);
             else if (chart.Series["shipment"].Points.Contains(dataPoint))
-                e.Text = "Shipment\nSears" + sears.GetNumberOfShipped(time) + ", Shop.ca: " + shopCa.GetNumberOfOrder(time);
+                e.Text = "Shipment\nSears: " + sears.GetNumberOfShipped(time) + ", Shop.ca: " + shopCa.GetNumberOfShipped(time);
         }
 
         /* mouse wheel event on the chart that zoom in and out */

@@ -15,7 +15,7 @@ namespace Order_Manager.channel.shop.ca
     /*
      * A class that connect to Shop.ca sftp server and manage all the orders for Shop.ca
      */
-    public class ShopCa : ShoppingChannel
+    public class ShopCa : Channel
     {
         // fields for directory on sftp server
         private const string SHIPMENT_DIR = "toclient/order";
@@ -61,7 +61,7 @@ namespace Order_Manager.channel.shop.ca
 
         #region Public Get
         /* a method that get all new order on the server and update to the database */
-        public override void GetOrder()
+        public void GetOrder()
         {
             // get all the new file on the order directory to local new order storing directory
             IEnumerable<string> orderCheck = checkOrderFile();
@@ -165,7 +165,7 @@ namespace Order_Manager.channel.shop.ca
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 SqlCommand command = new SqlCommand("SELECT OrderId, TrackingNumber, SelfLink FROM ShopCa_Order " +
-                                                    "WHERE TrackingNumber != '' AND EndofDay != 1 AND CompleteDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\';", connection);
+                                                    "WHERE EndofDay != 1 AND ShipDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\';", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 
@@ -195,19 +195,19 @@ namespace Order_Manager.channel.shop.ca
         {
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET TrackingNumber = \'" + trackingNumber + "\', SelfLink = \'" + selfLink + "\', LabelLink = \'" + labelLink + "\' "
-                                                  + "WHERE OrderId = \'" + orderId + "\';", connection);
+                SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET TrackingNumber = \'" + trackingNumber + "\', SelfLink = \'" + selfLink + "\', LabelLink = \'" + labelLink + "\', "
+                                                  + "ShipDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\' WHERE OrderId = \'" + orderId + "\';", connection);
                 connection.Open();
                 command.ExecuteNonQuery();
             }
         }
 
         /* a method that mark the order as end of day, so it cannot be voided anymore */
-        public void PostShip(bool endOfDay, DateTime completeDate)
+        public void PostShip(bool endOfDay, DateTime shipDate)
         {
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET EndofDay = \'" + endOfDay + "\' WHERE CompleteDate = \'" + completeDate.ToString("yyyy-MM-dd") + "\';", connection);
+                SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET EndofDay = \'" + endOfDay + "\' WHERE ShipDate = \'" + shipDate.ToString("yyyy-MM-dd") + "\';", connection);
                 connection.Open();
                 command.ExecuteNonQuery();
             }
@@ -224,7 +224,7 @@ namespace Order_Manager.channel.shop.ca
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 // for entire order cancellation
-                SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET TrackingNumber = '', SelfLink = '', LabelLink = '' WHERE OrderId IN " + candidate, connection);
+                SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET TrackingNumber = '', SelfLink = '', LabelLink = '', ShipDate = NULL WHERE OrderId IN " + candidate, connection);
                 connection.Open();
                 command.ExecuteNonQuery();
             }
@@ -233,7 +233,7 @@ namespace Order_Manager.channel.shop.ca
 
         #region Number of Orders and Shipments
         /* methods that return the number of order and shipment from the given date */
-        public override int GetNumberOfOrder(DateTime time)
+        public int GetNumberOfOrder(DateTime time)
         {
             int count;
 
@@ -247,7 +247,7 @@ namespace Order_Manager.channel.shop.ca
 
             return count;
         }
-        public override int GetNumberOfShipped(DateTime time)
+        public int GetNumberOfShipped(DateTime time)
         {
             int count;
 
@@ -297,21 +297,19 @@ namespace Order_Manager.channel.shop.ca
         /* method that get all the order in the file with the given dictionary <filePath, text> and return dictionary <orderId, filepath> */
         private static Dictionary<string, string> getOrderId(Dictionary<string, string> fileText)
         {
-            // local field for storing data
+            // local field for storing data and xml processing
             Dictionary<string, string> list = new Dictionary<string, string>();
+            XmlDocument doc = new XmlDocument();
 
             // get all order id and its path
             foreach (KeyValuePair<string, string> keyValue in fileText)
             {
-                // get the text
-                string copy = keyValue.Value;
+                // load xml text
+                doc.LoadXml(keyValue.Value);
 
-                // add order id and its file path to dictionary
-                while (copy.Contains("<order_id>"))
-                {
-                    copy = substringMethod(copy, "<order_id>", 10);
-                    list.Add(getTarget(copy), keyValue.Key);
-                }
+                // get all order id in the file
+                foreach (XmlNode parent in doc.DocumentElement.SelectSingleNode("/shop_ca_feed"))
+                    list.Add(parent["order_id"].InnerText, keyValue.Key);
             }
 
             return list;
@@ -707,7 +705,7 @@ namespace Order_Manager.channel.shop.ca
         }
 
         /* a method that delete obsolete orders in database and clear all local files */
-        public override void Delete()
+        public void Delete()
         {
             #region Database Delete
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))

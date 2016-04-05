@@ -161,12 +161,17 @@ namespace Order_Manager.supportingClasses.Shipment
             string[] returnString = new string[3];
             doc.LoadXml(result);
 
-            // tracking pin
-            XmlNode node = doc.SelectSingleNode("/shipment-info");
+            // get namespace
+            var xmlns = doc.DocumentElement.Attributes["xmlns"];
+            XmlNamespaceManager namespaceManager = new XmlNamespaceManager(doc.NameTable);
+            namespaceManager.AddNamespace("ns", xmlns.Value);
+
+            // getting tracking pin
+            XmlNode node = doc.SelectSingleNode("/ns:shipment-info", namespaceManager);
             returnString[0] = node["tracking-pin"].InnerText;
 
             // self and label links
-            node = doc.SelectSingleNode("/shipment-info/links");
+            node = doc.SelectSingleNode("/ns:shipment-info/ns:links", namespaceManager);
             foreach (XmlNode child in node)
             {
                 if (child.Attributes["rel"].Value == "self")
@@ -290,9 +295,16 @@ namespace Order_Manager.supportingClasses.Shipment
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 result = streamReader.ReadToEnd();
 
-            // read all the links in the xml
-            doc.LoadXml(result);
-            XmlNode node = doc.SelectSingleNode("/manifests");
+            // load xml
+            doc.Load(result);
+
+            // get namespace
+            var xmlns = doc.DocumentElement.Attributes["xmlns"];
+            XmlNamespaceManager namespaceManager = new XmlNamespaceManager(doc.NameTable);
+            namespaceManager.AddNamespace("ns", xmlns.Value);
+
+            // get all links
+            XmlNode node = doc.SelectSingleNode("/ns:manifests", namespaceManager);
 
             return (from XmlNode child in node select child.Attributes["href"].Value).ToArray();
         }
@@ -332,9 +344,16 @@ namespace Order_Manager.supportingClasses.Shipment
             using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                 result = streamReader.ReadToEnd();
 
-            // read all the links
+            // load xml
             doc.LoadXml(result);
-            XmlNode node = doc.SelectSingleNode("/manifest/links");
+
+            // get namespace
+            var xmlns = doc.DocumentElement.Attributes["xmlns"];
+            XmlNamespaceManager namespaceManager = new XmlNamespaceManager(doc.NameTable);
+            namespaceManager.AddNamespace("ns", xmlns.Value);
+
+            // get all links
+            XmlNode node = doc.SelectSingleNode("/ns:manifest/ns:links", namespaceManager);
 
             return node.Cast<XmlNode>().Where(child => child.Attributes["rel"].Value == "artifact").Select(child => child.Attributes["href"].Value).FirstOrDefault();
         }
