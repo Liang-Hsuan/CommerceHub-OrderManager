@@ -50,7 +50,7 @@ namespace Order_Manager.supportingClasses.Shipment
             // generate package detail -> weight and dimensions
             decimal[] skuDetail = { 0, 0, 0, 0 };
 
-            foreach (decimal[] detailList in value.TrxVendorSKU.Select(getSkuDetail).Where(detailList => !detailList.Equals(null)))
+            foreach (decimal[] detailList in value.TrxVendorSKU.Select(GetSkuDetail).Where(detailList => !detailList.Equals(null)))
             {
                 for (int i = 0; i < 4; i++)
                     skuDetail[i] += detailList[i];
@@ -73,7 +73,7 @@ namespace Order_Manager.supportingClasses.Shipment
             // generate package detail -> weight and dimensions
             decimal[] skuDetail = { 0, 0, 0, 0 };
 
-            foreach (decimal[] detailList in value.Sku.Select(getSkuDetail).Where(detailList => !detailList.Equals(null)))
+            foreach (decimal[] detailList in value.Sku.Select(GetSkuDetail).Where(detailList => !detailList.Equals(null)))
             {
                 for (int i = 0; i < 4; i++)
                     skuDetail[i] += detailList[i];
@@ -110,7 +110,7 @@ namespace Order_Manager.supportingClasses.Shipment
         }
 
         /* a method that get the detail of the given sku */
-        public static decimal[] getSkuDetail(string sku)
+        public static decimal[] GetSkuDetail(string sku)
         {
             // local supporting fields
             decimal[] list = new decimal[4];

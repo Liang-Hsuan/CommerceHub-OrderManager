@@ -21,15 +21,15 @@ namespace Order_Manager.mainForms
         private readonly  ShopCa shopCa = new ShopCa();
 
         // field for carrier connection
-        private readonly UPS ups = new UPS();
+        private readonly Ups ups = new Ups();
         private readonly CanadaPost canadaPost = new CanadaPost();
 
         // field for storing data
         private struct Order
         {
-            public string source;
-            public string transactionId;
-            public string shipmentIdentificationNumber;
+            public string Source;
+            public string TransactionId;
+            public string ShipmentIdentificationNumber;
         }
 
         /* constructor that initialize graphic components and data in listview */
@@ -106,7 +106,7 @@ namespace Order_Manager.mainForms
 
             // get all the manifest links
             string groupId = DateTime.Today.ToString("yyyyMMdd");
-            string[] list = canadaPost.transmitShipments(groupId);
+            string[] list = canadaPost.TransmitShipments(groupId);
 
             // error check 1
             if (canadaPost.Error)
@@ -122,7 +122,7 @@ namespace Order_Manager.mainForms
             List<string> manifestList = new List<string>();
             foreach (string manifest in list)
             {
-                manifestList.Add(canadaPost.getManifest(manifest));
+                manifestList.Add(canadaPost.GetManifest(manifest));
 
                 // error check 2
                 if (!canadaPost.Error) continue;
@@ -137,8 +137,8 @@ namespace Order_Manager.mainForms
             // get artifact and save as pdf
             for (int i = 0; i < manifestList.Count; i++)
             {
-                byte[] binary = canadaPost.getArtifact(manifestList[i]);
-                canadaPost.exportLabel(binary, groupId + '_' + (i + 1), false, false);
+                byte[] binary = canadaPost.GetArtifact(manifestList[i]);
+                canadaPost.ExportLabel(binary, groupId + '_' + (i + 1), false, false);
             }
 
             // set end of day to true in database
@@ -172,19 +172,19 @@ namespace Order_Manager.mainForms
             List<Order> cancelList = (from ListViewItem item in listview.CheckedItems
                 select new Order
                 {
-                    source = item.SubItems[0].Text,
-                    transactionId = item.SubItems[1].Text,
-                    shipmentIdentificationNumber = item.SubItems[3].Text
+                    Source = item.SubItems[0].Text,
+                    TransactionId = item.SubItems[1].Text,
+                    ShipmentIdentificationNumber = item.SubItems[3].Text
                 }).ToList();
 
             // cancellation to carriers
             foreach (Order cancelledOrder in cancelList)
             {
-                switch (cancelledOrder.source)
+                switch (cancelledOrder.Source)
                 {
                     case "Sears":
-                        list[0].Add(cancelledOrder.transactionId);
-                        ups.postShipmentVoid(cancelledOrder.shipmentIdentificationNumber);
+                        list[0].Add(cancelledOrder.TransactionId);
+                        ups.postShipmentVoid(cancelledOrder.ShipmentIdentificationNumber);
                         if (ups.Error)
                         {
                             MessageBox.Show(ups.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -193,8 +193,8 @@ namespace Order_Manager.mainForms
                         channel[0] = true;
                         break;
                     case "Shop.ca":
-                        list[1].Add(cancelledOrder.transactionId);
-                        canadaPost.deleteShipment(cancelledOrder.shipmentIdentificationNumber);
+                        list[1].Add(cancelledOrder.TransactionId);
+                        canadaPost.DeleteShipment(cancelledOrder.ShipmentIdentificationNumber);
                         if (canadaPost.Error)
                         {
                             MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);

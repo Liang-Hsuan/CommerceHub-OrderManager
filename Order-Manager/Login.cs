@@ -18,12 +18,11 @@ namespace Order_Manager
         {
             InitializeComponent();
 
-            if (remember)
-            {
-                usernameTextbox.Text = Properties.Settings.Default.Username;
-                passwordTextbox.Text = Properties.Settings.Default.Password;
-                rememberCheckbox.Checked = true;
-            }
+            if (!remember) return;
+
+            usernameTextbox.Text = Properties.Settings.Default.Username;
+            passwordTextbox.Text = Properties.Settings.Default.Password;
+            rememberCheckbox.Checked = true;
         }
 
         /* sign in button event that check if the user put in right credentials */

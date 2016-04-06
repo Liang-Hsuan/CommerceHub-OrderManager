@@ -15,7 +15,7 @@ namespace Order_Manager.supportingClasses.Address
         private static HttpWebResponse response;
 
         /* the main method of the object that return if the address is valid or not */
-        public static bool validate(Address address)
+        public static bool Validate(Address address)
         {
             // generate uri
             string uri = "https://maps.googleapis.com/maps/api/geocode/json?address=";

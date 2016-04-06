@@ -15,7 +15,7 @@ namespace Order_Manager.channel.sears
         public static string SavePath { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_PackingSlip";
 
         /* a method that save the packing slip pdf */
-        public static void createPackingSlip(SearsValues value, int[] cancelIndex, bool preview)
+        public static void CreatePackingSlip(SearsValues value, int[] cancelIndex, bool preview)
         {
             // the case if all of the items in the order are cancelled -> don't need to print the packing slip
             if (cancelIndex.Length >= value.LineCount)
@@ -505,11 +505,13 @@ namespace Order_Manager.channel.sears
                     if (code.Length % 2 != 0)
                         code += "0";
 
-                    BarcodeInter25 barcode25 = new BarcodeInter25();
-                    barcode25.Code = code;
-                    barcode25.StartStopText = false;
-                    barcode25.Font = null;
-                    barcode25.Extended = true;
+                    BarcodeInter25 barcode25 = new BarcodeInter25
+                    {
+                        Code = code,
+                        StartStopText = false,
+                        Font = null,
+                        Extended = true
+                    };
 
                     image = barcode25.CreateImageWithBarcode(contentByte, BaseColor.BLACK, BaseColor.BLACK);
                     image.ScaleAbsoluteHeight(43f);
@@ -648,10 +650,7 @@ namespace Order_Manager.channel.sears
                     #region Right Unknown Region
                     // determine if the order is direct shipment
                     string take;
-                    if (value.PartnerPersonPlaceId == "")
-                        take = "DIRECT";
-                    else
-                        take = value.PartnerPersonPlaceId;
+                    take = value.PartnerPersonPlaceId == "" ? "DIRECT" : value.PartnerPersonPlaceId;
 
                     text = new Phrase(take, new Font(boldFont, 16));
                     ct.SetSimpleColumn(text, 318f, 519f, 418f, 539f, 0f, Element.ALIGN_LEFT);

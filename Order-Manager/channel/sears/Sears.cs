@@ -284,7 +284,7 @@ namespace Order_Manager.channel.sears
                 sftp.Get(SHIPMENT_DIR + "/" + file, filePath + "\\" + fileNameTxt);
 
                 // after download the file delete it on the server (no need it anymore)
-                ServerDelete.delete(sftp.Host, sftp.Username, sftp.Password, SHIPMENT_DIR + "/" + file);
+                ServerDelete.Delete(sftp.Host, sftp.Username, sftp.Password, SHIPMENT_DIR + "/" + file);
             }
 
             sftp.Close();

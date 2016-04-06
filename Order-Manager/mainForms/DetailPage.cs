@@ -68,7 +68,7 @@ namespace Order_Manager.mainForms
                     // ths case if the order is from sears
                     try
                     {
-                        SearsPackingSlip.createPackingSlip(searsValues, cancelIndex, true);
+                        SearsPackingSlip.CreatePackingSlip(searsValues, cancelIndex, true);
                     }
                     catch (Exception ex)
                     {
@@ -99,10 +99,10 @@ namespace Order_Manager.mainForms
             switch (CHANNEL)
             {
                 case "Sears":
-                    flag = AddressValidation.validate(searsValues.ShipTo);
+                    flag = AddressValidation.Validate(searsValues.ShipTo);
                     break;
                 case "Shop.ca":
-                    flag = AddressValidation.validate(shopCaValues.ShipTo);
+                    flag = AddressValidation.Validate(shopCaValues.ShipTo);
                     break;
             }
 
@@ -197,7 +197,7 @@ namespace Order_Manager.mainForms
                     for (int i = 0; i < searsValues.LineCount; i++)
                     {
                         if (listview.Items[i].SubItems[5].Text != "") continue;
-                        decimal[] detailList = Package.getSkuDetail(searsValues.TrxVendorSKU[i]);
+                        decimal[] detailList = Package.GetSkuDetail(searsValues.TrxVendorSKU[i]);
 
                         if (detailList == null) continue;
                         for (int j = 0; j < 4; j++)
@@ -208,7 +208,7 @@ namespace Order_Manager.mainForms
                     for (int i = 0; i < shopCaValues.OrderItemId.Count; i++)
                     {
                         if (listview.Items[i].SubItems[5].Text != "") continue;
-                        decimal[] detailList = Package.getSkuDetail(shopCaValues.Sku[i]);
+                        decimal[] detailList = Package.GetSkuDetail(shopCaValues.Sku[i]);
 
                         if (detailList == null) continue;
                         for (int j = 0; j < 4; j++)
@@ -278,10 +278,9 @@ namespace Order_Manager.mainForms
             switch (CHANNEL)
             {
                 case "Sears":
-
                     #region UPS
                     // initialize field for shipment
-                    UPS ups = new UPS();
+                    Ups ups = new Ups();
 
                     // post shipment confirm and get the digest string from response
                     string[] digest = ups.postShipmentConfirm(searsValues);
@@ -313,21 +312,16 @@ namespace Order_Manager.mainForms
                     new Sears().PostShip(searsValues.Package.TrackingNumber, searsValues.Package.IdentificationNumber, searsValues.TransactionID);
 
                     // get the shipment label and show it
-                    ups.exportLabel(acceptResult[1], searsValues.TransactionID, true);
-
-                    // set bool flag to false
-                    e.Result = false;
+                    ups.ExportLabel(acceptResult[1], searsValues.TransactionID, true);
                     break;
                     #endregion
-
                 case "Shop.ca":
-
                     #region Canada Post
                     // initialize field for shipment
                     CanadaPost canadaPost = new CanadaPost();
 
                     // create shipment for canada post
-                    string[] result = canadaPost.createShipment(shopCaValues);
+                    string[] result = canadaPost.CreateShipment(shopCaValues);
 
                     // error checking
                     if (canadaPost.Error)
@@ -347,7 +341,7 @@ namespace Order_Manager.mainForms
 
                     // get artifect
                     Thread.Sleep(5000);
-                    byte[] artifect = canadaPost.getArtifact(result[2]);
+                    byte[] artifect = canadaPost.GetArtifact(result[2]);
 
                     // error checking
                     if (canadaPost.Error)
@@ -358,13 +352,13 @@ namespace Order_Manager.mainForms
                     }
 
                     // get the shipment label and show it
-                    canadaPost.exportLabel(artifect, shopCaValues.OrderId, true, true);
-
-                    // set bool flag to false
-                    e.Result = false;
+                    canadaPost.ExportLabel(artifect, shopCaValues.OrderId, true, true);
                     break;
                     #endregion
             }
+
+            // set bool flag to false
+            e.Result = false;
         }
 
         private void backgroundWorkerShip_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
@@ -414,10 +408,9 @@ namespace Order_Manager.mainForms
             switch (CHANNEL)
             {
                 case "Sears":
-
                     #region UPS
                     // post void shipment request and get the response
-                    UPS ups = new UPS();
+                    Ups ups = new Ups();
                     ups.postShipmentVoid(searsValues.Package.IdentificationNumber);
 
                     // the case if is bad request
@@ -436,13 +429,11 @@ namespace Order_Manager.mainForms
 
                     break;
                     #endregion
-
                 case "Shop.ca":
-
                     #region Canada Post
                     // post void shipment request and get the response
                     CanadaPost canadaPost = new CanadaPost();
-                    canadaPost.deleteShipment(shopCaValues.Package.SelfLink);
+                    canadaPost.DeleteShipment(shopCaValues.Package.SelfLink);
 
                     // the cas if is bad request
                     if (canadaPost.Error)
@@ -532,7 +523,7 @@ namespace Order_Manager.mainForms
                     simulate(40, 70);
 
                     // post order to brightpearl
-                    bp.postOrder(searsValues, new List<int>(cancelList.Keys).ToArray());
+                    bp.PostOrder(searsValues, new List<int>(cancelList.Keys).ToArray());
 
                     break;
                 case "Shop.ca":
@@ -543,7 +534,7 @@ namespace Order_Manager.mainForms
                     simulate(40, 70);
 
                     // post order to brightpearl
-                    bp.postOrder(shopCaValues, new List<int>(cancelList.Keys).ToArray());
+                    bp.PostOrder(shopCaValues, new List<int>(cancelList.Keys).ToArray());
 
                     break;
             }
@@ -679,7 +670,7 @@ namespace Order_Manager.mainForms
                 listview.Items.Add(item);
 
                 // generate sku detail
-                decimal[] detailList = Package.getSkuDetail(value.TrxVendorSKU[i]);
+                decimal[] detailList = Package.GetSkuDetail(value.TrxVendorSKU[i]);
 
                 // the case if bad sku
                 if (detailList == null)
@@ -704,7 +695,6 @@ namespace Order_Manager.mainForms
             createLabelButton.Enabled = false;
             trackingNumberTextbox.Text = value.Package.TrackingNumber;
             voidShipmentButton.Visible = true;
-
             #endregion
         }
 
@@ -789,7 +779,7 @@ namespace Order_Manager.mainForms
                 listview.Items.Add(item);
 
                 // generate sku detail
-                decimal[] detailList = Package.getSkuDetail(value.Sku[i]);
+                decimal[] detailList = Package.GetSkuDetail(value.Sku[i]);
 
                 // the case if bad sku
                 if (detailList == null)

@@ -26,8 +26,8 @@ namespace Order_Manager.mainForms
         // field for storing data
         private struct Order
         {
-            public string source;
-            public string transactionId;
+            public string Source;
+            public string TransactionId;
         }
         private Order[] orderList;
 
@@ -79,34 +79,33 @@ namespace Order_Manager.mainForms
             confirm.ShowDialog(this);
 
             // if user select to confirm, process the orders that have been checked
-            if (confirm.DialogResult == DialogResult.OK)
+            if (confirm.DialogResult != DialogResult.OK) return;
+
+            // start the timer 
+            timer.Start();
+
+            // set confirm button to enable
+            shipmentConfirmButton.Enabled = false;
+
+            // initialize orderList for further shipment confirm use
+            int length = listview.CheckedItems.Count;
+            orderList = new Order[length];
+
+            // adding each order to the list with source and transaction id
+            for (int i = 0; i < length; i++)
             {
-                // start the timer 
-                timer.Start();
-
-                // set confirm button to enable
-                shipmentConfirmButton.Enabled = false;
-
-                // initialize orderList for further shipment confirm use
-                int length = listview.CheckedItems.Count;
-                orderList = new Order[length];
-
-                // adding each order to the list with source and transaction id
-                for (int i = 0; i < length; i++)
+                Order order = new Order
                 {
-                    Order order = new Order
-                    {
-                        source = listview.CheckedItems[i].SubItems[0].Text,
-                        transactionId = listview.CheckedItems[i].SubItems[4].Text
-                    };
+                    Source = listview.CheckedItems[i].SubItems[0].Text,
+                    TransactionId = listview.CheckedItems[i].SubItems[4].Text
+                };
 
-                    orderList[i] = order;
-                }
-
-                // call backgorund worker
-                if (!backgroundWorker.IsBusy)
-                    backgroundWorker.RunWorkerAsync();
+                orderList[i] = order;
             }
+
+            // call backgorund worker
+            if (!backgroundWorker.IsBusy)
+                backgroundWorker.RunWorkerAsync();
         }
 
         /* print button click that export the checked items' packing slip */
@@ -126,18 +125,18 @@ namespace Order_Manager.mainForms
             foreach (Order order in from ListViewItem item in listview.CheckedItems
                                     select new Order
                                     {
-                                        source = item.SubItems[0].Text,
-                                        transactionId = item.SubItems[4].Text
+                                        Source = item.SubItems[0].Text,
+                                        TransactionId = item.SubItems[4].Text
                                     })
             {
-                switch (order.source)
+                switch (order.Source)
                 {
                     case "Sears":
                         {
                             // the case if it is sears order
                             try
                             {
-                                SearsPackingSlip.createPackingSlip(sears.GenerateValue(order.transactionId), new int[0], false);
+                                SearsPackingSlip.CreatePackingSlip(sears.GenerateValue(order.TransactionId), new int[0], false);
                             }
                             catch (Exception ex)
                             {
@@ -152,7 +151,7 @@ namespace Order_Manager.mainForms
                             // the case if it is shop.ca order
                             try
                             {
-                                ShopCaPackingSlip.createPackingSlip(shopCa.GenerateValue(order.transactionId), new int[0], false);
+                                ShopCaPackingSlip.createPackingSlip(shopCa.GenerateValue(order.TransactionId), new int[0], false);
                             }
                             catch (Exception ex)
                             {
@@ -228,20 +227,20 @@ namespace Order_Manager.mainForms
         private void backgroundWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             // initialize all carrier fields
-            UPS ups = new UPS();
+            Ups ups = new Ups();
             CanadaPost canadaPost = new CanadaPost();
 
             // start processing orders
             foreach (Order order in orderList)
             {
                 // for sears order
-                switch (order.source)
+                switch (order.Source)
                 {
                     case "Sears":
                         {
                             #region Sears Order
                             // first get the detail for the order
-                            SearsValues value = sears.GenerateValue(order.transactionId);
+                            SearsValues value = sears.GenerateValue(order.TransactionId);
                             value.Package = new Package(value);
 
                             // second ship it
@@ -262,11 +261,11 @@ namespace Order_Manager.mainForms
                             // get identification, tracking, label and shipment confirm with no cancellation of item
                             value.Package.IdentificationNumber = digest[0];
                             value.Package.TrackingNumber = result[0];
-                            ups.exportLabel(result[1], value.TransactionID, false);
+                            ups.ExportLabel(result[1], value.TransactionID, false);
                             sears.GenerateXML(value, new System.Collections.Generic.Dictionary<int, string>());
 
                             // post order to brightpearl with no cancellation
-                            bp.postOrder(value, new int[0]);
+                            bp.PostOrder(value, new int[0]);
                             #endregion
                         }
                         break;
@@ -274,11 +273,11 @@ namespace Order_Manager.mainForms
                         {
                             #region Shop.ca Order
                             // first get the detail for the order
-                            ShopCaValues value = shopCa.GenerateValue(order.transactionId);
+                            ShopCaValues value = shopCa.GenerateValue(order.TransactionId);
                             value.Package = new Package(value);
 
                             // second ship it
-                            string[] links = canadaPost.createShipment(value);
+                            string[] links = canadaPost.CreateShipment(value);
                             if (canadaPost.Error)
                             {
                                 MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -292,13 +291,13 @@ namespace Order_Manager.mainForms
                             shopCa.GenerateCSV(value, new System.Collections.Generic.Dictionary<int, string>());
 
                             // post order to brightpearl with no cancellation
-                            bp.postOrder(value, new int[0]);
+                            bp.PostOrder(value, new int[0]);
 
                             System.Threading.Thread.Sleep(5000);
 
                             // get artifact and export it
-                            byte[] binary = canadaPost.getArtifact(links[2]);
-                            canadaPost.exportLabel(binary, value.OrderId, true, false);
+                            byte[] binary = canadaPost.GetArtifact(links[2]);
+                            canadaPost.ExportLabel(binary, value.OrderId, true, false);
                             #endregion
                         }
                         break;

@@ -44,7 +44,7 @@ namespace Order_Manager.channel.brightpearl
         }
 
         /* a method that post sears order to brightpearl on sears account */
-        public void postOrder(SearsValues value, int[] cancelList)
+        public void PostOrder(SearsValues value, int[] cancelList)
         {
             // check if the order is cancelled entirely -> if it is just return no need to post it
             if (cancelList.Length >= value.LineCount)
@@ -55,7 +55,7 @@ namespace Order_Manager.channel.brightpearl
             BPvalues orderValue = new BPvalues(value.Recipient, value.TransactionID, value.CustOrderDate, 1, 7, null, null, 0, 0, 0, 0);
 
             // post order
-            string orderId = post.postOrderRequest("2854", orderValue);
+            string orderId = post.PostOrderRequest("2854", orderValue);
             Status = "Getting order ID - Sears";
             if (post.HasError)
             {
@@ -63,7 +63,7 @@ namespace Order_Manager.channel.brightpearl
                 do
                 {
                     Thread.Sleep(5000);
-                    orderId = post.postOrderRequest("2854", orderValue);
+                    orderId = post.PostOrderRequest("2854", orderValue);
                 } while (post.HasError);
             }
 
@@ -129,7 +129,7 @@ namespace Order_Manager.channel.brightpearl
                 BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], value.TrxUnitCost[i], value.TrxUnitCost[i] * tax, 0);
 
                 // post order row
-                string orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                string orderRowId = post.PostOrderRowRequest(orderId, itemValue);
                 Status = "Getting order row ID";
                 if (post.HasError)
                 {
@@ -137,12 +137,12 @@ namespace Order_Manager.channel.brightpearl
                     do
                     {
                         Thread.Sleep(5000);
-                        orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                        orderRowId = post.PostOrderRowRequest(orderId, itemValue);
                     } while (post.HasError);
                 }
 
                 // post reservation
-                post.postReservationRequest(orderId, orderRowId, itemValue);
+                post.PostReservationRequest(orderId, orderRowId, itemValue);
                 Status = "Posting reservation request " + i;
                 if (!post.HasError) continue;
 
@@ -150,14 +150,14 @@ namespace Order_Manager.channel.brightpearl
                 do
                 {
                     Thread.Sleep(5000);
-                    post.postReservationRequest(orderId, orderRowId, itemValue);
+                    post.PostReservationRequest(orderId, orderRowId, itemValue);
                 } while (post.HasError);
             }
             #endregion
         }
 
         /* a method that post shop.ca order to brightpearl on shop.ca account */
-        public void postOrder(ShopCaValues value, int[] cancelList)
+        public void PostOrder(ShopCaValues value, int[] cancelList)
         {
             // check if the order is cancelled entirely -> if it is just return no need to post it
             if (cancelList.Length >= value.OrderItemId.Count)
@@ -168,7 +168,7 @@ namespace Order_Manager.channel.brightpearl
             BPvalues orderValue = new BPvalues(value.ShipTo, value.OrderId, value.OrderCreateDate, 15, 1, null, null, 0, 0, 0, 0);
 
             // post order
-            string orderId = post.postOrderRequest("2897", orderValue);
+            string orderId = post.PostOrderRequest("2897", orderValue);
             Status = "Getting order ID";
             if (post.HasError)
             {
@@ -176,7 +176,7 @@ namespace Order_Manager.channel.brightpearl
                 do
                 {
                     Thread.Sleep(5000);
-                    orderId = post.postOrderRequest("2897", orderValue);
+                    orderId = post.PostOrderRequest("2897", orderValue);
                 } while (post.HasError);
             }
 
@@ -190,7 +190,7 @@ namespace Order_Manager.channel.brightpearl
                 BPvalues itemValue = new BPvalues(value.ShipTo, null, DateTime.Today, 1, 7, value.Sku[i], value.Title[i], value.Quantity[i], Convert.ToDouble(value.ExtendedItemPrice[i]), Convert.ToDouble(value.ItemTax[i]), 0);
 
                 // post order row
-                string orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                string orderRowId = post.PostOrderRowRequest(orderId, itemValue);
                 Status = "Getting order row ID";
                 if (post.HasError)
                 {
@@ -198,12 +198,12 @@ namespace Order_Manager.channel.brightpearl
                     do
                     {
                         Thread.Sleep(5000);
-                        orderRowId = post.postOrderRowRequest(orderId, itemValue);
+                        orderRowId = post.PostOrderRowRequest(orderId, itemValue);
                     } while (post.HasError);
                 }
 
                 // post reservation
-                post.postReservationRequest(orderId, orderRowId, itemValue);
+                post.PostReservationRequest(orderId, orderRowId, itemValue);
                 Status = "Posting reservation request " + i;
                 if (!post.HasError) continue;
 
@@ -211,7 +211,7 @@ namespace Order_Manager.channel.brightpearl
                 do
                 {
                     Thread.Sleep(5000);
-                    post.postReservationRequest(orderId, orderRowId, itemValue);
+                    post.PostReservationRequest(orderId, orderRowId, itemValue);
                 } while (post.HasError);
             }
             #endregion
@@ -256,7 +256,7 @@ namespace Order_Manager.channel.brightpearl
             }
 
             /* a method that return customer id from given firstname and lastname*/
-            public string getCustomerId(string firstName, string lastName, string postalCode)
+            public string GetCustomerId(string firstName, string lastName, string postalCode)
             {
                 #region Contact ID Get
                 string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/contact-service/contact-search?firstName=" + firstName + "&lastName=" + lastName;
@@ -333,7 +333,7 @@ namespace Order_Manager.channel.brightpearl
             }
 
             /* a method that return product id from given sku */
-            public string getProductId(string sku)
+            public string GetProductId(string sku)
             {
                 string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/product-service/product-search?SKU=" + sku;
 
@@ -385,7 +385,7 @@ namespace Order_Manager.channel.brightpearl
             }
 
             /* post new address to API */
-            public string postAddressRequest(Address address)
+            public string PostAddressRequest(Address address)
             {
                 const string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/contact-service/postal-address";
 
@@ -416,7 +416,7 @@ namespace Order_Manager.channel.brightpearl
             }
 
             /* post new customer to API */
-            public string postContactRequest(string addressID, BPvalues value)
+            public string PostContactRequest(string addressID, BPvalues value)
             {
                 const string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/contact-service/contact";
 
@@ -448,7 +448,7 @@ namespace Order_Manager.channel.brightpearl
             }
 
             /* post new order to API */
-            public string postOrderRequest(string contactID, BPvalues value)
+            public string PostOrderRequest(string contactID, BPvalues value)
             {
                 // reset boolean flag to false 
                 HasError = false;
@@ -492,13 +492,13 @@ namespace Order_Manager.channel.brightpearl
             }
 
             /* post new order row to API */
-            public string postOrderRowRequest(string orderID, BPvalues value)
+            public string PostOrderRowRequest(string orderID, BPvalues value)
             {
                 // reset boolean flag to false 
                 HasError = false;
 
                 // get product id
-                string productId = new GetRequest(appRef, appToken).getProductId(value.SKU);
+                string productId = new GetRequest(appRef, appToken).GetProductId(value.SKU);
 
                 string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/order-service/order/" + orderID + "/row";
                 request = (HttpWebRequest)WebRequest.Create(uri);
@@ -593,14 +593,14 @@ namespace Order_Manager.channel.brightpearl
             }
 
             /* post reservation request to API return the message*/
-            public void postReservationRequest(string orderID, string orderRowID, BPvalues value)
+            public void PostReservationRequest(string orderID, string orderRowID, BPvalues value)
             {
                 // reset boolean flag to false 
                 HasError = false;
 
                 // get product id
                 GetRequest get = new GetRequest(appRef, appToken);
-                string productId = get.getProductId(value.SKU);
+                string productId = get.GetProductId(value.SKU);
 
                 string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/warehouse-service/order/" + orderID + "/reservation/warehouse/2";
                 request = (HttpWebRequest)WebRequest.Create(uri);
@@ -640,7 +640,7 @@ namespace Order_Manager.channel.brightpearl
             }
 
             /* post receipt to API */
-            public void postReceipt(string orderID, string contactID, BPvalues value)
+            public void PostReceipt(string orderID, string contactID, BPvalues value)
             {
                 // reset boolean flag to false 
                 HasError = false;

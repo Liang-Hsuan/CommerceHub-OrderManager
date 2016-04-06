@@ -42,7 +42,7 @@ namespace Order_Manager.supportingClasses.Shipment
 
         #region API Methods
         /* a method that create shipment and return [0] tracking pin, [1] self link, [2] label link */
-        public string[] createShipment(ShopCaValues value)
+        public string[] CreateShipment(ShopCaValues value)
         {
             // set error to false
             Error = false;
@@ -184,7 +184,7 @@ namespace Order_Manager.supportingClasses.Shipment
         }
 
         /* a method that get artifect in pdf binary format */
-        public byte[] getArtifact(string labelLink)
+        public byte[] GetArtifact(string labelLink)
         {
             // post request to uri
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(labelLink);
@@ -203,7 +203,7 @@ namespace Order_Manager.supportingClasses.Shipment
         }
 
         /* a method that delete shipment */
-        public void deleteShipment(string selfLink)
+        public void DeleteShipment(string selfLink)
         {
             // set error to false
             Error = false;
@@ -230,7 +230,7 @@ namespace Order_Manager.supportingClasses.Shipment
         }
 
         /* a method that post transmit shipment */
-        public string[] transmitShipments(string groupId)
+        public string[] TransmitShipments(string groupId)
         {
             // set error to false
             Error = false;
@@ -310,7 +310,7 @@ namespace Order_Manager.supportingClasses.Shipment
         }
 
         /* a method that get artifact link for the given manifest link */
-        public string getManifest(string manifestLink)
+        public string GetManifest(string manifestLink)
         {
             // set error to false
             Error = false;
@@ -360,7 +360,7 @@ namespace Order_Manager.supportingClasses.Shipment
         #endregion
 
         /* a method that turn binary string into pdf file */
-        public void exportLabel(byte[] binary, string orderId, bool label, bool preview)
+        public void ExportLabel(byte[] binary, string orderId, bool label, bool preview)
         {
             // create path
             string file;
@@ -387,11 +387,10 @@ namespace Order_Manager.supportingClasses.Shipment
             File.WriteAllBytes(file, binary);
 
             // show the pdf if user want to preview
-            if (preview)
-            {
-                if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)
-                    System.Diagnostics.Process.Start(file);
-            }
+            if (!preview) return;
+
+            if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)
+                System.Diagnostics.Process.Start(file);
         }
     }
 }

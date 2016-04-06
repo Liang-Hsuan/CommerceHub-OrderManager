@@ -12,7 +12,7 @@ namespace Order_Manager.supportingClasses.Shipment
     /* 
      * A class that post shipment to UPS
      */
-    public class UPS : Shipment
+    public class Ups : Shipment
     {
         // field for credentials
         private readonly string ACCESS_LISCENSE_NUMBER;
@@ -25,7 +25,7 @@ namespace Order_Manager.supportingClasses.Shipment
         public string SavePathSears { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_ShippingLabel";
 
         /* constructor that initialize UPS credentials */
-        public UPS()
+        public Ups()
         {
             // get credentials from database
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.ASCMcs))
@@ -361,7 +361,7 @@ namespace Order_Manager.supportingClasses.Shipment
         #endregion
 
         /* a method that turn base64 string into GIF format image */
-        public void exportLabel(string base64String, string transactionId, bool preview)
+        public void ExportLabel(string base64String, string transactionId, bool preview)
         { 
             // Convert Base64 String to byte[]
             byte[] imageBytes = Convert.FromBase64String(base64String);

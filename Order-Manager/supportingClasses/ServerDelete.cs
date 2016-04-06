@@ -9,7 +9,7 @@ namespace Order_Manager.supportingClasses
     public static class ServerDelete
     {
         /* the only function in the class that delete file on the sftp server */
-        public static void delete(string host, string username, string password, string fileName)
+        public static void Delete(string host, string username, string password, string fileName)
         {
             JSch js = new JSch();
 
