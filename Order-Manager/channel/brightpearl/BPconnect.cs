@@ -52,7 +52,7 @@ namespace Order_Manager.channel.brightpearl
 
             #region Posting Order to Sears Account on BP
             // initialize order BPvalues object
-            BPvalues orderValue = new BPvalues(value.Recipient, value.TransactionID, value.CustOrderDate, 1, 7, null, null, 0, 0, 0, 0);
+            BPvalues orderValue = new BPvalues(value.Recipient, value.CustOrderNumber, value.CustOrderDate, 1, 7, null, null, 0, 0, 0, 0);
 
             // post order
             string orderId = post.PostOrderRequest("2854", orderValue);

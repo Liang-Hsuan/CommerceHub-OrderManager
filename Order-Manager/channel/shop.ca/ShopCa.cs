@@ -164,8 +164,9 @@ namespace Order_Manager.channel.shop.ca
             // grab all shipped 
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
+                string date = DateTime.Today.ToString("yyyy-MM-dd");
                 SqlCommand command = new SqlCommand("SELECT OrderId, TrackingNumber, SelfLink FROM ShopCa_Order " +
-                                                    "WHERE EndofDay != 1 AND ShipDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\';", connection);
+                                                    "WHERE EndofDay != 1 AND TrackingNumber != '' AND (ShipDate = \'" + date + "\' OR CompleteDate = \'" + date + "\')", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 
@@ -205,9 +206,10 @@ namespace Order_Manager.channel.shop.ca
         /* a method that mark the order as end of day, so it cannot be voided anymore */
         public void PostShip(bool endOfDay, DateTime shipDate)
         {
+            string date = shipDate.ToString("yyyy-MM-dd");
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET EndofDay = \'" + endOfDay + "\' WHERE ShipDate = \'" + shipDate.ToString("yyyy-MM-dd") + "\';", connection);
+                SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET EndofDay = \'" + endOfDay + "\' WHERE ShipDate = \'" + date + "\' OR CompleteDate = \'" + date + "\'", connection);
                 connection.Open();
                 command.ExecuteNonQuery();
             }

@@ -118,7 +118,7 @@ namespace Order_Manager.supportingClasses.Shipment
             // [0] weight, [1] length, [2] width, [3] height
             using (SqlConnection conneciton = new SqlConnection(Properties.Settings.Default.Designcs))
             {
-                SqlCommand command = new SqlCommand("SELECT Weight_grams, Shippable_Depth_cm, Shippable_Width_cm, Shippable_Height_cm " +
+                SqlCommand command = new SqlCommand("SELECT Weight_grams, Shippable_Height_cm, Shippable_Width_cm, Shippable_Depth_cm " +
                                                     "FROM master_Design_Attributes design JOIN master_SKU_Attributes sku ON (design.Design_Service_Code = sku.Design_Service_Code) " +
                                                     "WHERE SKU_Ashlin = \'" + sku + "\';", conneciton);
                 conneciton.Open();

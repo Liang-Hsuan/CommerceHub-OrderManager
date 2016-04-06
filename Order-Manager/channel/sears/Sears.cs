@@ -180,8 +180,9 @@ namespace Order_Manager.channel.sears
             // grab all shipped 
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
+                string date = DateTime.Today.ToString("yyyy-MM-dd");
                 SqlCommand command = new SqlCommand("SELECT TransactionId, TrackingNumber, ShipmentIdentificationNumber FROM Sears_Order " +
-                                                    "WHERE ShipDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\';", connection);
+                                                    "WHERE TrackingNumber != '' AND (ShipDate = \'" + date + "\' OR CompleteDate = \'" + date + "\')", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 
