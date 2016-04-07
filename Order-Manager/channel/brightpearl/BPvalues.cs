@@ -16,7 +16,7 @@ namespace Order_Manager.channel.brightpearl
         public DateTime PlaceOn { get; set; }
         public int ChannelId { get; set; }
         public int DeliveryId { get; set; }
-        public string SKU { get; set; }
+        public string Sku { get; set; }
         public string ProductName { get; set; }
         public int Quantity { get; set; }
         public double RowNet { get; set; }
@@ -32,7 +32,7 @@ namespace Order_Manager.channel.brightpearl
             PlaceOn = DateTime.Today;
             ChannelId = 0;
             DeliveryId = 0;
-            SKU = "";
+            Sku = "";
             ProductName = "";
             Quantity = 0;
             RowNet = 0;
@@ -50,7 +50,7 @@ namespace Order_Manager.channel.brightpearl
             PlaceOn = placeOn;
             ChannelId = channelId;
             DeliveryId = deliveryId;
-            SKU = sku;
+            Sku = sku;
             ProductName = productName;
             Quantity = quantity;
             RowNet = rowNet;

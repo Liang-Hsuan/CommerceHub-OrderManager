@@ -15,7 +15,7 @@ namespace Order_Manager.channel.shop.ca
         public static string SavePath { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ShopCa_PackingSlip";
 
         /* a method that save the packing slip pdf */
-        public static void createPackingSlip(ShopCaValues value, int[] cancelIndex, bool preview)
+        public static void CreatePackingSlip(ShopCaValues value, int[] cancelIndex, bool preview)
         {
             // the case if all of the items in the order are cancelled -> don't need to print the packing slip
             if (cancelIndex.Length >= value.OrderItemId.Count)
@@ -27,7 +27,7 @@ namespace Order_Manager.channel.shop.ca
 
             // initialize fields
             Document doc = new Document(PageSize.LETTER, 0, 0, 0, 0);
-            string file = SavePath + "\\" + value.OrderId + ".pdf"; ;
+            string file = SavePath + "\\" + value.OrderId + ".pdf";
             PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(file, FileMode.Create));
 
             // open the documents

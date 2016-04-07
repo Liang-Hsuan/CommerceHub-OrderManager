@@ -151,7 +151,7 @@ namespace Order_Manager.mainForms
                             // the case if it is shop.ca order
                             try
                             {
-                                ShopCaPackingSlip.createPackingSlip(shopCa.GenerateValue(order.TransactionId), new int[0], false);
+                                ShopCaPackingSlip.CreatePackingSlip(shopCa.GenerateValue(order.TransactionId), new int[0], false);
                             }
                             catch (Exception ex)
                             {
@@ -261,7 +261,7 @@ namespace Order_Manager.mainForms
                             // get identification, tracking, label and shipment confirm with no cancellation of item
                             value.Package.IdentificationNumber = digest[0];
                             value.Package.TrackingNumber = result[0];
-                            ups.ExportLabel(result[1], value.TransactionID, false);
+                            ups.ExportLabel(result[1], value.TransactionId, false);
                             sears.GenerateXML(value, new System.Collections.Generic.Dictionary<int, string>());
 
                             // post order to brightpearl with no cancellation
@@ -368,10 +368,10 @@ namespace Order_Manager.mainForms
                 else
                 {
                     item.SubItems.Add(value.Description[0]);
-                    item.SubItems.Add(value.TrxVendorSKU[0]);
+                    item.SubItems.Add(value.TrxVendorSku[0]);
                 }
 
-                item.SubItems.Add(value.TransactionID);
+                item.SubItems.Add(value.TransactionId);
                 item.SubItems.Add(value.CustOrderDate.ToString("yyyy-MM-dd"));
                 item.SubItems.Add(value.TrxBalanceDue.ToString());
 

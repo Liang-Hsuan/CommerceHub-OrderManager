@@ -36,7 +36,7 @@ namespace Order_Manager.channel.sears
                 {
                     // initialize PdfWriter object
                     Document doc = new Document(PageSize.LETTER, 0, 0, 0, 35);
-                    string file = SavePath + "\\" + value.TransactionID + "_" + (i + 1) + ".pdf";
+                    string file = SavePath + "\\" + value.TransactionId + "_" + (i + 1) + ".pdf";
                     PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(file, FileMode.Create));
 
                     // open the document 
@@ -147,7 +147,7 @@ namespace Order_Manager.channel.sears
                     ct.Go();
 
                     // data in the first box
-                    string merchantSku = value.TrxMerchantSKU[i];
+                    string merchantSku = value.TrxMerchantSku[i];
                     text = new Phrase(merchantSku.Remove(2), new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 23f, 587f, 38f, 597f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
@@ -199,7 +199,7 @@ namespace Order_Manager.channel.sears
                     draw.Stroke();
 
                     // title in the second box
-                    text = new Phrase("  D             REASON       DATE\nM.U.C        RAISON", new iTextSharp.text.Font(baseFont, 7));
+                    text = new Phrase("  D             REASON       DATE\nM.U.C        RAISON", new Font(baseFont, 7));
                     ct.SetSimpleColumn(text, 24f, 553.5f, 174f, 603.5f, 21.5f, Element.ALIGN_LEFT);
                     ct.Go();
                     #endregion
@@ -349,7 +349,7 @@ namespace Order_Manager.channel.sears
                     text = new Phrase(value.CustOrderNumber, new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 10f, 446f, 150f, 462f, 10f, Element.ALIGN_LEFT);
                     ct.Go();
-                    text = new Phrase("VENDOR SKU\n" + value.TrxVendorSKU[i], new Font(boldFont, 13));
+                    text = new Phrase("VENDOR SKU\n" + value.TrxVendorSku[i], new Font(boldFont, 13));
                     ct.SetSimpleColumn(text, 10f, 400f, 150f, 450f, 11f, Element.ALIGN_LEFT);
                     ct.Go();
 
@@ -359,7 +359,7 @@ namespace Order_Manager.channel.sears
                     ct.Go();
 
                     // sku number
-                    merchantSku = value.TrxMerchantSKU[i];
+                    merchantSku = value.TrxMerchantSku[i];
                     text = new Phrase(merchantSku.Remove(2), new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 24f, 413.5f, 39f, 428.5f, 10f, Element.ALIGN_LEFT);
                     ct.Go();
@@ -408,7 +408,7 @@ namespace Order_Manager.channel.sears
                     ct.Go();
 
                     // note
-                    text = new Phrase("THIS BILL OF SALE IS REQUIRED FOR RETURN OR ADJUSTMENT\nOF PURCHASE.\nCETTE FACTURE EST REQUISE POUR TOUT RETROU DE\nMARCHANDIS OU RECLAMATION.", new iTextSharp.text.Font(boldFont, 9));
+                    text = new Phrase("THIS BILL OF SALE IS REQUIRED FOR RETURN OR ADJUSTMENT\nOF PURCHASE.\nCETTE FACTURE EST REQUISE POUR TOUT RETROU DE\nMARCHANDIS OU RECLAMATION.", new Font(boldFont, 9));
                     ct.SetSimpleColumn(text, 10f, 277f, 320f, 317f, 9f, Element.ALIGN_LEFT);
                     ct.Go();
                     #endregion
@@ -440,7 +440,7 @@ namespace Order_Manager.channel.sears
                     draw.Stroke();
 
                     // text
-                    text = new Phrase("REASON\n RAISON", new iTextSharp.text.Font(baseFont, 11));
+                    text = new Phrase("REASON\n RAISON", new Font(baseFont, 11));
                     ct.SetSimpleColumn(text, 47f, 208f, 97f, 250f, 16f, Element.ALIGN_LEFT);
                     ct.Go();
                     #endregion
@@ -478,16 +478,18 @@ namespace Order_Manager.channel.sears
                     #region Barcode Left Bottom
                     #region Barcode One
                     // barcode number
-                    text = new Phrase(value.EncodedPrice[i], new iTextSharp.text.Font(baseFont, 9));
+                    text = new Phrase(value.EncodedPrice[i], new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 16f, 177f, 176f, 192f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
 
                     // add barcode
-                    Barcode128 barcode128 = new Barcode128();
-                    barcode128.Code = value.EncodedPrice[i];
-                    barcode128.StartStopText = false;
-                    barcode128.Font = null;
-                    barcode128.Extended = true;
+                    Barcode128 barcode128 = new Barcode128
+                    {
+                        Code = value.EncodedPrice[i],
+                        StartStopText = false,
+                        Font = null,
+                        Extended = true
+                    };
 
                     Image image = barcode128.CreateImageWithBarcode(contentByte, BaseColor.BLACK, BaseColor.BLACK);
                     image.ScaleAbsoluteHeight(43f);
@@ -501,7 +503,7 @@ namespace Order_Manager.channel.sears
                     #endregion
 
                     #region Barcode Two
-                    string code = value.TrxMerchantSKU[i].Replace(" ", string.Empty);
+                    string code = value.TrxMerchantSku[i].Replace(" ", string.Empty);
                     if (code.Length % 2 != 0)
                         code += "0";
 
@@ -519,20 +521,20 @@ namespace Order_Manager.channel.sears
                     contentByte.AddImage(image);
 
                     // barcode text
-                    text = new Phrase(value.TrxMerchantSKU[i] + "\n" + value.Description[i], new iTextSharp.text.Font(baseFont, 9));
+                    text = new Phrase(value.TrxMerchantSku[i] + "\n" + value.Description[i], new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 16f, 48f, 156f, 68f, 9f, Element.ALIGN_LEFT);
                     ct.Go();
 
                     // section description
-                    text = new Phrase("THIS BILL OF SALE IS\nREQUIRED FOR RETURN", new iTextSharp.text.Font(boldFont, 9));
+                    text = new Phrase("THIS BILL OF SALE IS\nREQUIRED FOR RETURN", new Font(boldFont, 9));
                     ct.SetSimpleColumn(text, 181f, 66f, 291f, 116f, 9f, Element.ALIGN_LEFT);
                     ct.Go();
 
                     // useless stuff
-                    text = new Phrase("66", new iTextSharp.text.Font(boldFont, 11));
+                    text = new Phrase("66", new Font(boldFont, 11));
                     ct.SetSimpleColumn(text, 200f, 61f, 220f, 71f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
-                    text = new Phrase("V2C", new iTextSharp.text.Font(boldFont, 13));
+                    text = new Phrase("V2C", new Font(boldFont, 13));
                     ct.SetSimpleColumn(text, 258f, 3f, 300f, 23f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
                     #endregion
@@ -565,11 +567,13 @@ namespace Order_Manager.channel.sears
                     ct.Go();
 
                     // add barcode
-                    barcode128 = new Barcode128();
-                    barcode128.Code = value.EncodedPrice[i];
-                    barcode128.StartStopText = false;
-                    barcode128.Font = null;
-                    barcode128.Extended = true;
+                    barcode128 = new Barcode128
+                    {
+                        Code = value.EncodedPrice[i],
+                        StartStopText = false,
+                        Font = null,
+                        Extended = true
+                    };
 
                     image = barcode128.CreateImageWithBarcode(contentByte, BaseColor.BLACK, BaseColor.BLACK);
                     image.ScaleAbsoluteHeight(43f);
@@ -614,7 +618,7 @@ namespace Order_Manager.channel.sears
                     ct.Go();
 
                     // data in the first box
-                    merchantSku = value.TrxMerchantSKU[i];
+                    merchantSku = value.TrxMerchantSku[i];
                     text = new Phrase(merchantSku.Remove(2), new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 326f, 582f, 349f, 592f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
@@ -649,8 +653,7 @@ namespace Order_Manager.channel.sears
 
                     #region Right Unknown Region
                     // determine if the order is direct shipment
-                    string take;
-                    take = value.PartnerPersonPlaceId == "" ? "DIRECT" : value.PartnerPersonPlaceId;
+                    string take = value.PartnerPersonPlaceId == "" ? "DIRECT" : value.PartnerPersonPlaceId;
 
                     text = new Phrase(take, new Font(boldFont, 16));
                     ct.SetSimpleColumn(text, 318f, 519f, 418f, 539f, 0f, Element.ALIGN_LEFT);
@@ -718,11 +721,13 @@ namespace Order_Manager.channel.sears
                     if (code.Length % 2 != 0)
                         code += "0";
 
-                    barcode25 = new BarcodeInter25();
-                    barcode25.Code = code;
-                    barcode25.StartStopText = false;
-                    barcode25.Font = null;
-                    barcode25.Extended = true;
+                    barcode25 = new BarcodeInter25
+                    {
+                        Code = code,
+                        StartStopText = false,
+                        Font = null,
+                        Extended = true
+                    };
 
                     image = barcode25.CreateImageWithBarcode(contentByte, BaseColor.BLACK, BaseColor.BLACK);
                     image.ScaleAbsoluteHeight(43f);

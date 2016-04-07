@@ -126,7 +126,7 @@ namespace Order_Manager.channel.brightpearl
                 #endregion
 
                 // initialize BPvalues object -> no need tax and total paid ( this is unit cost & no recipt )
-                BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSKU[i], value.Description[i], value.TrxQty[i], value.TrxUnitCost[i], value.TrxUnitCost[i] * tax, 0);
+                BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSku[i], value.Description[i], value.TrxQty[i], value.TrxUnitCost[i], value.TrxUnitCost[i] * tax, 0);
 
                 // post order row
                 string orderRowId = post.PostOrderRowRequest(orderId, itemValue);
@@ -498,7 +498,7 @@ namespace Order_Manager.channel.brightpearl
                 HasError = false;
 
                 // get product id
-                string productId = new GetRequest(appRef, appToken).GetProductId(value.SKU);
+                string productId = new GetRequest(appRef, appToken).GetProductId(value.Sku);
 
                 string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/order-service/order/" + orderID + "/row";
                 request = (HttpWebRequest)WebRequest.Create(uri);
@@ -563,7 +563,7 @@ namespace Order_Manager.channel.brightpearl
                 if (productId != null)
                     textJSON = "{\"productId\":\"" + productId + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"" + taxCode + "\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 4) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax, 4) + "\"}}}";
                 else
-                    textJSON = "{\"productName\":\"" + value.ProductName + " " + value.SKU  + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"" + taxCode + "\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 4) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax, 4) + "\"}}}";
+                    textJSON = "{\"productName\":\"" + value.ProductName + " " + value.Sku  + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"" + taxCode + "\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 4) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax, 4) + "\"}}}";
 
 
                 // turn request string into a byte stream
@@ -600,7 +600,7 @@ namespace Order_Manager.channel.brightpearl
 
                 // get product id
                 GetRequest get = new GetRequest(appRef, appToken);
-                string productId = get.GetProductId(value.SKU);
+                string productId = get.GetProductId(value.Sku);
 
                 string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/warehouse-service/order/" + orderID + "/reservation/warehouse/2";
                 request = (HttpWebRequest)WebRequest.Create(uri);

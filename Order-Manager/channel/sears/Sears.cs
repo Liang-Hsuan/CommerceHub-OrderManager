@@ -100,7 +100,7 @@ namespace Order_Manager.channel.sears
                     SearsValues value = new SearsValues();
 
                     string transactionId = reader.GetString(0);
-                    value.TransactionID = transactionId;
+                    value.TransactionId = transactionId;
                     value.LineCount = reader.GetInt32(1);
                     value.PoNumber = reader.GetString(2);
                     value.TrxBalanceDue = Convert.ToDouble(reader.GetValue(3));
@@ -144,9 +144,9 @@ namespace Order_Manager.channel.sears
                     {
                         value.LineBalanceDue.Add(Convert.ToDouble(table.Rows[i][0]));
                         value.MerchantLineNumber.Add(Convert.ToInt32(table.Rows[i][1]));
-                        value.TrxVendorSKU.Add(table.Rows[i][2].ToString());
-                        value.TrxMerchantSKU.Add(table.Rows[i][3].ToString());
-                        value.UPC.Add(table.Rows[i][4].ToString());
+                        value.TrxVendorSku.Add(table.Rows[i][2].ToString());
+                        value.TrxMerchantSku.Add(table.Rows[i][3].ToString());
+                        value.Upc.Add(table.Rows[i][4].ToString());
                         value.TrxQty.Add(Convert.ToInt32(table.Rows[i][5]));
                         value.TrxUnitCost.Add(Convert.ToDouble(table.Rows[i][6]));
                         value.Description.Add(table.Rows[i][7].ToString());
@@ -190,7 +190,7 @@ namespace Order_Manager.channel.sears
                 {
                     SearsValues value = new SearsValues
                     {
-                        TransactionID = reader.GetString(0),
+                        TransactionId = reader.GetString(0),
                         Package =
                         {
                             TrackingNumber = reader.GetString(1),
@@ -384,7 +384,7 @@ namespace Order_Manager.channel.sears
         {
             // get other necessary values
             value.VendorInvoiceNumber = getInvoiceNumber();
-            value.PackageDetailID = getPackageId();
+            value.PackageDetailId = getPackageId();
 
             // fields for database update
             SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs);
@@ -395,9 +395,9 @@ namespace Order_Manager.channel.sears
             string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                          "<ConfirmMessageBatch>" +
                          "<partnerID roleType=\"vendor\" name=\"Ashlin BPG Marketing, Inc.\">ashlinbpg</partnerID>" +
-                         "<hubConfirm transactionID=\"" + value.TransactionID + "\">" +
+                         "<hubConfirm transactionID=\"" + value.TransactionId + "\">" +
                          "<participatingParty roleType=\"merchant\" name=\"Sears Canada\" participationCode=\"To:\">searscanada</participatingParty>" +
-                         "<partnerTrxID>" + value.PartnerTrxID + "</partnerTrxID>" +
+                         "<partnerTrxID>" + value.PartnerTrxId + "</partnerTrxID>" +
                          "<partnerTrxDate>" + DateTime.Today.ToString("yyyyMMdd") + "</partnerTrxDate>" +
                          "<poNumber>" + value.PoNumber + "</poNumber>";
 
@@ -469,7 +469,7 @@ namespace Order_Manager.channel.sears
                         "<actionCode>" + reason + "</actionCode>";
 
                     // update item to cancelled to database
-                    command.CommandText = "UPDATE Sears_Order_Item SET Cancelled = 'True' WHERE TransactionId = \'" + value.TransactionID +
+                    command.CommandText = "UPDATE Sears_Order_Item SET Cancelled = 'True' WHERE TransactionId = \'" + value.TransactionId +
                                              "\' AND MerchantLineNumber = \'" + value.MerchantLineNumber[j] + "\'";
                     command.ExecuteNonQuery();
 
@@ -483,19 +483,19 @@ namespace Order_Manager.channel.sears
                     "<hubAction>" +
                     "<action>v_ship</action>";
 
-                    command.CommandText = "UPDATE Sears_Order_Item SET Shipped = 'True' WHERE TransactionId = \'" + value.TransactionID +
+                    command.CommandText = "UPDATE Sears_Order_Item SET Shipped = 'True' WHERE TransactionId = \'" + value.TransactionId +
                                           "\' AND MerchantLineNumber = \'" + value.MerchantLineNumber[i - 1] + "\'";
                     command.ExecuteNonQuery();
                 }
                 xml +=
                 "<merchantLineNumber>" + value.MerchantLineNumber[i - 1] + "</merchantLineNumber>" +
-                "<trxVendorSKU>" + value.TrxVendorSKU[i - 1] + "</trxVendorSKU>" +
-                "<trxMerchantSKU>" + value.TrxMerchantSKU[i - 1] + "</trxMerchantSKU>" +
-                "<UPC>" + value.UPC[i - 1] + "</UPC>" +
+                "<trxVendorSKU>" + value.TrxVendorSku[i - 1] + "</trxVendorSKU>" +
+                "<trxMerchantSKU>" + value.TrxMerchantSku[i - 1] + "</trxMerchantSKU>" +
+                "<UPC>" + value.Upc[i - 1] + "</UPC>" +
                 "<trxQty>" + value.TrxQty[i - 1] + "</trxQty>" +
                 "<trxUnitCost>" + value.TrxUnitCost[i - 1] + "</trxUnitCost>";
                 if (!isCancelled)
-                    xml += "<packageDetailLink packageDetailID=\"" + value.PackageDetailID + "\"/>";
+                    xml += "<packageDetailLink packageDetailID=\"" + value.PackageDetailId + "\"/>";
                 xml +=
                 "</hubAction>";
             }
@@ -504,7 +504,7 @@ namespace Order_Manager.channel.sears
             if (cancelList.Count < value.LineCount)
             {
                 xml +=
-                    "<packageDetail packageDetailID=\"" + value.PackageDetailID + "\">" +
+                    "<packageDetail packageDetailID=\"" + value.PackageDetailId + "\">" +
                     "<shipDate>" + DateTime.Today.ToString("yyyyMMdd") /*value.ExpectedShipDate[0].ToString("yyyyMMdd")*/ + "</shipDate>" +
                     "<serviceLevel1>" + value.ServiceLevel + "</serviceLevel1>" +
                     "<trackingNumber>" + value.Package.TrackingNumber + "</trackingNumber>" +
@@ -516,15 +516,15 @@ namespace Order_Manager.channel.sears
                 "</ConfirmMessageBatch>";
 
             // convert txt to xsd file
-            string path = completeOrderDir + "\\" + value.TransactionID + ".xsd";
+            string path = completeOrderDir + "\\" + value.TransactionId + ".xsd";
             StreamWriter writer = new StreamWriter(path);
             writer.WriteLine(xml);
             writer.Close();
             #endregion
 
             // master database update
-            command.CommandText = "UPDATE Sears_Order SET VendorInvoiceNumber = \'" + value.VendorInvoiceNumber + "\', PakageDetailId = \'" + value.PackageDetailID + "\', TrackingNumber = \'" + value.Package.TrackingNumber + "\', CompleteDate = \'" +
-                                   DateTime.Today.ToString("yyyy-MM-dd HH:mm:ss") + "\', ShipmentIdentificationNumber = \'" + value.Package.IdentificationNumber + "\', Complete = 'True' WHERE TransactionId = \'" + value.TransactionID + "\'";
+            command.CommandText = "UPDATE Sears_Order SET VendorInvoiceNumber = \'" + value.VendorInvoiceNumber + "\', PakageDetailId = \'" + value.PackageDetailId + "\', TrackingNumber = \'" + value.Package.TrackingNumber + "\', CompleteDate = \'" +
+                                   DateTime.Today.ToString("yyyy-MM-dd HH:mm:ss") + "\', ShipmentIdentificationNumber = \'" + value.Package.IdentificationNumber + "\', Complete = 'True' WHERE TransactionId = \'" + value.TransactionId + "\'";
             command.ExecuteNonQuery();
             connection.Close();
 
@@ -550,7 +550,7 @@ namespace Order_Manager.channel.sears
                 // transaction id
                 copy = substringMethod(copy, targetTransaction, 0);
                 copy = copy.Remove(copy.IndexOf("/hubOrder>"));
-                value.TransactionID = getTarget(copy);
+                value.TransactionId = getTarget(copy);
 
                 // line count
                 copy = substringMethod(copy, "lineCount", 10);
@@ -607,10 +607,10 @@ namespace Order_Manager.channel.sears
                     if (copy.Contains("UPC"))
                     {
                         copy = substringMethod(copy, "UPC", 4);
-                        value.UPC.Add(getTarget(copy));
+                        value.Upc.Add(getTarget(copy));
                     }
                     else
-                        value.UPC.Add("");
+                        value.Upc.Add("");
 
                     // description 
                     copy = substringMethod(copy, "description", 12);
@@ -627,11 +627,11 @@ namespace Order_Manager.channel.sears
 
                     // merchant sku
                     copy = substringMethod(copy, "merchantSKU", 12);
-                    value.TrxMerchantSKU.Add(getTarget(copy));
+                    value.TrxMerchantSku.Add(getTarget(copy));
 
                     // vendor sku
                     copy = substringMethod(copy, "vendorSKU", 10);
-                    value.TrxVendorSKU.Add(getTarget(copy));
+                    value.TrxVendorSku.Add(getTarget(copy));
 
                     // unit price
                     copy = substringMethod(copy, "unitPrice", 10);
@@ -845,7 +845,7 @@ namespace Order_Manager.channel.sears
                 SqlDataReader reader = command.ExecuteReader();
                 reader.Read();
 
-                value.TransactionID = targetTransaction;
+                value.TransactionId = targetTransaction;
                 value.LineCount = reader.GetInt32(0);
                 value.PoNumber = reader.GetString(1);
                 value.TrxBalanceDue = Convert.ToDouble(reader.GetValue(2));
@@ -893,9 +893,9 @@ namespace Order_Manager.channel.sears
                 {
                     value.LineBalanceDue.Add(Convert.ToDouble(table.Rows[i][0]));
                     value.MerchantLineNumber.Add(Convert.ToInt32(table.Rows[i][1]));
-                    value.TrxVendorSKU.Add(table.Rows[i][2].ToString());
-                    value.TrxMerchantSKU.Add(table.Rows[i][3].ToString());
-                    value.UPC.Add(table.Rows[i][4].ToString());
+                    value.TrxVendorSku.Add(table.Rows[i][2].ToString());
+                    value.TrxMerchantSku.Add(table.Rows[i][3].ToString());
+                    value.Upc.Add(table.Rows[i][4].ToString());
                     value.TrxQty.Add(Convert.ToInt32(table.Rows[i][5]));
                     value.TrxUnitCost.Add(Convert.ToDouble(table.Rows[i][6]));
                     value.Description.Add(table.Rows[i][7].ToString());
@@ -961,7 +961,7 @@ namespace Order_Manager.channel.sears
                 // add new transaction to order
                 SqlCommand command = new SqlCommand("INSERT INTO Sears_Order " +
                                                     "(TransactionId, LineCount, PoNumber, TrxBalanceDue, VendorInvoiceNumber, PakageDetailId, ServiceLevel, TrackingNumber, ShipmentIdentificationNumber, OrderDate, PaymentMethod, CustOrderNumber, CustOrderDate, PackSlipMessage, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, RecipientName, RecipientAddress1, RecipientAddress2, RecipientCity, RecipientState, RecipientPostalCode, RecipientPhone, ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, PartnerPersonPlaceId, FreightLane, Spur, Complete) Values " +
-                                                    "(\'" + value.TransactionID + "\'," + value.LineCount + ",\'" + value.PoNumber + "\'," + value.TrxBalanceDue + ",\'" + value.VendorInvoiceNumber + "\',\'" + value.PackageDetailID + "\',\'" + value.ServiceLevel + "\',\'" + value.Package.TrackingNumber + "\',\'" + value.Package.IdentificationNumber + "\', \'" + value.OrderDate.ToString("yyyy-MM-dd") + "\',\'" + value.PaymentMethod + "\',\'" + value.CustOrderNumber + "\',\'" + value.CustOrderDate.ToString("yyyy-MM-dd") + "\',\'" + value.PackSlipMessage + "\',\'" +
+                                                    "(\'" + value.TransactionId + "\'," + value.LineCount + ",\'" + value.PoNumber + "\'," + value.TrxBalanceDue + ",\'" + value.VendorInvoiceNumber + "\',\'" + value.PackageDetailId + "\',\'" + value.ServiceLevel + "\',\'" + value.Package.TrackingNumber + "\',\'" + value.Package.IdentificationNumber + "\', \'" + value.OrderDate.ToString("yyyy-MM-dd") + "\',\'" + value.PaymentMethod + "\',\'" + value.CustOrderNumber + "\',\'" + value.CustOrderDate.ToString("yyyy-MM-dd") + "\',\'" + value.PackSlipMessage + "\',\'" +
                                                     value.BillTo.Name.Replace("'","''") + "\',\'" + value.BillTo.Address1.Replace("'", "''") + "\',\'" + value.BillTo.Address2.Replace("'", "''") + "\',\'" + value.BillTo.City.Replace("'", "''") + "\',\'" + value.BillTo.State + "\',\'" + value.BillTo.PostalCode + "\',\'" + value.BillTo.DayPhone + "\',\'" + value.Recipient.Name.Replace("'", "''") + "\',\'" + value.Recipient.Address1.Replace("'", "''") + "\',\'" + value.Recipient.Address2.Replace("'", "''") + "\',\'" + value.Recipient.City.Replace("'", "''") + "\',\'" + value.Recipient.State + "\',\'" + value.Recipient.PostalCode + "\',\'" + value.Recipient.DayPhone + "\',\'" + 
                                                     value.ShipTo.Name.Replace("'", "''") + "\',\'" + value.ShipTo.Address1.Replace("'", "''") + "\',\'" + value.ShipTo.Address2.Replace("'", "''") + "\',\'" + value.ShipTo.City.Replace("'", "''") + "\',\'" + value.ShipTo.State + "\',\'" + value.ShipTo.PostalCode + "\',\'" + value.ShipTo.DayPhone +"\',\'" + value.PartnerPersonPlaceId + "\',\'" + value.FreightLane + "\',\'" + value.Spur + "\',\'False\')", connection);
                 connection.Open();
@@ -972,7 +972,7 @@ namespace Order_Manager.channel.sears
                 {
                     command.CommandText = "INSERT INTO Sears_Order_Item " +
                                           "(TransactionId, LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, LineHandling, ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions, Shipped, Cancelled) Values" +
-                                          "(\'" + value.TransactionID + "\'," + value.LineBalanceDue[i] + "," + value.MerchantLineNumber[i] + ",\'" + value.TrxVendorSKU[i] + "\',\'" + value.TrxMerchantSKU[i] + "\',\'" + value.UPC[i] + "\'," + value.TrxQty[i] + "," + value.TrxUnitCost[i] + ",\'" + value.Description[i].Replace("'", "''") + "\',\'" + value.Description2[i].Replace("'", "''") +
+                                          "(\'" + value.TransactionId + "\'," + value.LineBalanceDue[i] + "," + value.MerchantLineNumber[i] + ",\'" + value.TrxVendorSku[i] + "\',\'" + value.TrxMerchantSku[i] + "\',\'" + value.Upc[i] + "\'," + value.TrxQty[i] + "," + value.TrxUnitCost[i] + ",\'" + value.Description[i].Replace("'", "''") + "\',\'" + value.Description2[i].Replace("'", "''") +
                                           "\'," + value.UnitPrice[i] + "," + value.LineHandling[i] + ",\'" + value.ExpectedShipDate[i].ToString("yyyy-MM-dd") + "\',\'" + value.GST_HST_Extended[i] + "\',\'" + value.PST_Extended[i] + "\',\'" + value.GST_HST_Total[i] + "\',\'" + value.PST_Total[i] + "\',\'" + value.EncodedPrice[i] + "\',\'" + value.ReceivingInstructions[i] + "\',\'False\',\'False\')";
                     command.ExecuteNonQuery();
                 }

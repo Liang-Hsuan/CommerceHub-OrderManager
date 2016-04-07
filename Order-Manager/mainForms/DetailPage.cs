@@ -79,7 +79,7 @@ namespace Order_Manager.mainForms
                     // the case if the order is from shop.ca
                     try
                     {
-                        ShopCaPackingSlip.createPackingSlip(shopCaValues, cancelIndex, true);
+                        ShopCaPackingSlip.CreatePackingSlip(shopCaValues, cancelIndex, true);
                     }
                     catch (Exception ex)
                     {
@@ -197,7 +197,7 @@ namespace Order_Manager.mainForms
                     for (int i = 0; i < searsValues.LineCount; i++)
                     {
                         if (listview.Items[i].SubItems[5].Text != "") continue;
-                        decimal[] detailList = Package.GetSkuDetail(searsValues.TrxVendorSKU[i]);
+                        decimal[] detailList = Package.GetSkuDetail(searsValues.TrxVendorSku[i]);
 
                         if (detailList == null) continue;
                         for (int j = 0; j < 4; j++)
@@ -309,10 +309,10 @@ namespace Order_Manager.mainForms
                     searsValues.Package.TrackingNumber = acceptResult[0];
 
                     // update database set the order's tracking number and identification number
-                    new Sears().PostShip(searsValues.Package.TrackingNumber, searsValues.Package.IdentificationNumber, searsValues.TransactionID);
+                    new Sears().PostShip(searsValues.Package.TrackingNumber, searsValues.Package.IdentificationNumber, searsValues.TransactionId);
 
                     // get the shipment label and show it
-                    ups.ExportLabel(acceptResult[1], searsValues.TransactionID, true);
+                    ups.ExportLabel(acceptResult[1], searsValues.TransactionId, true);
                     break;
                     #endregion
                 case "Shop.ca":
@@ -421,7 +421,7 @@ namespace Order_Manager.mainForms
                     }
 
                     // mark transaction as not shipped
-                    new Sears().PostVoid(new[] { searsValues.TransactionID });
+                    new Sears().PostVoid(new[] { searsValues.TransactionId });
 
                     // set tracking and identification to nothing
                     searsValues.Package.IdentificationNumber = "";
@@ -568,7 +568,7 @@ namespace Order_Manager.mainForms
         {
             // title bar set up
             logoPicturebox.Image = Image.FromFile(@"..\..\image\sears.png");
-            topOrderNumberTextbox.Text = value.TransactionID;
+            topOrderNumberTextbox.Text = value.TransactionId;
 
             #region Order Summary
             // date
@@ -660,7 +660,7 @@ namespace Order_Manager.mainForms
                 // add item to list
                 ListViewItem item = new ListViewItem(value.MerchantLineNumber[i].ToString());
 
-                item.SubItems.Add(value.Description[i] + "  SKU: " + value.TrxVendorSKU[i]);
+                item.SubItems.Add(value.Description[i] + "  SKU: " + value.TrxVendorSku[i]);
                 item.SubItems.Add("$ " + value.UnitPrice[i]);
                 item.SubItems.Add(value.TrxQty[i].ToString());
                 item.SubItems.Add("$ " + value.LineBalanceDue[i]);
@@ -670,7 +670,7 @@ namespace Order_Manager.mainForms
                 listview.Items.Add(item);
 
                 // generate sku detail
-                decimal[] detailList = Package.GetSkuDetail(value.TrxVendorSKU[i]);
+                decimal[] detailList = Package.GetSkuDetail(value.TrxVendorSku[i]);
 
                 // the case if bad sku
                 if (detailList == null)

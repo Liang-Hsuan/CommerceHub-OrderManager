@@ -11,20 +11,20 @@ namespace Order_Manager.channel.sears
     public class SearsValues
     {
         // fields for xml feed data
-        public string PartnerTrxID { get; }
-        public string TransactionID { get; set; }
+        public string PartnerTrxId { get; }
+        public string TransactionId { get; set; }
         public int LineCount { get; set; }
         public string PoNumber { get; set; }
         public double TrxBalanceDue { get; set; }
         public List<double> LineBalanceDue { get; set; }  // for cancel supporting purpose
         public string VendorInvoiceNumber { get; set; }
         public List<int> MerchantLineNumber { get; set; }
-        public List<string> TrxVendorSKU { get; set; }
-        public List<string> TrxMerchantSKU { get; set; }
-        public List<string> UPC { get; set; }
+        public List<string> TrxVendorSku { get; set; }
+        public List<string> TrxMerchantSku { get; set; }
+        public List<string> Upc { get; set; }
         public List<int> TrxQty { get; set; }
         public List<double> TrxUnitCost { get; set; }
-        public string PackageDetailID { get; set; }
+        public string PackageDetailId { get; set; }
         public string ServiceLevel { get; set; }
         public Package Package { get; set; }
 
@@ -55,21 +55,21 @@ namespace Order_Manager.channel.sears
         /* first constructor that take no argument */
         public SearsValues()
         {
-            PartnerTrxID = "ashlinbpg";
+            PartnerTrxId = "ashlinbpg";
 
-            TransactionID = "";
+            TransactionId = "";
             LineCount = 0;
             PoNumber = "";
             TrxBalanceDue = 0;
             LineBalanceDue = new List<double>();
             VendorInvoiceNumber = "";
             MerchantLineNumber = new List<int>();
-            TrxVendorSKU = new List<string>();
-            TrxMerchantSKU = new List<string>();
-            UPC = new List<string>();
+            TrxVendorSku = new List<string>();
+            TrxMerchantSku = new List<string>();
+            Upc = new List<string>();
             TrxQty = new List<int>();
             TrxUnitCost = new List<double>();
-            PackageDetailID = "";
+            PackageDetailId = "";
             ServiceLevel = "";
             Package = new Package();
 
@@ -103,21 +103,21 @@ namespace Order_Manager.channel.sears
                            List<string> description, List<string> description2, List<double> unitPrice, List<double> lineHandling, List<DateTime> expectedShipDate, List<double> gstHstExtended, List<double> pstExtended, List<double> gstHstTotal, List<double> pstTotal, List<string> encodedPrice,
                            List<string> receivingInstructions, Address billTo, Address recipient, Address shipTo, string partnerPersonPlaceId, string freightLane, string spur)
         {
-            PartnerTrxID = "ashlinbpg";
+            PartnerTrxId = "ashlinbpg";
 
-            TransactionID = transactionId;
+            TransactionId = transactionId;
             LineCount = lineCount;
             PoNumber = poNumber;
             TrxBalanceDue = trxBalanceDue;
             LineBalanceDue = lineBalanceDue;
             VendorInvoiceNumber = vendorInvoiceNumber;
             MerchantLineNumber = merchantLineNumber;
-            TrxVendorSKU = trxVendorSku;
-            TrxMerchantSKU = trxMerchantSku;
-            UPC = upc;
+            TrxVendorSku = trxVendorSku;
+            TrxMerchantSku = trxMerchantSku;
+            Upc = upc;
             TrxQty = trxQty;
             TrxUnitCost = trxUnitCost;
-            PackageDetailID = packageDetailId;
+            PackageDetailId = packageDetailId;
             ServiceLevel = serviceLevel1;
             Package = package;
 
@@ -125,7 +125,7 @@ namespace Order_Manager.channel.sears
             PaymentMethod = paymentMethod;
             CustOrderNumber = custOrderNumber;
             CustOrderDate = custOrderDate;
-            PackageDetailID = packslipMessage;
+            PackageDetailId = packslipMessage;
             Description = description;
             Description2 = description2;
             UnitPrice = unitPrice;

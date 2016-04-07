@@ -382,11 +382,9 @@ namespace Order_Manager.supportingClasses.Shipment
             image.Save(file, System.Drawing.Imaging.ImageFormat.Gif);
 
             // show the image if user want to preview
-            if (preview)
-            {
-                if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)
-                    System.Diagnostics.Process.Start(file);
-            }
+            if (!preview) return;
+            if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)
+                System.Diagnostics.Process.Start(file);
         }
     }
 }

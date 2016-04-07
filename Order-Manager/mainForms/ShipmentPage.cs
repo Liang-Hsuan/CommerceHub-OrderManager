@@ -55,7 +55,7 @@ namespace Order_Manager.mainForms
             {
                 ListViewItem item = new ListViewItem("Sears");
 
-                item.SubItems.Add(value.TransactionID);
+                item.SubItems.Add(value.TransactionId);
                 item.SubItems.Add(value.Package.TrackingNumber);
                 item.SubItems.Add(value.Package.IdentificationNumber);
 

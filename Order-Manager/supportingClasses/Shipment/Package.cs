@@ -50,7 +50,7 @@ namespace Order_Manager.supportingClasses.Shipment
             // generate package detail -> weight and dimensions
             decimal[] skuDetail = { 0, 0, 0, 0 };
 
-            foreach (decimal[] detailList in value.TrxVendorSKU.Select(GetSkuDetail).Where(detailList => !detailList.Equals(null)))
+            foreach (decimal[] detailList in value.TrxVendorSku.Select(GetSkuDetail).Where(detailList => !detailList.Equals(null)))
             {
                 for (int i = 0; i < 4; i++)
                     skuDetail[i] += detailList[i];
