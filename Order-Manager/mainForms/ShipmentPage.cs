@@ -184,7 +184,7 @@ namespace Order_Manager.mainForms
                 {
                     case "Sears":
                         list[0].Add(cancelledOrder.TransactionId);
-                        ups.postShipmentVoid(cancelledOrder.ShipmentIdentificationNumber);
+                        ups.PostShipmentVoid(cancelledOrder.ShipmentIdentificationNumber);
                         if (ups.Error)
                         {
                             MessageBox.Show(ups.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);

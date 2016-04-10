@@ -330,7 +330,7 @@ namespace Order_Manager.channel.sears
                     text = new Phrase(tempTax[0], new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 252f, 478f, 293f, 493f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
-                    text = new Phrase(tempTax[1].ToString(), new Font(baseFont, 9));
+                    text = new Phrase(tempTax[1], new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 252f, 466f, 293f, 481f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
                     text = new Phrase(value.LineBalanceDue[i].ToString(), new Font(baseFont, 9));
@@ -392,18 +392,18 @@ namespace Order_Manager.channel.sears
 
                     #region Left Bottom Additional Info
                     // some number
-                    text = new Phrase(value.PoNumber, new iTextSharp.text.Font(baseFont, 9));
+                    text = new Phrase(value.PoNumber, new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 10f, 357f, 150f, 367f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
 
                     // sears infomation
-                    text = new Phrase("CUSTOMER INQUIRY/DE CLIENT", new iTextSharp.text.Font(boldFont, 7));
+                    text = new Phrase("CUSTOMER INQUIRY/DE CLIENT", new Font(boldFont, 7));
                     ct.SetSimpleColumn(text, 10f, 338f, 150f, 348f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
-                    text = new Phrase("WWW.SEARS.CA", new iTextSharp.text.Font(baseFont, 9));
+                    text = new Phrase("WWW.SEARS.CA", new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 10f, 328f, 150f, 338f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
-                    text = new Phrase("1-800-267-3277", new iTextSharp.text.Font(baseFont, 10));
+                    text = new Phrase("1-800-267-3277", new Font(baseFont, 10));
                     ct.SetSimpleColumn(text, 10f, 318f, 150f, 328f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
 

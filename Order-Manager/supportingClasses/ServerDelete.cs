@@ -46,7 +46,7 @@ namespace Order_Manager.supportingClasses
         /* a supportin class for deleting file */
         private class UInfo : UserInfo
         {
-            private readonly string passwd = string.Empty;
+            private readonly string passwd;
 
             public UInfo(string pwd) { passwd = pwd; }
 

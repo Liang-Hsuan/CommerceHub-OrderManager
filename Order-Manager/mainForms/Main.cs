@@ -244,14 +244,14 @@ namespace Order_Manager.mainForms
                             value.Package = new Package(value);
 
                             // second ship it
-                            string[] digest = ups.postShipmentConfirm(value);
+                            string[] digest = ups.PostShipmentConfirm(value);
                             if (ups.Error)
                             {
                                 MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 return;
                             }
 
-                            string[] result = ups.postShipmentAccept(digest[1]);
+                            string[] result = ups.PostShipmentAccept(digest[1]);
                             if (ups.Error)
                             {
                                 MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -288,7 +288,7 @@ namespace Order_Manager.mainForms
                             value.Package.TrackingNumber = links[0];
                             value.Package.SelfLink = links[1];
                             value.Package.LabelLink = links[2];
-                            shopCa.GenerateCSV(value, new System.Collections.Generic.Dictionary<int, string>());
+                            shopCa.GenerateCsv(value, new System.Collections.Generic.Dictionary<int, string>());
 
                             // post order to brightpearl with no cancellation
                             bp.PostOrder(value, new int[0]);
@@ -510,7 +510,7 @@ namespace Order_Manager.mainForms
                     chart.ChartAreas[0].AxisY.ScaleView.Zoom(posYStart, posYFinish);
                 }
             }
-            catch { }
+            catch { /* ignore */ }
         }
         #endregion
     }

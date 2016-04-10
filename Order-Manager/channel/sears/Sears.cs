@@ -67,16 +67,16 @@ namespace Order_Manager.channel.sears
             getOrder(newOrderDir, orderCheck);
 
             // read all the text of the file in the local directory
-            string[] textXML = getOrderFileText();
+            string[] textXml = getOrderFileText();
 
             // return the transaction that haved not been processed
-            orderCheck = getTransactionId(textXML);
+            orderCheck = getTransactionId(textXml);
             orderCheck = checkTransaction(orderCheck);
 
             // get information for each unprocessed transaction and update the them to the database
             foreach (string transaction in orderCheck)
             {
-                SearsValues value = GenerateValue(transaction, textXML);
+                SearsValues value = GenerateValue(transaction, textXml);
                 addNewOrder(value);
             }
         }
@@ -333,11 +333,11 @@ namespace Order_Manager.channel.sears
 
             // read all the text of the file in the local directory
             int fileCount = filesLocal.Length;
-            string[] textXML = new string[fileCount];      // xml text for each file
+            string[] textXml = new string[fileCount];      // xml text for each file
             for (int i = 0; i < fileCount; i++)
-                textXML[i] = File.ReadAllText(newOrderDir + "\\" + filesLocal[i]);
+                textXml[i] = File.ReadAllText(newOrderDir + "\\" + filesLocal[i]);
 
-            return textXML;
+            return textXml;
         }
         #endregion
 

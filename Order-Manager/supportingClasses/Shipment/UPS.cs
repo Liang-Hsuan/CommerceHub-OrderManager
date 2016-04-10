@@ -46,7 +46,7 @@ namespace Order_Manager.supportingClasses.Shipment
 
         #region Posting Methods
         /* a method that post shipment confirm request and return shipment digest and identification number*/
-        public string[] postShipmentConfirm(SearsValues value)
+        public string[] PostShipmentConfirm(SearsValues value)
         {
             // set error to false
             Error = false;
@@ -235,7 +235,7 @@ namespace Order_Manager.supportingClasses.Shipment
         }
 
         /* a method that post shipment accept request and return base64 image string and tracking number*/
-        public string[] postShipmentAccept(string shipmentDigest)
+        public string[] PostShipmentAccept(string shipmentDigest)
         {
             // set error to false
             Error = false;
@@ -304,7 +304,7 @@ namespace Order_Manager.supportingClasses.Shipment
         }
 
         /* a method that post shipment void request and check if the void request is success */
-        public void postShipmentVoid(string identificationNumber)
+        public void PostShipmentVoid(string identificationNumber)
         {
             // set error to false
             Error = false;

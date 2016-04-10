@@ -283,7 +283,7 @@ namespace Order_Manager.mainForms
                     Ups ups = new Ups();
 
                     // post shipment confirm and get the digest string from response
-                    string[] digest = ups.postShipmentConfirm(searsValues);
+                    string[] digest = ups.PostShipmentConfirm(searsValues);
 
                     // error checking
                     if (ups.Error)
@@ -294,7 +294,7 @@ namespace Order_Manager.mainForms
                     }
 
                     // post shipment accept and get tracking number and image 
-                    string[] acceptResult = ups.postShipmentAccept(digest[1]);
+                    string[] acceptResult = ups.PostShipmentAccept(digest[1]);
 
                     // error checking
                     if (ups.Error)
@@ -411,7 +411,7 @@ namespace Order_Manager.mainForms
                     #region UPS
                     // post void shipment request and get the response
                     Ups ups = new Ups();
-                    ups.postShipmentVoid(searsValues.Package.IdentificationNumber);
+                    ups.PostShipmentVoid(searsValues.Package.IdentificationNumber);
 
                     // the case if is bad request
                     if (ups.Error)
@@ -529,7 +529,7 @@ namespace Order_Manager.mainForms
                 case "Shop.ca":
                     // shop.ca case
                     // export csv file
-                    new ShopCa().GenerateCSV(shopCaValues, cancelList);
+                    new ShopCa().GenerateCsv(shopCaValues, cancelList);
 
                     simulate(40, 70);
 

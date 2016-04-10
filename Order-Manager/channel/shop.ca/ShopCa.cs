@@ -366,7 +366,7 @@ namespace Order_Manager.channel.shop.ca
 
         #region CSV Generation
         /* a method that generate xml order and upload to the sftp server and update database */
-        public void GenerateCSV(ShopCaValues value, Dictionary<int, string> cancelList)
+        public void GenerateCsv(ShopCaValues value, Dictionary<int, string> cancelList)
         {
             // adding csv file header
             string csv = "Base Data\tfeed_id=shop.ca_order_update_01\t(For internal processing. Do not remove rows 1 and 2)\n" +
@@ -374,8 +374,7 @@ namespace Order_Manager.channel.shop.ca
 
             // fields for database update
             SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs);
-            SqlCommand command = new SqlCommand();
-            command.Connection = connection;
+            SqlCommand command = new SqlCommand {Connection = connection};
             connection.Open();
 
             // start adding content to the csv file
