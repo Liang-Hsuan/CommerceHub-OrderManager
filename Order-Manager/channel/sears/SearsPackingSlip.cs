@@ -740,14 +740,14 @@ namespace Order_Manager.channel.sears
                     ct.Go();
                     #endregion
 
+                    doc.Close();
+
                     if (preview)
                     {
                         // start the pdf for previewing
                         if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)
                             System.Diagnostics.Process.Start(file);
                     }
-
-                    doc.Close();
                 }
             }
         }
