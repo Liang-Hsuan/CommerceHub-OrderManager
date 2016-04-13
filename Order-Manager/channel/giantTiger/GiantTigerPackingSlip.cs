@@ -39,7 +39,7 @@ namespace Order_Manager.channel.giantTiger
             doc.Add(logo);
 
             // add barcode
-            Barcode128 barcode128 = new Barcode128
+            Barcode39 barcode128 = new Barcode39
             {
                 Code = "19791104008",
                 StartStopText = false,

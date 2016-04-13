@@ -76,7 +76,9 @@
     <Compile Include="channel\brightpearl\BPconnect.cs" />
     <Compile Include="channel\brightpearl\BPvalues.cs" />
     <Compile Include="channel\Channel.cs" />
+    <Compile Include="channel\giantTiger\GiantTiger.cs" />
     <Compile Include="channel\giantTiger\GiantTigerPackingSlip.cs" />
+    <Compile Include="channel\giantTiger\GiantTigerValues.cs" />
     <Compile Include="channel\shop.ca\ShopCa.cs" />
     <Compile Include="channel\shop.ca\ShopCaPackingSlip.cs" />
     <Compile Include="channel\shop.ca\ShopCaValues.cs" />
