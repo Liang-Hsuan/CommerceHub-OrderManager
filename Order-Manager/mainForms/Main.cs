@@ -36,10 +36,10 @@ namespace Order_Manager.mainForms
             InitializeComponent();
 
             // show new orders from shopping channels
-            showResult();
+            ShowResult();
 
             // show result on the chart
-            refreshGraph();
+            RefreshGraph();
 
             // get parent
             this.parent = parent;
@@ -179,8 +179,8 @@ namespace Order_Manager.mainForms
             // set wait cursor for working
             System.Windows.Forms.Cursor.Current = Cursors.WaitCursor;
 
-            showResult();
-            refreshGraph();
+            ShowResult();
+            RefreshGraph();
 
             // set default cursor after complete
             System.Windows.Forms.Cursor.Current = Cursors.Default;
@@ -241,28 +241,33 @@ namespace Order_Manager.mainForms
                             #region Sears Order
                             // first get the detail for the order
                             SearsValues value = sears.GenerateValue(order.TransactionId);
-                            value.Package = new Package(value);
 
-                            // second ship it
-                            string[] digest = ups.PostShipmentConfirm(value);
-                            if (ups.Error)
+                            // check if the order has been shipped before -> if not, ship it now
+                            if (value.Package.TrackingNumber != "")
                             {
-                                MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
+                                value.Package = new Package(value);
 
-                            string[] result = ups.PostShipmentAccept(digest[1]);
-                            if (ups.Error)
-                            {
-                                MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
+                                // second ship it
+                                string[] digest = ups.PostShipmentConfirm(value);
+                                if (ups.Error)
+                                {
+                                    MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
 
-                            // get identification, tracking, label and shipment confirm with no cancellation of item
-                            value.Package.IdentificationNumber = digest[0];
-                            value.Package.TrackingNumber = result[0];
-                            ups.ExportLabel(result[1], value.TransactionId, false);
-                            sears.GenerateXML(value, new System.Collections.Generic.Dictionary<int, string>());
+                                string[] result = ups.PostShipmentAccept(digest[1]);
+                                if (ups.Error)
+                                {
+                                    MessageBox.Show(ups.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+
+                                // get identification, tracking, label and shipment confirm with no cancellation of item
+                                value.Package.IdentificationNumber = digest[0];
+                                value.Package.TrackingNumber = result[0];
+                                ups.ExportLabel(result[1], value.TransactionId, false);
+                            }
+                            sears.GenerateXml(value, new System.Collections.Generic.Dictionary<int, string>());
 
                             // post order to brightpearl with no cancellation
                             bp.PostOrder(value, new int[0]);
@@ -274,30 +279,35 @@ namespace Order_Manager.mainForms
                             #region Shop.ca Order
                             // first get the detail for the order
                             ShopCaValues value = shopCa.GenerateValue(order.TransactionId);
-                            value.Package = new Package(value);
 
-                            // second ship it
-                            string[] links = canadaPost.CreateShipment(value);
-                            if (canadaPost.Error)
+                            // check if the order has been shipped before -> if not, ship it now
+                            if (value.Package.TrackingNumber != "")
                             {
-                                MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
+                                value.Package = new Package(value);
 
-                            // get tracking, self link, label link and shipment confirm with no cancellation of item
-                            value.Package.TrackingNumber = links[0];
-                            value.Package.SelfLink = links[1];
-                            value.Package.LabelLink = links[2];
+                                // second ship it
+                                string[] links = canadaPost.CreateShipment(value);
+                                if (canadaPost.Error)
+                                {
+                                    MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+
+                                // get tracking, self link, label link and shipment confirm with no cancellation of item
+                                value.Package.TrackingNumber = links[0];
+                                value.Package.SelfLink = links[1];
+                                value.Package.LabelLink = links[2];
+
+                                System.Threading.Thread.Sleep(5000);
+
+                                // get artifact and export it
+                                byte[] binary = canadaPost.GetArtifact(links[2]);
+                                canadaPost.ExportLabel(binary, value.OrderId, true, false);
+                            }
                             shopCa.GenerateCsv(value, new System.Collections.Generic.Dictionary<int, string>());
 
                             // post order to brightpearl with no cancellation
                             bp.PostOrder(value, new int[0]);
-
-                            System.Threading.Thread.Sleep(5000);
-
-                            // get artifact and export it
-                            byte[] binary = canadaPost.GetArtifact(links[2]);
-                            canadaPost.ExportLabel(binary, value.OrderId, true, false);
                             #endregion
                         }
                         break;
@@ -341,7 +351,7 @@ namespace Order_Manager.mainForms
 
         #region Supporting Methods
         /* a supporting method that get new order from online shopping channels and show them on the list view */
-        private void showResult()
+        private void ShowResult()
         {
             // first clear the listview
             listview.Items.Clear();
@@ -421,7 +431,7 @@ namespace Order_Manager.mainForms
         }
 
         /* a supporting method that refresh the chart */
-        private void refreshGraph()
+        private void RefreshGraph()
         {
             // clear chart first
             foreach (var series in chart.Series)

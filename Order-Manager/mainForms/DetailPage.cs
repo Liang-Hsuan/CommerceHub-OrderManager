@@ -37,7 +37,7 @@ namespace Order_Manager.mainForms
             InitializeComponent();
 
             searsValues = value;
-            showResult(value);
+            ShowResult(value);
 
             // set flag to sears
             CHANNEL = "Sears";
@@ -49,7 +49,7 @@ namespace Order_Manager.mainForms
             InitializeComponent();
 
             shopCaValues = value;
-            showResult(value);
+            ShowResult(value);
 
             // set flag to shop.ca
             CHANNEL = "Shop.ca";
@@ -60,7 +60,7 @@ namespace Order_Manager.mainForms
         private void printPackingSlipButton_Click(object sender, EventArgs e)
         {
             // get all cancel index and print the packing slip that are not cancelled
-            int[] cancelIndex = getCancelIndex();
+            int[] cancelIndex = GetCancelIndex();
 
             switch (CHANNEL)
             {
@@ -398,7 +398,7 @@ namespace Order_Manager.mainForms
                 timeLeft = 4;
             }
             else
-                trackingNumberTextbox.Text += ".";
+                trackingNumberTextbox.Text += '.';
         }
         #endregion
 
@@ -511,16 +511,16 @@ namespace Order_Manager.mainForms
         }
         private void backgroundWorkerConfirm_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            simulate(1, 40);
+            Simulate(1, 40);
 
             switch (CHANNEL)
             {
                 case "Sears":
                     // sears case
                     // export xml file
-                    new Sears().GenerateXML(searsValues, cancelList);
+                    new Sears().GenerateXml(searsValues, cancelList);
 
-                    simulate(40, 70);
+                    Simulate(40, 70);
 
                     // post order to brightpearl
                     bp.PostOrder(searsValues, new List<int>(cancelList.Keys).ToArray());
@@ -531,7 +531,7 @@ namespace Order_Manager.mainForms
                     // export csv file
                     new ShopCa().GenerateCsv(shopCaValues, cancelList);
 
-                    simulate(40, 70);
+                    Simulate(40, 70);
 
                     // post order to brightpearl
                     bp.PostOrder(shopCaValues, new List<int>(cancelList.Keys).ToArray());
@@ -539,7 +539,7 @@ namespace Order_Manager.mainForms
                     break;
             }
 
-            simulate(70, 100);
+            Simulate(70, 100);
         }
         private void backgroundWorkerConfirm_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
         {
@@ -564,7 +564,7 @@ namespace Order_Manager.mainForms
 
         #region Supporting Region
         /* a method that show the information of the given SearsValues object */
-        private void showResult(SearsValues value)
+        private void ShowResult(SearsValues value)
         {
             // title bar set up
             logoPicturebox.Image = Image.FromFile(@"..\..\image\sears.png");
@@ -699,7 +699,7 @@ namespace Order_Manager.mainForms
         }
 
         /* a method that show the information of the given ShopCaValues object */
-        private void showResult(ShopCaValues value)
+        private void ShowResult(ShopCaValues value)
         {
             // title bar set up
             logoPicturebox.Image = Image.FromFile(@"..\..\image\shopca.png");
@@ -808,13 +808,13 @@ namespace Order_Manager.mainForms
         }
 
         /* a method that get the current cancel items' idexes */
-        private int[] getCancelIndex()
+        private int[] GetCancelIndex()
         {
             return (from ListViewItem item in listview.Items where item.SubItems[5].Text == "Cancelled" select item.Index).ToArray();
         }
 
         /* a method that report to progress bar value from the start to end */
-        private void simulate(int start, int end)
+        private void Simulate(int start, int end)
         {
             // simulate progress 1% ~ 30%
             for (int i = start; i <= end; i++)

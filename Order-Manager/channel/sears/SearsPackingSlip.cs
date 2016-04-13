@@ -742,12 +742,11 @@ namespace Order_Manager.channel.sears
 
                     doc.Close();
 
-                    if (preview)
-                    {
-                        // start the pdf for previewing
-                        if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)
-                            System.Diagnostics.Process.Start(file);
-                    }
+                    if (!preview) continue;
+
+                    // start the pdf for previewing
+                    if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)
+                        System.Diagnostics.Process.Start(file);
                 }
             }
         }

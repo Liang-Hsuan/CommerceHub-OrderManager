@@ -219,13 +219,13 @@ namespace Order_Manager.channel.brightpearl
 
         #region Supporting Methods
         /* a method that substring the given string */
-        private static string substringMethod(string original, string startingString, int additionIndex)
+        private static string SubstringMethod(string original, string startingString, int additionIndex)
         {
             return original.Substring(original.IndexOf(startingString) + additionIndex);
         }
 
         /* a method that get the next target token */
-        private static string getTarget(string text)
+        private static string GetTarget(string text)
         {
             int i = 0;
             while (text[i] != '"' && text[i] != ',' && text[i] != '}')
@@ -396,10 +396,10 @@ namespace Order_Manager.channel.brightpearl
                 request.Headers.Add("brightpearl-account-token", appToken);
 
                 // generate the JSON file for address post
-                string textJSON = "{\"addressLine1\":\"" + address.Address1 + "\",\"addressLine2\":\"" + address.Address2 + "\",\"addressLine3\":\"" + address.City + "\",\"addressLine4\":\"" + address.State + "\",\"postalCode\":\"" + address.PostalCode + "\",\"countryIsoCode\":\"CAN\"}";
+                string textJson = "{\"addressLine1\":\"" + address.Address1 + "\",\"addressLine2\":\"" + address.Address2 + "\",\"addressLine3\":\"" + address.City + "\",\"addressLine4\":\"" + address.State + "\",\"postalCode\":\"" + address.PostalCode + "\",\"countryIsoCode\":\"CAN\"}";
 
                 // turn request string into a byte stream
-                byte[] postBytes = Encoding.UTF8.GetBytes(textJSON);
+                byte[] postBytes = Encoding.UTF8.GetBytes(textJson);
 
                 // send request
                 using (Stream requestStream = request.GetRequestStream())
@@ -411,12 +411,12 @@ namespace Order_Manager.channel.brightpearl
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                     result = streamReader.ReadToEnd();
 
-                result = substringMethod(result, ":", 1);
-                return getTarget(result);  //return the addresss ID
+                result = SubstringMethod(result, ":", 1);
+                return GetTarget(result);  //return the addresss ID
             }
 
             /* post new customer to API */
-            public string PostContactRequest(string addressID, BPvalues value)
+            public string PostContactRequest(string addressId, BPvalues value)
             {
                 const string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/contact-service/contact";
 
@@ -427,11 +427,11 @@ namespace Order_Manager.channel.brightpearl
                 request.Headers.Add("brightpearl-account-token", appToken);
 
                 // generate JSON file for contact post
-                string textJSON = "{\"firstName\":\"" + value.Address.Name.Remove(value.Address.Name.IndexOf(' ')) + "\",\"lastName\":\"" + value.Address.Name.Substring(value.Address.Name.IndexOf(' ') + 1) + "\",\"postAddressIds\":{\"DEF\":" + addressID + ",\"BIL\":" + addressID + ",\"DEL\":" + addressID + "}," + 
+                string textJson = "{\"firstName\":\"" + value.Address.Name.Remove(value.Address.Name.IndexOf(' ')) + "\",\"lastName\":\"" + value.Address.Name.Substring(value.Address.Name.IndexOf(' ') + 1) + "\",\"postAddressIds\":{\"DEF\":" + addressId + ",\"BIL\":" + addressId + ",\"DEL\":" + addressId + "}," + 
                                   "\"communication\":{\"telephones\":{\"PRI\":\"" + value.Address.DayPhone + "\"}},\"relationshipToAccount\":{\"isSupplier\": false,\"isStaff\":false,\"isCustomer\":true},\"financialDetails\":{\"priceListId\":3}}";
 
                 // turn request string into a byte stream
-                byte[] postBytes = Encoding.UTF8.GetBytes(textJSON);
+                byte[] postBytes = Encoding.UTF8.GetBytes(textJson);
 
                 // send request
                 using (Stream requestStream = request.GetRequestStream())
@@ -443,12 +443,12 @@ namespace Order_Manager.channel.brightpearl
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                     result = streamReader.ReadToEnd();
 
-                result = substringMethod(result, ":", 1);
-                return getTarget(result);  //return the contact ID
+                result = SubstringMethod(result, ":", 1);
+                return GetTarget(result);  //return the contact ID
             }
 
             /* post new order to API */
-            public string PostOrderRequest(string contactID, BPvalues value)
+            public string PostOrderRequest(string contactId, BPvalues value)
             {
                 // reset boolean flag to false 
                 HasError = false;
@@ -462,11 +462,11 @@ namespace Order_Manager.channel.brightpearl
                 request.Headers.Add("brightpearl-account-token", appToken);
 
                 // generate JSON file for order post
-                string textJSON = "{\"orderTypeCode\":\"SO\",\"reference\":\"" + value.Reference + "\",\"priceListId\":3,\"placeOn\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\",\"orderStatus\":{\"orderStatusId\":2}," + "\"delivery\":{\"deliveryDate\":\"" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ', 'T') + "+00:00\",\"shippingMethodId\":" + value.DeliveryId + "},\"currency\":{\"orderCurrencyCode\":\"CAD\"},\"parties\":{\"customer\":{\"contactId\":" + 
-                                  contactID + "},\"delivery\":{\"addressFullName\":\"" + value.Address.Name + "\",\"addressLine1\":\"" + value.Address.Address1 + "\",\"addressLine2\":\"" + value.Address.Address2 + "\",\"addressLine3\":\"" + value.Address.City + "\",\"addressLine4\":\"" + value.Address.State + "\",\"postalCode\":\"" + value.Address.PostalCode + "\",\"countryIsoCode\":\"CAN\",\"telephone\":\"" + value.Address.DayPhone + "\"}},\"assignment\":{\"current\":{\"channelId\":" + value.ChannelId + "}}}";
+                string textJson = "{\"orderTypeCode\":\"SO\",\"reference\":\"" + value.Reference + "\",\"priceListId\":3,\"placeOn\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\",\"orderStatus\":{\"orderStatusId\":2}," + "\"delivery\":{\"deliveryDate\":\"" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ', 'T') + "+00:00\",\"shippingMethodId\":" + value.DeliveryId + "},\"currency\":{\"orderCurrencyCode\":\"CAD\"},\"parties\":{\"customer\":{\"contactId\":" + 
+                                  contactId + "},\"delivery\":{\"addressFullName\":\"" + value.Address.Name + "\",\"addressLine1\":\"" + value.Address.Address1 + "\",\"addressLine2\":\"" + value.Address.Address2 + "\",\"addressLine3\":\"" + value.Address.City + "\",\"addressLine4\":\"" + value.Address.State + "\",\"postalCode\":\"" + value.Address.PostalCode + "\",\"countryIsoCode\":\"CAN\",\"telephone\":\"" + value.Address.DayPhone + "\"}},\"assignment\":{\"current\":{\"channelId\":" + value.ChannelId + "}}}";
 
                 // turn request string into a byte stream
-                byte[] postBytes = Encoding.UTF8.GetBytes(textJSON);
+                byte[] postBytes = Encoding.UTF8.GetBytes(textJson);
 
                 // send request
                 using (Stream requestStream = request.GetRequestStream())
@@ -487,12 +487,12 @@ namespace Order_Manager.channel.brightpearl
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                     result = streamReader.ReadToEnd();
 
-                result = substringMethod(result, ":", 1);
-                return getTarget(result);  //return the order ID
+                result = SubstringMethod(result, ":", 1);
+                return GetTarget(result);  //return the order ID
             }
 
             /* post new order row to API */
-            public string PostOrderRowRequest(string orderID, BPvalues value)
+            public string PostOrderRowRequest(string orderId, BPvalues value)
             {
                 // reset boolean flag to false 
                 HasError = false;
@@ -500,7 +500,7 @@ namespace Order_Manager.channel.brightpearl
                 // get product id
                 string productId = new GetRequest(appRef, appToken).GetProductId(value.Sku);
 
-                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/order-service/order/" + orderID + "/row";
+                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/order-service/order/" + orderId + "/row";
                 request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Method = "POST";
                 request.ContentType = "application/json";
@@ -559,15 +559,15 @@ namespace Order_Manager.channel.brightpearl
                 }
 
                 // generate JSON file for order row post
-                string textJSON;
+                string textJson;
                 if (productId != null)
-                    textJSON = "{\"productId\":\"" + productId + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"" + taxCode + "\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 4) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax, 4) + "\"}}}";
+                    textJson = "{\"productId\":\"" + productId + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"" + taxCode + "\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 4) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax, 4) + "\"}}}";
                 else
-                    textJSON = "{\"productName\":\"" + value.ProductName + " " + value.Sku  + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"" + taxCode + "\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 4) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax, 4) + "\"}}}";
+                    textJson = "{\"productName\":\"" + value.ProductName + " " + value.Sku  + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"" + taxCode + "\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 4) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax, 4) + "\"}}}";
 
 
                 // turn request string into a byte stream
-                byte[] postBytes = Encoding.UTF8.GetBytes(textJSON);
+                byte[] postBytes = Encoding.UTF8.GetBytes(textJson);
 
                 // send request
                 using (Stream requestStream = request.GetRequestStream())
@@ -588,12 +588,12 @@ namespace Order_Manager.channel.brightpearl
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                     result = streamReader.ReadToEnd();
 
-                result = substringMethod(result, ":", 1);
-                return getTarget(result);  //return the order row ID
+                result = SubstringMethod(result, ":", 1);
+                return GetTarget(result);  //return the order row ID
             }
 
             /* post reservation request to API return the message*/
-            public void PostReservationRequest(string orderID, string orderRowID, BPvalues value)
+            public void PostReservationRequest(string orderId, string orderRowId, BPvalues value)
             {
                 // reset boolean flag to false 
                 HasError = false;
@@ -602,7 +602,7 @@ namespace Order_Manager.channel.brightpearl
                 GetRequest get = new GetRequest(appRef, appToken);
                 string productId = get.GetProductId(value.Sku);
 
-                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/warehouse-service/order/" + orderID + "/reservation/warehouse/2";
+                string uri = "https://ws-use.brightpearl.com/2.0.0/ashlin/warehouse-service/order/" + orderId + "/reservation/warehouse/2";
                 request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Method = "POST";
                 request.ContentType = "application/json";
@@ -610,14 +610,14 @@ namespace Order_Manager.channel.brightpearl
                 request.Headers.Add("brightpearl-account-token", appToken);
 
                 // generate JSON file for order row post
-                string textJSON;
+                string textJson;
                 if (productId != null)
-                    textJSON = "{\"products\": [{\"productId\": \"" + productId + "\",\"salesOrderRowId\": \"" + orderRowID + "\",\"quantity\":\"" + value.Quantity + "\"}]}";
+                    textJson = "{\"products\": [{\"productId\": \"" + productId + "\",\"salesOrderRowId\": \"" + orderRowId + "\",\"quantity\":\"" + value.Quantity + "\"}]}";
                 else
                     return;
 
                 // turn request string into a byte stream
-                byte[] postBytes = Encoding.UTF8.GetBytes(textJSON);
+                byte[] postBytes = Encoding.UTF8.GetBytes(textJson);
 
                 // send request
                 using (Stream requestStream = request.GetRequestStream())
@@ -640,7 +640,7 @@ namespace Order_Manager.channel.brightpearl
             }
 
             /* post receipt to API */
-            public void PostReceipt(string orderID, string contactID, BPvalues value)
+            public void PostReceipt(string orderId, string contactId, BPvalues value)
             {
                 // reset boolean flag to false 
                 HasError = false;
@@ -652,10 +652,10 @@ namespace Order_Manager.channel.brightpearl
                 request.Headers.Add("brightpearl-app-ref", appRef);
                 request.Headers.Add("brightpearl-account-token", appToken);
 
-                string textJSON = "{\"orderId\":\"" + orderID + "\",\"customerId\":\"" + contactID + "\",\"received\":{\"currency\":\"CAD\",\"value\":\"" + Math.Round(value.TotalPaid, 4) + "\"},\"bankAccountNominalCode\":\"1001\",\"channelId\":" + value.ChannelId + ",\"taxDate\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\"}";
+                string textJson = "{\"orderId\":\"" + orderId + "\",\"customerId\":\"" + contactId + "\",\"received\":{\"currency\":\"CAD\",\"value\":\"" + Math.Round(value.TotalPaid, 4) + "\"},\"bankAccountNominalCode\":\"1001\",\"channelId\":" + value.ChannelId + ",\"taxDate\":\"" + value.PlaceOn.ToString("yyyy-MM-dd") + "T00:00:00+00:00\"}";
 
                 // turn request string into a byte stream
-                byte[] postBytes = Encoding.UTF8.GetBytes(textJSON);
+                byte[] postBytes = Encoding.UTF8.GetBytes(textJson);
 
                 // send request
                 using (Stream requestStream = request.GetRequestStream())

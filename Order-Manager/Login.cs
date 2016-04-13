@@ -50,7 +50,7 @@ namespace Order_Manager
             SqlConnection[] connection = { new SqlConnection(connectionString[0]), new SqlConnection(connectionString[1]), new SqlConnection(connectionString[2]) };
 
             // if connections are true -> open sku manager
-            if (isConnected(connection[0]) && isConnected(connection[1]) && isConnected(connection[2]))
+            if (IsConnected(connection[0]) && IsConnected(connection[1]) && IsConnected(connection[2]))
             {
                 Properties.Settings.Default.CHcs = connectionString[0];
                 Properties.Settings.Default.Designcs = connectionString[1];
@@ -67,7 +67,7 @@ namespace Order_Manager
         }
 
         /* a supporting method that see if the connection is valid or not */
-        private static bool isConnected(IDbConnection connection)
+        private static bool IsConnected(IDbConnection connection)
         {
             try
             {

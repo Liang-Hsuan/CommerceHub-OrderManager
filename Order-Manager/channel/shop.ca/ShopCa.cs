@@ -64,21 +64,21 @@ namespace Order_Manager.channel.shop.ca
         public void GetOrder()
         {
             // get all the new file on the order directory to local new order storing directory
-            IEnumerable<string> orderCheck = checkOrderFile();
-            getOrder(newOrderDir, orderCheck);
+            IEnumerable<string> orderCheck = CheckOrderFile();
+            GetOrder(newOrderDir, orderCheck);
 
             // read all the text of the file in the local directory
-            Dictionary<string,string> dic = getOrderFileText();
+            Dictionary<string,string> dic = GetOrderFileText();
 
             // return the transaction that haved not been processed
-            dic = getOrderId(dic);
-            dic = checkOrder(dic);
+            dic = GetOrderId(dic);
+            dic = CheckOrder(dic);
 
             // get information for each unprocessed order and update the them to the database
             foreach (KeyValuePair<string, string> keyValue in dic)
             {
                 ShopCaValues value = GenerateValue(keyValue.Key, keyValue.Value);
-                addNewOrder(value);
+                AddNewOrder(value);
             }
         }
 
@@ -267,7 +267,7 @@ namespace Order_Manager.channel.shop.ca
 
         #region Get Order Infomation
         /* method that get the new order from sftp server */
-        private void getOrder(string filePath, IEnumerable<string> fileList)
+        private void GetOrder(string filePath, IEnumerable<string> fileList)
         {
             // connection to sftp server and read all the list of file
             sftp.Connect();
@@ -285,7 +285,7 @@ namespace Order_Manager.channel.shop.ca
         }
 
         /* method that get the shipment order file name from sftp server */
-        private IEnumerable<string> getOrderName(string serverDir)
+        private IEnumerable<string> GetOrderName(string serverDir)
         {
             // connection to sftp server and read all the list of file
             sftp.Connect();
@@ -297,7 +297,7 @@ namespace Order_Manager.channel.shop.ca
         }
 
         /* method that get all the order in the file with the given dictionary <filePath, text> and return dictionary <orderId, filepath> */
-        private static Dictionary<string, string> getOrderId(Dictionary<string, string> fileText)
+        private static Dictionary<string, string> GetOrderId(Dictionary<string, string> fileText)
         {
             // local field for storing data and xml processing
             Dictionary<string, string> list = new Dictionary<string, string>();
@@ -318,7 +318,7 @@ namespace Order_Manager.channel.shop.ca
         }
 
         /* method that return all the text of order xml feed with dictionary <filePath, text> */
-        private Dictionary<string, string> getOrderFileText()
+        private Dictionary<string, string> GetOrderFileText()
         {
             // get all the order file on local
             DirectoryInfo dirInfo = new DirectoryInfo(newOrderDir);
@@ -331,14 +331,14 @@ namespace Order_Manager.channel.shop.ca
 
         #region Check Order Methods
         /* return all the new order file name on the server */
-        private IEnumerable<string> checkOrderFile()
+        private IEnumerable<string> CheckOrderFile()
         {
             // get all order file on local
             DirectoryInfo dirInfo = new DirectoryInfo(newOrderDir);
             FileInfo[] filesLocal = dirInfo.GetFiles("*.xml");       // getting all file that have been on local
 
             // get all order file on server
-            IEnumerable<string> fileOnServer = getOrderName(SHIPMENT_DIR);
+            IEnumerable<string> fileOnServer = GetOrderName(SHIPMENT_DIR);
 
             // check the number of new order on the server compare to ones on the computer
             return (from file1 in fileOnServer let found = filesLocal.Any(file2 => file1 == file2.ToString()) where !found select file1).ToArray();
@@ -346,7 +346,7 @@ namespace Order_Manager.channel.shop.ca
 
         /* a method that receive all the current order and check the duplicate then only return the ones that have not been processed 
         -> receive and return dictionary <orderId, filePath> */
-        private static Dictionary<string, string> checkOrder(Dictionary<string, string> allOrderList)
+        private static Dictionary<string, string> CheckOrder(Dictionary<string, string> allOrderList)
         {
             // get all complete order id 
             List<string> completeOrderList = new List<string>();
@@ -430,8 +430,8 @@ namespace Order_Manager.channel.shop.ca
             //Load xml file content
             XmlDocument doc = new XmlDocument();
             doc.Load(filePath);
-            int order_position = 1;
-            int order_item_position = 1;
+            int orderPosition = 1;
+            int orderItemPosition = 1;
 
             // field for return
             ShopCaValues value = new ShopCaValues();
@@ -441,7 +441,7 @@ namespace Order_Manager.channel.shop.ca
             {
                 if (parentnode.Name == "order")
                 {
-                    foreach (XmlNode order in doc.DocumentElement.SelectSingleNode("/shop_ca_feed/order[" + order_position + "]"))
+                    foreach (XmlNode order in doc.DocumentElement.SelectSingleNode("/shop_ca_feed/order[" + orderPosition + "]"))
                     {
                         // bool flag for determine if the order is the target -> default set to true
                         bool isTarget = true;
@@ -513,7 +513,7 @@ namespace Order_Manager.channel.shop.ca
 
                             #region Order Item
                             case "order_item":
-                                foreach (XmlNode subnode in doc.DocumentElement.SelectSingleNode("/shop_ca_feed/order[" + order_position + "]/order_item[" + order_item_position + "]"))
+                                foreach (XmlNode subnode in doc.DocumentElement.SelectSingleNode("/shop_ca_feed/order[" + orderPosition + "]/order_item[" + orderItemPosition + "]"))
                                 {
                                     switch (subnode.Name)
                                     {
@@ -553,45 +553,45 @@ namespace Order_Manager.channel.shop.ca
                                             value.ItemDiscount.Add(decimal.Parse(subnode.InnerText));
                                             break;
                                         case "shipping_first_name":
-                                            if (order_item_position == 1)
+                                            if (orderItemPosition == 1)
                                                 value.ShipTo.Name = subnode.InnerText;
                                             break;
                                         case "shipping_last_name":
-                                            if (order_item_position == 1)
+                                            if (orderItemPosition == 1)
                                                 value.ShipTo.Name += " " + subnode.InnerText;
                                             break;
                                         case "shipping_address_one":
-                                            if (order_item_position == 1)
+                                            if (orderItemPosition == 1)
                                                 value.ShipTo.Address1 = subnode.InnerText;
                                             break;
                                         case "shipping_address_two":
-                                            if (order_item_position == 1)
+                                            if (orderItemPosition == 1)
                                                 value.ShipTo.Address2 = subnode.InnerText;
                                             break;
                                         case "shipping_city":
-                                            if (order_item_position == 1)
+                                            if (orderItemPosition == 1)
                                                 value.ShipTo.City = subnode.InnerText;
                                             break;
                                         case "shipping_province":
-                                            if (order_item_position == 1)
+                                            if (orderItemPosition == 1)
                                                 value.ShipTo.State = subnode.InnerText;
                                             break;
                                         case "shipping_postalcode":
-                                            if (order_item_position == 1)
+                                            if (orderItemPosition == 1)
                                                 value.ShipTo.PostalCode = subnode.InnerText;
                                             break;
                                         case "shipping_phone":
-                                            if (order_item_position == 1)
+                                            if (orderItemPosition == 1)
                                                 value.ShipTo.DayPhone = subnode.InnerText;
                                             break;
                                         case "shipping_method":
-                                            if (order_item_position == 1)
+                                            if (orderItemPosition == 1)
                                                 value.ShippingMethod = subnode.InnerText;
                                             break;
                                     }
                                 }
                                 //increment position (for multiple order item)
-                                order_item_position++;
+                                orderItemPosition++;
                                 break;
                         }
                         #endregion
@@ -603,8 +603,8 @@ namespace Order_Manager.channel.shop.ca
                 }
 
                 //adjust position of order item
-                order_position++;
-                order_item_position = 1;
+                orderPosition++;
+                orderItemPosition = 1;
             }
             #endregion
 
@@ -680,7 +680,7 @@ namespace Order_Manager.channel.shop.ca
         #endregion
 
         /* a method that add a new order to database */
-        private static void addNewOrder(ShopCaValues value)
+        private static void AddNewOrder(ShopCaValues value)
         {
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {

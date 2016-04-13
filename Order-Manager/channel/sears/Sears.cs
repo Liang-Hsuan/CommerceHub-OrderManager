@@ -63,21 +63,21 @@ namespace Order_Manager.channel.sears
         public void GetOrder()
         {
             // get all the new file on the order directory to local new order storing directory
-            string[] orderCheck = checkOrderFile();
-            getOrder(newOrderDir, orderCheck);
+            string[] orderCheck = CheckOrderFile();
+            GetOrder(newOrderDir, orderCheck);
 
             // read all the text of the file in the local directory
-            string[] textXml = getOrderFileText();
+            string[] textXml = GetOrderFileText();
 
             // return the transaction that haved not been processed
-            orderCheck = getTransactionId(textXml);
-            orderCheck = checkTransaction(orderCheck);
+            orderCheck = GetTransactionId(textXml);
+            orderCheck = CheckTransaction(orderCheck);
 
             // get information for each unprocessed transaction and update the them to the database
             foreach (string transaction in orderCheck)
             {
                 SearsValues value = GenerateValue(transaction, textXml);
-                addNewOrder(value);
+                AddNewOrder(value);
             }
         }
 
@@ -271,7 +271,7 @@ namespace Order_Manager.channel.sears
 
         #region Get Order Information
         /* method that get the new order from sftp server */
-        private void getOrder(string filePath, IEnumerable<string> fileList)
+        private void GetOrder(string filePath, IEnumerable<string> fileList)
         {
             // connection to sftp server and read all the list of file
             sftp.Connect();
@@ -292,7 +292,7 @@ namespace Order_Manager.channel.sears
         }
 
         /* method that get the new order from sftp server */
-        private IEnumerable<string> getOrderName(string serverDir)
+        private IEnumerable<string> GetOrderName(string serverDir)
         {
             // connection to sftp server and read all the list of file
             sftp.Connect();
@@ -304,7 +304,7 @@ namespace Order_Manager.channel.sears
         }
 
         /* method that get all the transaction in the file */
-        private static string[] getTransactionId(IEnumerable<string> fileText)
+        private static string[] GetTransactionId(IEnumerable<string> fileText)
         {
             // local field for storing data
             List<string> list = new List<string>();
@@ -316,8 +316,8 @@ namespace Order_Manager.channel.sears
 
                 while (copy.Contains("hubOrder transactionID"))
                 {
-                    copy = substringMethod(copy, "transactionID", 15);
-                    list.Add(getTarget(copy));
+                    copy = SubstringMethod(copy, "transactionID", 15);
+                    list.Add(GetTarget(copy));
                 }
             }
 
@@ -325,7 +325,7 @@ namespace Order_Manager.channel.sears
         }
 
         /* method that return all the text of order xml feed */
-        private string[] getOrderFileText()
+        private string[] GetOrderFileText()
         {
             // get all the order file on local
             DirectoryInfo dirInfo = new DirectoryInfo(newOrderDir);
@@ -343,21 +343,21 @@ namespace Order_Manager.channel.sears
 
         #region Checking Order Methods
         /* give the information about the new orders and also return all the new order files on server */
-        private string[] checkOrderFile()
+        private string[] CheckOrderFile()
         {
             // get all order file on local
             DirectoryInfo dirInfo = new DirectoryInfo(newOrderDir);
             FileInfo[] filesLocal = dirInfo.GetFiles("*.txt");       // getting all file that have been on local
 
             // get all order file on server
-            IEnumerable<string> fileOnServer = getOrderName(SHIPMENT_DIR);
+            IEnumerable<string> fileOnServer = GetOrderName(SHIPMENT_DIR);
 
             // check the number of new order on the server compare to ones on the computer
             return (from file1 in fileOnServer let found = filesLocal.Select(file2 => file2.ToString()).Any(file2Copy => file1.Remove(file1.LastIndexOf('.')) == file2Copy.Remove(file2Copy.LastIndexOf('.'))) where !found select file1).ToArray();
         }
 
         /* a method that receive all the current transaction and check the duplicate then only return the ones that have not been added to the database */
-        private string[] checkTransaction(string[] allTransactionList)
+        private string[] CheckTransaction(string[] allTransactionList)
         {
             // input error check
             if (allTransactionList == null) throw new ArgumentNullException(nameof(allTransactionList));
@@ -380,11 +380,11 @@ namespace Order_Manager.channel.sears
 
         #region XML Generation
         /* a method that generate xml order and upload to the sftp server and update database */
-        public void GenerateXML(SearsValues value, Dictionary<int, string> cancelList)
+        public void GenerateXml(SearsValues value, Dictionary<int, string> cancelList)
         {
             // get other necessary values
-            value.VendorInvoiceNumber = getInvoiceNumber();
-            value.PackageDetailId = getPackageId();
+            value.VendorInvoiceNumber = GetInvoiceNumber();
+            value.PackageDetailId = GetPackageId();
 
             // fields for database update
             SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs);
@@ -548,104 +548,104 @@ namespace Order_Manager.channel.sears
                 string copy = text;
 
                 // transaction id
-                copy = substringMethod(copy, targetTransaction, 0);
+                copy = SubstringMethod(copy, targetTransaction, 0);
                 copy = copy.Remove(copy.IndexOf("/hubOrder>"));
-                value.TransactionId = getTarget(copy);
+                value.TransactionId = GetTarget(copy);
 
                 // line count
-                copy = substringMethod(copy, "lineCount", 10);
-                value.LineCount = Convert.ToInt32(getTarget(copy));
+                copy = SubstringMethod(copy, "lineCount", 10);
+                value.LineCount = Convert.ToInt32(GetTarget(copy));
 
                 // po number
-                copy = substringMethod(copy, "poNumber", 9);
-                value.PoNumber = getTarget(copy);
+                copy = SubstringMethod(copy, "poNumber", 9);
+                value.PoNumber = GetTarget(copy);
 
                 // order date
-                copy = substringMethod(copy, "orderDate", 10);
-                value.OrderDate = DateTime.ParseExact(getTarget(copy), "yyyyMMdd", CultureInfo.InvariantCulture);
+                copy = SubstringMethod(copy, "orderDate", 10);
+                value.OrderDate = DateTime.ParseExact(GetTarget(copy), "yyyyMMdd", CultureInfo.InvariantCulture);
 
                 // payment method
-                copy = substringMethod(copy, "paymentMethod", 14);
-                value.PaymentMethod = getTarget(copy);
+                copy = SubstringMethod(copy, "paymentMethod", 14);
+                value.PaymentMethod = GetTarget(copy);
 
                 // ship to person place id
-                copy = substringMethod(copy, "shipTo personPlaceID", 22);
-                string shipToId = getTarget(copy);
+                copy = SubstringMethod(copy, "shipTo personPlaceID", 22);
+                string shipToId = GetTarget(copy);
 
                 // bill to person place id 
-                copy = substringMethod(copy, "billTo personPlaceID", 22);
-                string billToId = getTarget(copy);
+                copy = SubstringMethod(copy, "billTo personPlaceID", 22);
+                string billToId = GetTarget(copy);
 
                 // customer person place id 
-                copy = substringMethod(copy, "customer personPlaceID", 24);
-                string customerPlaceId = getTarget(copy);
+                copy = SubstringMethod(copy, "customer personPlaceID", 24);
+                string customerPlaceId = GetTarget(copy);
 
                 // cust order number
-                copy = substringMethod(copy, "custOrderNumber", 16);
-                value.CustOrderNumber = getTarget(copy);
+                copy = SubstringMethod(copy, "custOrderNumber", 16);
+                value.CustOrderNumber = GetTarget(copy);
 
                 // cust order date
-                copy = substringMethod(copy, "custOrderDate", 14);
-                value.CustOrderDate = DateTime.ParseExact(getTarget(copy), "yyyyMMdd", CultureInfo.InvariantCulture);
+                copy = SubstringMethod(copy, "custOrderDate", 14);
+                value.CustOrderDate = DateTime.ParseExact(GetTarget(copy), "yyyyMMdd", CultureInfo.InvariantCulture);
 
                 // pack slip message
-                copy = substringMethod(copy, "packslipMessage", 16);
-                value.PackSlipMessage = getTarget(copy);
+                copy = SubstringMethod(copy, "packslipMessage", 16);
+                value.PackSlipMessage = GetTarget(copy);
 
                 // get info for each line count
                 for (int i = 1; i <= value.LineCount; i++)
                 {
                     // order line number
-                    copy = substringMethod(copy, "merchantLineNumber", 19);
-                    value.MerchantLineNumber.Add(Convert.ToInt32(getTarget(copy)));
+                    copy = SubstringMethod(copy, "merchantLineNumber", 19);
+                    value.MerchantLineNumber.Add(Convert.ToInt32(GetTarget(copy)));
 
                     // trx qty
-                    copy = substringMethod(copy, "qtyOrdered", 11);
-                    value.TrxQty.Add(Convert.ToInt32(getTarget(copy)));
+                    copy = SubstringMethod(copy, "qtyOrdered", 11);
+                    value.TrxQty.Add(Convert.ToInt32(GetTarget(copy)));
 
                     // upc
                     if (copy.Contains("UPC"))
                     {
-                        copy = substringMethod(copy, "UPC", 4);
-                        value.Upc.Add(getTarget(copy));
+                        copy = SubstringMethod(copy, "UPC", 4);
+                        value.Upc.Add(GetTarget(copy));
                     }
                     else
                         value.Upc.Add("");
 
                     // description 
-                    copy = substringMethod(copy, "description", 12);
-                    value.Description.Add(getTarget(copy));
+                    copy = SubstringMethod(copy, "description", 12);
+                    value.Description.Add(GetTarget(copy));
 
                     // description 2
                     if (copy.Contains("description2"))
                     {
-                        copy = substringMethod(copy, "description2", 13);
-                        value.Description2.Add(getTarget(copy));
+                        copy = SubstringMethod(copy, "description2", 13);
+                        value.Description2.Add(GetTarget(copy));
                     }
                     else
                         value.Description2.Add("");
 
                     // merchant sku
-                    copy = substringMethod(copy, "merchantSKU", 12);
-                    value.TrxMerchantSku.Add(getTarget(copy));
+                    copy = SubstringMethod(copy, "merchantSKU", 12);
+                    value.TrxMerchantSku.Add(GetTarget(copy));
 
                     // vendor sku
-                    copy = substringMethod(copy, "vendorSKU", 10);
-                    value.TrxVendorSku.Add(getTarget(copy));
+                    copy = SubstringMethod(copy, "vendorSKU", 10);
+                    value.TrxVendorSku.Add(GetTarget(copy));
 
                     // unit price
-                    copy = substringMethod(copy, "unitPrice", 10);
-                    value.UnitPrice.Add(Convert.ToDouble(getTarget(copy)));
+                    copy = SubstringMethod(copy, "unitPrice", 10);
+                    value.UnitPrice.Add(Convert.ToDouble(GetTarget(copy)));
 
                     // unit price
-                    copy = substringMethod(copy, "unitCost", 9);
-                    value.TrxUnitCost.Add(Convert.ToDouble(getTarget(copy)));
+                    copy = SubstringMethod(copy, "unitCost", 9);
+                    value.TrxUnitCost.Add(Convert.ToDouble(GetTarget(copy)));
 
                     // line handling
                     if (copy.Contains("lineHandling"))
                     {
-                        copy = substringMethod(copy, "lineHandling", 13);
-                        value.LineHandling.Add(Convert.ToDouble(getTarget(copy)));
+                        copy = SubstringMethod(copy, "lineHandling", 13);
+                        value.LineHandling.Add(Convert.ToDouble(GetTarget(copy)));
                     }
                     else
                         value.LineHandling.Add(0);
@@ -653,168 +653,168 @@ namespace Order_Manager.channel.sears
                     if (i == 1)
                     {
                         // service level / shipping code
-                        copy = substringMethod(copy, "shippingCode", 13);
-                        value.ServiceLevel = getTarget(copy);
+                        copy = SubstringMethod(copy, "shippingCode", 13);
+                        value.ServiceLevel = GetTarget(copy);
                     }
 
                     // trx balance due (plus line balance due)
-                    copy = substringMethod(copy, "lineTotal", 10);
-                    value.LineBalanceDue.Add(Convert.ToDouble(getTarget(copy)));
-                    value.TrxBalanceDue += Convert.ToDouble(getTarget(copy));
+                    copy = SubstringMethod(copy, "lineTotal", 10);
+                    value.LineBalanceDue.Add(Convert.ToDouble(GetTarget(copy)));
+                    value.TrxBalanceDue += Convert.ToDouble(GetTarget(copy));
 
                     // expected ship date
-                    copy = substringMethod(copy, "expectedShipDate", 17);
-                    value.ExpectedShipDate.Add(DateTime.ParseExact(getTarget(copy), "yyyyMMdd", CultureInfo.InvariantCulture));
+                    copy = SubstringMethod(copy, "expectedShipDate", 17);
+                    value.ExpectedShipDate.Add(DateTime.ParseExact(GetTarget(copy), "yyyyMMdd", CultureInfo.InvariantCulture));
 
                     // gst and hst extended
-                    copy = substringMethod(copy, "GST_HST_Extended", 16);
-                    copy = substringMethod(copy, ">", 1);
-                    value.GST_HST_Extended.Add(Convert.ToDouble(getTarget(copy)));
+                    copy = SubstringMethod(copy, "GST_HST_Extended", 16);
+                    copy = SubstringMethod(copy, ">", 1);
+                    value.GST_HST_Extended.Add(Convert.ToDouble(GetTarget(copy)));
 
                     // pst extended
-                    copy = substringMethod(copy, "PST_Extended", 12);
-                    copy = substringMethod(copy, ">", 1);
-                    value.PST_Extended.Add(Convert.ToDouble(getTarget(copy)));
+                    copy = SubstringMethod(copy, "PST_Extended", 12);
+                    copy = SubstringMethod(copy, ">", 1);
+                    value.PST_Extended.Add(Convert.ToDouble(GetTarget(copy)));
 
                     // gst and hst
-                    copy = substringMethod(copy, "GST_HST_Total", 16);
-                    copy = substringMethod(copy, ">", 1);
-                    value.GST_HST_Total.Add(Convert.ToDouble(getTarget(copy)));
+                    copy = SubstringMethod(copy, "GST_HST_Total", 16);
+                    copy = SubstringMethod(copy, ">", 1);
+                    value.GST_HST_Total.Add(Convert.ToDouble(GetTarget(copy)));
 
                     // pst
-                    copy = substringMethod(copy, "PST_Total", 13);
-                    copy = substringMethod(copy, ">", 1);
-                    value.PST_Total.Add(Convert.ToDouble(getTarget(copy)));
+                    copy = SubstringMethod(copy, "PST_Total", 13);
+                    copy = SubstringMethod(copy, ">", 1);
+                    value.PST_Total.Add(Convert.ToDouble(GetTarget(copy)));
 
                     // encoded price 
-                    copy = substringMethod(copy, "encodedPrice", 13);
-                    value.EncodedPrice.Add(getTarget(copy));
+                    copy = SubstringMethod(copy, "encodedPrice", 13);
+                    value.EncodedPrice.Add(GetTarget(copy));
 
                     // ps receiving instructions
-                    copy = substringMethod(copy, "psReceivingInstructions", 24);
-                    value.ReceivingInstructions.Add(getTarget(copy));
+                    copy = SubstringMethod(copy, "psReceivingInstructions", 24);
+                    value.ReceivingInstructions.Add(GetTarget(copy));
                 }
 
                 string copyCopy = copy;
 
                 #region Bill To Address
                 // bill to name
-                copyCopy = substringMethod(copyCopy, billToId, billToId.Length);
-                copyCopy = substringMethod(copyCopy, "name1", 6);
-                value.BillTo.Name = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, billToId, billToId.Length);
+                copyCopy = SubstringMethod(copyCopy, "name1", 6);
+                value.BillTo.Name = GetTarget(copyCopy);
 
                 // bill to address
                 copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
-                copyCopy = substringMethod(copyCopy, "address1", 9);
-                value.BillTo.Address1 = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "address1", 9);
+                value.BillTo.Address1 = GetTarget(copyCopy);
                 if (copyCopy.Contains("address2"))
                 {
-                    copyCopy = substringMethod(copyCopy, "address2", 9);
-                    value.BillTo.Address2 = getTarget(copyCopy);
+                    copyCopy = SubstringMethod(copyCopy, "address2", 9);
+                    value.BillTo.Address2 = GetTarget(copyCopy);
                 }
 
                 // bill to city
-                copyCopy = substringMethod(copyCopy, "city", 5);
-                value.BillTo.City = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "city", 5);
+                value.BillTo.City = GetTarget(copyCopy);
 
                 // bill to state
-                copyCopy = substringMethod(copyCopy, "state", 6);
-                value.BillTo.State = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "state", 6);
+                value.BillTo.State = GetTarget(copyCopy);
 
                 // bill to postal code
-                copyCopy = substringMethod(copyCopy, "postalCode", 11);
-                value.BillTo.PostalCode = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "postalCode", 11);
+                value.BillTo.PostalCode = GetTarget(copyCopy);
 
                 // bill to phone
-                copyCopy = substringMethod(copyCopy, "dayPhone", 9);
-                value.BillTo.DayPhone = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "dayPhone", 9);
+                value.BillTo.DayPhone = GetTarget(copyCopy);
                 #endregion
 
                 copyCopy = copy;
 
                 #region Recipient Address
                 // recipient name
-                copyCopy = substringMethod(copyCopy, customerPlaceId, customerPlaceId.Length);
-                copyCopy = substringMethod(copyCopy, "name1", 6);
-                value.Recipient.Name = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, customerPlaceId, customerPlaceId.Length);
+                copyCopy = SubstringMethod(copyCopy, "name1", 6);
+                value.Recipient.Name = GetTarget(copyCopy);
 
                 // recipient address
                 copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
-                copyCopy = substringMethod(copyCopy, "address1", 9);
-                value.Recipient.Address1 = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "address1", 9);
+                value.Recipient.Address1 = GetTarget(copyCopy);
                 if (copyCopy.Contains("address2"))
                 {
-                    copyCopy = substringMethod(copyCopy, "address2", 9);
-                    value.Recipient.Address2 = getTarget(copyCopy);
+                    copyCopy = SubstringMethod(copyCopy, "address2", 9);
+                    value.Recipient.Address2 = GetTarget(copyCopy);
                 }
 
                 // recipient city
-                copyCopy = substringMethod(copyCopy, "city", 5);
-                value.Recipient.City = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "city", 5);
+                value.Recipient.City = GetTarget(copyCopy);
 
                 // recipient state
-                copyCopy = substringMethod(copyCopy, "state", 6);
-                value.Recipient.State = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "state", 6);
+                value.Recipient.State = GetTarget(copyCopy);
 
                 // recipient postal code
-                copyCopy = substringMethod(copyCopy, "postalCode", 11);
-                value.Recipient.PostalCode = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "postalCode", 11);
+                value.Recipient.PostalCode = GetTarget(copyCopy);
 
                 // recipient phone
-                copyCopy = substringMethod(copyCopy, "dayPhone", 9);
-                value.Recipient.DayPhone = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "dayPhone", 9);
+                value.Recipient.DayPhone = GetTarget(copyCopy);
                 #endregion
 
                 copyCopy = copy;
 
                 #region Ship To Address
                 // ship to name
-                copyCopy = substringMethod(copyCopy, shipToId, shipToId.Length);
-                copyCopy = substringMethod(copyCopy, "name1", 6);
-                value.ShipTo.Name = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, shipToId, shipToId.Length);
+                copyCopy = SubstringMethod(copyCopy, "name1", 6);
+                value.ShipTo.Name = GetTarget(copyCopy);
 
                 // ship to
                 copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
-                copyCopy = substringMethod(copyCopy, "address1", 9);
-                value.ShipTo.Address1 = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "address1", 9);
+                value.ShipTo.Address1 = GetTarget(copyCopy);
                 if (copyCopy.Contains("address2"))
                 {
-                    copyCopy = substringMethod(copyCopy, "address2", 9);
-                    value.ShipTo.Address2 = getTarget(copyCopy);
+                    copyCopy = SubstringMethod(copyCopy, "address2", 9);
+                    value.ShipTo.Address2 = GetTarget(copyCopy);
                 }
 
                 // ship to city
-                copyCopy = substringMethod(copyCopy, "city", 5);
-                value.ShipTo.City = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "city", 5);
+                value.ShipTo.City = GetTarget(copyCopy);
 
                 // ship to state
-                copyCopy = substringMethod(copyCopy, "state", 6);
-                value.ShipTo.State = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "state", 6);
+                value.ShipTo.State = GetTarget(copyCopy);
 
                 // ship to postal code
-                copyCopy = substringMethod(copyCopy, "postalCode", 11);
-                value.ShipTo.PostalCode = getTarget(copyCopy);
+                copyCopy = SubstringMethod(copyCopy, "postalCode", 11);
+                value.ShipTo.PostalCode = GetTarget(copyCopy);
 
                 // ship to day phone
                 if (copyCopy.Contains("dayPhone"))
                 {
-                    copyCopy = substringMethod(copyCopy, "dayPhone", 9);
-                    value.ShipTo.DayPhone = getTarget(copyCopy);
+                    copyCopy = SubstringMethod(copyCopy, "dayPhone", 9);
+                    value.ShipTo.DayPhone = GetTarget(copyCopy);
                 }
 
                 // ship to partner person place id
                 if (copyCopy.Contains("partnerPersonPlaceId"))
                 {
-                    copyCopy = substringMethod(copyCopy, "partnerPersonPlaceId", 21);
-                    value.PartnerPersonPlaceId = getTarget(copyCopy);
+                    copyCopy = SubstringMethod(copyCopy, "partnerPersonPlaceId", 21);
+                    value.PartnerPersonPlaceId = GetTarget(copyCopy);
                 }
                 #endregion
 
                 // freight lane & spur -> only if exist
                 if (copyCopy.Contains("attnLine"))
                 {
-                    copyCopy = substringMethod(copyCopy, "attnLine", 9);
-                    string attention = getTarget(copyCopy);
+                    copyCopy = SubstringMethod(copyCopy, "attnLine", 9);
+                    string attention = GetTarget(copyCopy);
 
                     int index = 0;
                     while ((char.IsLetter(attention[index]) || char.IsNumber(attention[index])) && attention[index] != ' ' && attention[index] != '_')
@@ -954,7 +954,7 @@ namespace Order_Manager.channel.sears
         }
 
         /* a method that add a new transaction order to database */
-        private static void addNewOrder(SearsValues value)
+        private static void AddNewOrder(SearsValues value)
         {
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
@@ -981,7 +981,7 @@ namespace Order_Manager.channel.sears
 
         #region Supporting Methods
         /* a method that get invoice number */
-        private static string getInvoiceNumber()
+        private static string GetInvoiceNumber()
         {
             // get iterator
             int iterator = !Properties.Settings.Default.Date.Equals(DateTime.Today) ? 1 : Properties.Settings.Default.Iterator;
@@ -1003,7 +1003,7 @@ namespace Order_Manager.channel.sears
         }
 
         /* a method that get package id */
-        private static string getPackageId()
+        private static string GetPackageId()
         {
             // get iterator
             int iterator = !Properties.Settings.Default.Date.Equals(DateTime.Today) ? 1 : Properties.Settings.Default.Iterator;
@@ -1013,13 +1013,13 @@ namespace Order_Manager.channel.sears
         }
 
         /* a method that substring the given string */
-        private static string substringMethod(string original, string startingString, int additionIndex)
+        private static string SubstringMethod(string original, string startingString, int additionIndex)
         {
             return original.Substring(original.IndexOf(startingString) + additionIndex);
         }
 
         /* a method that get the next target token */
-        private static string getTarget(string text)
+        private static string GetTarget(string text)
         {
             int i = 0;
             while (text[i] != '<' && text[i] != '>' && text[i] != '"')
