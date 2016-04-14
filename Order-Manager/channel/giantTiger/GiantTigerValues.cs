@@ -1,4 +1,5 @@
 ﻿using Order_Manager.supportingClasses.Address;
+using Order_Manager.supportingClasses.Shipment;
 using System;
 using System.Collections.Generic;
 
@@ -16,8 +17,11 @@ namespace Order_Manager.channel.giantTiger
         public string ShipMethod { get; set; }
         public Address ShipTo { get; set; }
         public string StoreNumber { get; set; }
+        public string OmsOrderNumber { get; set; }
+        public Package Package { get; set; }
 
         // fields for item details
+        public List<string> VendorSku { get; set; }
         public List<string> HostSku { get; set; }
         public List<string> ClientItemId { get; set; }
         public List<double> UnitCost { get; set; }
@@ -32,7 +36,9 @@ namespace Order_Manager.channel.giantTiger
             ShipMethod = "";
             ShipTo = new Address();
             StoreNumber = "";
+            OmsOrderNumber = "";
 
+            VendorSku = new List<string>();
             HostSku = new List<string>();
             ClientItemId = new List<string>();
             UnitCost = new List<double>();
@@ -40,8 +46,8 @@ namespace Order_Manager.channel.giantTiger
         }
 
         /* second constructor that take all the parametoers */
-        public GiantTigerValues(string poNumber, string webOrderNo, DateTime orderDate, string shipMethod, Address shipTo, string storeName,
-                                List<string> hostSku, List<string> clientItemId, List<double> unitCost, List<int> quantity)
+        public GiantTigerValues(string poNumber, string webOrderNo, DateTime orderDate, string shipMethod, Address shipTo, string storeName, string omsOrderNumber,
+                                List<string> vendorSku, List<string> hostSku, List<string> clientItemId, List<double> unitCost, List<int> quantity)
         {
             PoNumber = poNumber;
             WebOrderNo = webOrderNo;
@@ -49,7 +55,9 @@ namespace Order_Manager.channel.giantTiger
             ShipMethod = shipMethod;
             ShipTo = shipTo;
             StoreNumber = storeName;
+            OmsOrderNumber = omsOrderNumber;
 
+            VendorSku = vendorSku;
             HostSku = hostSku;
             ClientItemId = clientItemId;
             UnitCost = unitCost;

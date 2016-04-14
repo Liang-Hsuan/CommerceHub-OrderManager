@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Order_Manager.channel.sears;
 using Order_Manager.channel.shop.ca;
+using Order_Manager.channel.giantTiger;
 
 namespace Order_Manager.supportingClasses.Shipment
 {
@@ -91,7 +92,31 @@ namespace Order_Manager.supportingClasses.Shipment
             LabelLink = "";
         }
 
-        /* third constructor that take all parameters */
+        /* fourth constructor that take GiantTigerValues object as parameter */
+        public Package(GiantTigerValues value)
+        {
+            // generate package detail -> weight and dimensions
+            decimal[] skuDetail = { 0, 0, 0, 0 };
+
+            foreach (decimal[] detailList in value.VendorSku.Select(GetSkuDetail).Where(detailList => !detailList.Equals(null)))
+            {
+                for (int i = 0; i < 4; i++)
+                    skuDetail[i] += detailList[i];
+            }
+
+            // allocate data
+            Weight = skuDetail[0] / 1000;
+            Length = skuDetail[1];
+            Width = skuDetail[2];
+            Height = skuDetail[3];
+
+            // service is set to default
+            Service = "Expedited Parcel";
+            SelfLink = "";
+            LabelLink = "";
+        }
+
+        /* fiveth constructor that take all parameters */
         public Package(decimal weight, decimal length, decimal width, decimal height, string packageType, string service, string trackingNumber, 
                        string identificationNumber, string selfLink, string labelLink)
         {

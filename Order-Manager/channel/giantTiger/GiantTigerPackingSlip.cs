@@ -15,15 +15,19 @@ namespace Order_Manager.channel.giantTiger
         public static string SavePath { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\GiantTiger_PackingSlip";
 
         /* a method that save the packing slip pdf */
-        public static void CreatePackingSlip(int[] cancelIndex, bool preview)
+        public static void CreatePackingSlip(GiantTigerValues value, int[] cancelIndex, bool preview)
         {
+            // the case if all of the items in the order are cancelled -> don't need to print the packing slip
+            if (cancelIndex.Length >= value.VendorSku.Count)
+                return;
+
             // first check if the save directory exist -> if not create it
             if (!File.Exists(SavePath))
                 Directory.CreateDirectory(SavePath);
 
             // initialize fields
             Document doc = new Document(PageSize.LETTER, 0, 0, 0, 0);
-            string file = SavePath + "\\test.pdf";
+            string file = SavePath + "\\" + value.PoNumber + ".pdf";
             PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(file, FileMode.Create));
 
             // open the documents
@@ -65,7 +69,8 @@ namespace Order_Manager.channel.giantTiger
             ct.Go();
 
             // sold to address
-            text = new Phrase("Leon Ma\n240 Westmount Road North\nReison\nWaterloo, ON N2L 3G4\nCanada", new Font(baseFont, 9));
+            text = new Phrase(value.ShipTo.Name + '\n' + value.ShipTo.Address1 + '\n' + value.ShipTo.Address2 + '\n' + value.ShipTo.City + ", " + value.ShipTo.State + ' ' + value.ShipTo.PostalCode + "\nCanada"
+                 , new Font(baseFont, 9));
             ct.SetSimpleColumn(text, 42f, 568f, 177f, 668f, 10f, Element.ALIGN_LEFT);
             ct.Go();
             #endregion
@@ -77,7 +82,8 @@ namespace Order_Manager.channel.giantTiger
             ct.Go();
 
             // ship to address
-            text = new Phrase("Leon Ma\n240 Westmount Road North\nReison\nWaterloo, ON N2L 3G4\nCanada", new Font(baseFont, 9f));
+            text = new Phrase(value.ShipTo.Name + '\n' + value.ShipTo.Address1 + '\n' + value.ShipTo.Address2 + '\n' + value.ShipTo.City + ", " + value.ShipTo.State + ' ' + value.ShipTo.PostalCode + "\nCanada"
+                 , new Font(baseFont, 9f));
             ct.SetSimpleColumn(text, 302f, 568f, 447f, 668f, 10f, Element.ALIGN_LEFT);
             ct.Go();
             #endregion
@@ -145,7 +151,7 @@ namespace Order_Manager.channel.giantTiger
             ct.SetSimpleColumn(text, 40f, 523f, 160f, 533f, 0f, Element.ALIGN_CENTER);
             ct.Go();
 
-            text = new Phrase("04/29/2016", new Font(baseFont, 10));
+            text = new Phrase(value.OrderDate.ToString("MM/dd/yyyy"), new Font(baseFont, 10));
             ct.SetSimpleColumn(text, 160f, 523f, 280f, 533f, 0f, Element.ALIGN_CENTER);
             ct.Go();
 
@@ -153,11 +159,11 @@ namespace Order_Manager.channel.giantTiger
             ct.SetSimpleColumn(text, 280f, 523f, 320f, 533f, 0f, Element.ALIGN_CENTER);
             ct.Go();
 
-            text = new Phrase("19791104008", new Font(baseFont, 10));
+            text = new Phrase(value.WebOrderNo, new Font(baseFont, 10));
             ct.SetSimpleColumn(text, 320f, 523f, 500f, 533f, 0f, Element.ALIGN_CENTER);
             ct.Go();
 
-            text = new Phrase("19790007", new Font(baseFont, 10));
+            text = new Phrase(value.PoNumber, new Font(baseFont, 10));
             ct.SetSimpleColumn(text, 500f, 523f, doc.PageSize.Width - 40f, 533f, 0f, Element.ALIGN_CENTER);
             ct.Go();
             #endregion
@@ -222,7 +228,7 @@ namespace Order_Manager.channel.giantTiger
             float height = 480f;
 
             // adding items
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < value.VendorSku.Count; i++)
             {
                 // if the item is cancelled, skip this item
                 if (cancelIndex.Any(j => i == j)) continue;
@@ -251,27 +257,27 @@ namespace Order_Manager.channel.giantTiger
                 draw.Stroke();
 
                 // qty
-                text = new Phrase("1", new Font(baseFont, 10));
+                text = new Phrase(value.Quantity[i].ToString(), new Font(baseFont, 10));
                 ct.SetSimpleColumn(text, 40f, height - 19f, 130, height - 9f, 0f, Element.ALIGN_CENTER);
                 ct.Go();
 
                 // item
-                text = new Phrase("41228972", new Font(baseFont, 10));
+                text = new Phrase(value.HostSku[i], new Font(baseFont, 10));
                 ct.SetSimpleColumn(text, 130f, height - 19f, 220f, height - 9f, 0f, Element.ALIGN_CENTER);
                 ct.Go();
 
                 // description
-                text = new Phrase("Item Description for Giant Tiger", new Font(baseFont, 10));
+                text = new Phrase("", new Font(baseFont, 10));
                 ct.SetSimpleColumn(text, 220f, height - 19f, 400f, height - 9f, 0f, Element.ALIGN_CENTER);
                 ct.Go();
 
                 // qty shipped
-                text = new Phrase("1", new Font(baseFont, 10));
+                text = new Phrase(value.Quantity[i].ToString(), new Font(baseFont, 10));
                 ct.SetSimpleColumn(text, 400f, height - 19f, 480f, height - 9f, 0f, Element.ALIGN_CENTER);
                 ct.Go();
 
                 // vendor sku
-                text = new Phrase("111-111-111", new Font(baseFont, 10));
+                text = new Phrase(value.VendorSku[i], new Font(baseFont, 10));
                 ct.SetSimpleColumn(text, 480f, height - 19f, doc.PageSize.Width - 40f, height - 9f, 0f, Element.ALIGN_CENTER);
                 ct.Go();
 
