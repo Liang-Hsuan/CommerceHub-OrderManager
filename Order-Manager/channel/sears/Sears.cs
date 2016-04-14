@@ -1015,7 +1015,7 @@ namespace Order_Manager.channel.sears
         /* a method that substring the given string */
         private static string SubstringMethod(string original, string startingString, int additionIndex)
         {
-            return original.Substring(original.IndexOf(startingString) + additionIndex);
+            return original.Substring(original.IndexOf(startingString, StringComparison.Ordinal) + additionIndex);
         }
 
         /* a method that get the next target token */

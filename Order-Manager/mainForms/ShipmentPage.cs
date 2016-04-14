@@ -37,11 +37,11 @@ namespace Order_Manager.mainForms
         {
             InitializeComponent();
 
-            showResult();
+            ShowResult();
         }
 
         /* a method that show today's shipped order to the listview */
-        private void showResult()
+        private void ShowResult()
         {
             // first clear the listview
             listview.Items.Clear();
@@ -146,7 +146,7 @@ namespace Order_Manager.mainForms
 
             // show the new result
             MessageBox.Show("Manifests have been successfully exported to\n" + canadaPost.SavePathManifestShopCa, "Congratulation");
-            showResult();
+            ShowResult();
 
             // set end of day button to enabled and cursor to default state
             endOfDayButton.Enabled = true;
@@ -212,7 +212,7 @@ namespace Order_Manager.mainForms
                 shopCa.PostVoid(list[1].ToArray());
 
             // show new result
-            showResult();
+            ShowResult();
         }
 
         /* beck botton clicks that clost the form */

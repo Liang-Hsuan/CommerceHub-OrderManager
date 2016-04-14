@@ -243,7 +243,7 @@ namespace Order_Manager.mainForms
                             SearsValues value = sears.GenerateValue(order.TransactionId);
 
                             // check if the order has been shipped before -> if not, ship it now
-                            if (value.Package.TrackingNumber != "")
+                            if (value.Package.TrackingNumber == "")
                             {
                                 value.Package = new Package(value);
 
@@ -281,7 +281,7 @@ namespace Order_Manager.mainForms
                             ShopCaValues value = shopCa.GenerateValue(order.TransactionId);
 
                             // check if the order has been shipped before -> if not, ship it now
-                            if (value.Package.TrackingNumber != "")
+                            if (value.Package.TrackingNumber == "")
                             {
                                 value.Package = new Package(value);
 
@@ -438,10 +438,9 @@ namespace Order_Manager.mainForms
                 series.Points.Clear();
 
             // creating chart
-            DateTime from = DateTime.Today;
             for (int i = -6; i <= 0; i++)
             {
-                from = DateTime.Today.AddDays(i);
+                DateTime from = DateTime.Today.AddDays(i);
 
                 int order = sears.GetNumberOfOrder(from) + shopCa.GetNumberOfOrder(from);
                 int shipped = sears.GetNumberOfShipped(from) + shopCa.GetNumberOfShipped(from);
