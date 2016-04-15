@@ -21,7 +21,7 @@
 
 **Third party libraries**
 
-* iTextSharp (for packing slip generation) & TamirSSH (for SFTP server connection)
+* iTextSharp (for packing slip generation) & TamirSSH (for SFTP server connection) & Ftp (my own open source class for FTP server connection)
 
 -------------
 
