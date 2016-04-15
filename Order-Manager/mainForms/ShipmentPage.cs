@@ -8,6 +8,7 @@ using Order_Manager.supportingClasses.Shipment;
 using Order_Manager.supportingClasses;
 using System.Threading;
 using System.Globalization;
+using Order_Manager.channel.giantTiger;
 
 namespace Order_Manager.mainForms
 {
@@ -19,6 +20,7 @@ namespace Order_Manager.mainForms
         // field for online shopping channels' order
         private readonly Sears sears = new Sears();
         private readonly  ShopCa shopCa = new ShopCa();
+        private readonly GiantTiger giantTiger = new GiantTiger();
 
         // field for carrier connection
         private readonly Ups ups = new Ups();
@@ -36,7 +38,6 @@ namespace Order_Manager.mainForms
         public ShipmentPage()
         {
             InitializeComponent();
-
             ShowResult();
         }
 
@@ -79,6 +80,23 @@ namespace Order_Manager.mainForms
                 listview.Items.Add(item);
             }
             #endregion
+
+            #region Giant Tiger
+            // get shipped items from shop.ca
+            GiantTigerValues[] giantTigerValues = giantTiger.GetAllShippedOrder();
+
+            // shor shipped item to list view 
+            foreach (GiantTigerValues value in giantTigerValues)
+            {
+                ListViewItem item = new ListViewItem("Giant Tiger");
+
+                item.SubItems.Add(value.PoNumber);
+                item.SubItems.Add(value.Package.TrackingNumber);
+                item.SubItems.Add(value.Package.SelfLink);
+
+                listview.Items.Add(item);
+            }
+            #endregion
         }
 
         #region Top Buttons
@@ -88,7 +106,7 @@ namespace Order_Manager.mainForms
             // check all the items that can be end of day
             foreach (ListViewItem item in listview.Items)
             {
-                if (item.SubItems[0].Text == "Shop.ca")
+                if (item.SubItems[0].Text == "Shop.ca" || item.SubItems[0].Text == "Giant Tiger")
                     item.Checked = true;
             }
 
@@ -143,9 +161,10 @@ namespace Order_Manager.mainForms
 
             // set end of day to true in database
             shopCa.PostShip(true, DateTime.ParseExact(groupId, "yyyyMMdd", CultureInfo.InvariantCulture));
+            giantTiger.PostShip(true, DateTime.ParseExact(groupId, "yyyyMMdd", CultureInfo.InvariantCulture));
 
             // show the new result
-            MessageBox.Show("Manifests have been successfully exported to\n" + canadaPost.SavePathManifestShopCa, "Congratulation");
+            MessageBox.Show("Manifests have been successfully exported to\n" + canadaPost.SavePathManifest, "Congratulation");
             ShowResult();
 
             // set end of day button to enabled and cursor to default state
@@ -164,9 +183,9 @@ namespace Order_Manager.mainForms
                 return;
             }
 
-            // local fields for storing data -> [0] sears, [1] shop.ca
-            List<string>[] list = { new List<string>(), new List<string>() };
-            bool[] channel = { false, false };
+            // local fields for storing data -> [0] sears, [1] shop.ca, [2] giant tiger
+            List<string>[] list = { new List<string>(), new List<string>(), new List<string>() };
+            bool[] channel = { false, false, false };
 
             // adding cancel order list and post shipment void
             List<Order> cancelList = (from ListViewItem item in listview.CheckedItems
@@ -202,6 +221,16 @@ namespace Order_Manager.mainForms
                         }
                         channel[1] = true;
                         break;
+                    case "Giant Tiger":
+                        list[2].Add(cancelledOrder.TransactionId);
+                        canadaPost.DeleteShipment(cancelledOrder.ShipmentIdentificationNumber);
+                        if (canadaPost.Error)
+                        {
+                            MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                        channel[2] = true;
+                        break;
                 }
             }
 
@@ -210,6 +239,8 @@ namespace Order_Manager.mainForms
                 sears.PostVoid(list[0].ToArray());
             if (channel[1])
                 shopCa.PostVoid(list[1].ToArray());
+            if (channel[2])
+                giantTiger.PostVoid(list[2].ToArray());
 
             // show new result
             ShowResult();

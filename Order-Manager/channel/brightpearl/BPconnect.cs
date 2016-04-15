@@ -10,6 +10,7 @@ using Order_Manager.supportingClasses.Address;
 using Order_Manager.channel.shop.ca;
 using System.Web.Script.Serialization;
 using System.Collections.Generic;
+using Order_Manager.channel.giantTiger;
 
 namespace Order_Manager.channel.brightpearl
 {
@@ -125,7 +126,7 @@ namespace Order_Manager.channel.brightpearl
                 }
                 #endregion
 
-                // initialize BPvalues object -> no need tax and total paid ( this is unit cost & no recipt )
+                // initialize BPvalues object -> no need total paid ( this is unit cost & no recipt )
                 BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSku[i], value.Description[i], value.TrxQty[i], value.TrxUnitCost[i], value.TrxUnitCost[i] * tax, 0);
 
                 // post order row
@@ -186,8 +187,8 @@ namespace Order_Manager.channel.brightpearl
                 // the case if not cancel post it to brightpearl
                 if (cancelList.Where(j => j == i).Any()) continue;
 
-                // initialize BPvalues object -> no need tax and total paid ( this is unit cost & no recipt )
-                BPvalues itemValue = new BPvalues(value.ShipTo, null, DateTime.Today, 1, 7, value.Sku[i], value.Title[i], value.Quantity[i], Convert.ToDouble(value.ExtendedItemPrice[i]), Convert.ToDouble(value.ItemTax[i]), 0);
+                // initialize BPvalues object
+                BPvalues itemValue = new BPvalues(value.ShipTo, null, DateTime.Today, 15, 1, value.Sku[i], value.Title[i], value.Quantity[i], Convert.ToDouble(value.ExtendedItemPrice[i]), Convert.ToDouble(value.ItemTax[i]), 0);
 
                 // post order row
                 string orderRowId = post.PostOrderRowRequest(orderId, itemValue);
@@ -208,6 +209,119 @@ namespace Order_Manager.channel.brightpearl
                 if (!post.HasError) continue;
 
                 Status = "Error occur during reservation post " + i + "- Shop.ca";
+                do
+                {
+                    Thread.Sleep(5000);
+                    post.PostReservationRequest(orderId, orderRowId, itemValue);
+                } while (post.HasError);
+            }
+            #endregion
+        }
+
+        /* a method that post giant tiger order to brightpearl on giant tiger account */
+        public void PostOrder(GiantTigerValues value, int[] cancelList)
+        {
+            // check if the order is cancelled entirely -> if it is just return no need to post it
+            if (cancelList.Length >= value.VendorSku.Count)
+                return;
+
+            #region Posting Order to Shop.ca Account on BP
+            // initialize order BPvalues object
+            BPvalues orderValue = new BPvalues(value.ShipTo, value.PoNumber, value.OrderDate, 12, 1, null, null, 0, 0, 0, 0);
+
+            // post order
+            string orderId = post.PostOrderRequest("10115", orderValue);
+            Status = "Getting order ID";
+            if (post.HasError)
+            {
+                Status = "Error occur during order post - Giant Tiger";
+                do
+                {
+                    Thread.Sleep(5000);
+                    orderId = post.PostOrderRequest("10115", orderValue);
+                } while (post.HasError);
+            }
+
+            // calculate the total amount when excluding the cancelled items
+            for (int i = 0; i < value.VendorSku.Count; i++)
+            {
+                // the case if not cancel post it to brightpearl
+                if (cancelList.Where(j => j == i).Any()) continue;
+
+                #region Tax Determination
+                double tax;
+                switch (value.ShipTo.State)
+                {
+                    case "NB":
+                        tax = 0.13;
+                        break;
+                    case "NF":
+                        tax = 0.15;
+                        break;
+                    case "NL":
+                        tax = 0.15;
+                        break;
+                    case "NS":
+                        tax = 0.15;
+                        break;
+                    case "ON":
+                        tax = 0.13;
+                        break;
+                    case "PEI":
+                        tax = 0.14;
+                        break;
+                    case "BC":
+                        tax = 0.05;
+                        break;
+                    case "MAN":
+                        tax = 0.05;
+                        break;
+                    case "PQ":
+                        tax = 0.05;
+                        break;
+                    case "QC":
+                        tax = 0.05;
+                        break;
+                    case "SK":
+                        tax = 0.05;
+                        break;
+                    case "AB":
+                        tax = 0.05;
+                        break;
+                    case "NV":
+                        tax = 0.05;
+                        break;
+                    case "YK":
+                        tax = 0.05;
+                        break;
+                    default:
+                        tax = 0;
+                        break;
+                }
+                #endregion
+
+                // initialize BPvalues object -> no need total paid ( this is unit cost & no recipt )
+                BPvalues itemValue = new BPvalues(value.ShipTo, null, DateTime.Today, 12, 1, value.VendorSku[i], "Host SKU: " + value.HostSku[i], value.Quantity[i], value.UnitCost[i], value.UnitCost[i] * tax, 0);
+
+                // post order row
+                string orderRowId = post.PostOrderRowRequest(orderId, itemValue);
+                Status = "Getting order row ID";
+                if (post.HasError)
+                {
+                    Status = "Error occur during order row post " + i + "- Giant Tiger";
+                    do
+                    {
+                        Thread.Sleep(5000);
+                        orderRowId = post.PostOrderRowRequest(orderId, itemValue);
+                    } while (post.HasError);
+                }
+
+                // post reservation
+                post.PostReservationRequest(orderId, orderRowId, itemValue);
+                Status = "Posting reservation request " + i;
+                if (!post.HasError) continue;
+
+                Status = "Error occur during reservation post " + i + "- Giant Tiger";
                 do
                 {
                     Thread.Sleep(5000);
@@ -563,7 +677,7 @@ namespace Order_Manager.channel.brightpearl
                 if (productId != null)
                     textJson = "{\"productId\":\"" + productId + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"" + taxCode + "\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 4) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax, 4) + "\"}}}";
                 else
-                    textJson = "{\"productName\":\"" + value.ProductName + " " + value.Sku  + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"" + taxCode + "\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 4) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax, 4) + "\"}}}";
+                    textJson = "{\"productName\":\"" + value.ProductName + " --- " + value.Sku  + "\",\"quantity\":{\"magnitude\":\"" + value.Quantity + "\"},\"rowValue\":{\"taxCode\":\"" + taxCode + "\",\"rowNet\":{\"value\":\"" + Math.Round(value.RowNet, 4) + "\"},\"rowTax\":{\"value\":\"" + Math.Round(value.RowTax, 4) + "\"}}}";
 
 
                 // turn request string into a byte stream

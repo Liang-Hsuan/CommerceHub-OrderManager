@@ -77,6 +77,31 @@ namespace Order_Manager.supportingClasses
             response.Close();
         }
 
+        /* a method that upload file to the ftp server from the local path provided */
+        public void Upload(string remoteFile, string localFile)
+        {
+            // get the object used to communicate with the server
+            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(Host + '/' + remoteFile);
+            request.Method = WebRequestMethods.Ftp.UploadFile;
+
+            // declare credentials
+            request.Credentials = new NetworkCredential(Username, Password);
+
+            // copy the contents of the file to the request stream
+            StreamReader sourceStream = new StreamReader(localFile);
+            byte[] fileContents = System.Text.Encoding.UTF8.GetBytes(sourceStream.ReadToEnd());
+            sourceStream.Close();
+            request.ContentLength = fileContents.Length;
+
+            Stream requestStream = request.GetRequestStream();
+            requestStream.Write(fileContents, 0, fileContents.Length);
+            requestStream.Close();
+
+            // ger response
+            FtpWebResponse response = (FtpWebResponse)request.GetResponse();
+            response.Close();
+        }
+
         /* a method that delete file on the ftp server from the path provided */
         public bool Delete(string remoteFile)
         {

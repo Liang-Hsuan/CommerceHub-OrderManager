@@ -529,9 +529,9 @@ namespace Order_Manager.channel.sears
             connection.Close();
 
             // upload file to sftp server
-            sftp.Connect();
-            sftp.Put(path, CONFIRM_DIR);
-            sftp.Close();
+            // sftp.Connect();
+            // sftp.Put(path, CONFIRM_DIR);
+            // sftp.Close();
         }
 
         /* a method that generate SearsValues object for the given transaction number (first version -> take from local) */
@@ -987,11 +987,11 @@ namespace Order_Manager.channel.sears
             int iterator = !Properties.Settings.Default.Date.Equals(DateTime.Today) ? 1 : Properties.Settings.Default.Iterator;
 
             // create invoice number
-            string invoice = "100";
+            string invoice = "2002";
             invoice += DateTime.Today.ToString("yyyyMMdd");
 
             for (int i = 0; i < 3 - iterator.ToString().Length; i++)
-                invoice += "0";
+                invoice += '0';
 
             invoice += iterator.ToString();
 

@@ -1,5 +1,4 @@
-﻿using Order_Manager.channel.shop.ca;
-using System;
+﻿using System;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -18,8 +17,8 @@ namespace Order_Manager.supportingClasses.Shipment
         private readonly string CONTRACT_NUMBER;
 
         /* Get for save path for shipment label and manifest */
-        public string SavePathLabelShopCa { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ShopCa_ShippingLabel";
-        public string SavePathManifestShopCa { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ShopCa_ShippingManifest";
+        public string SavePathLabel { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CanadaPost_ShippingLabel";
+        public string SavePathManifest { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CanadaPost_ShippingManifest";
 
         /* constructor that initialize Canada Post credentials */
         public CanadaPost()
@@ -42,13 +41,13 @@ namespace Order_Manager.supportingClasses.Shipment
 
         #region API Methods
         /* a method that create shipment and return [0] tracking pin, [1] self link, [2] label link */
-        public string[] CreateShipment(ShopCaValues value)
+        public string[] CreateShipment(Address.Address address, Package package)
         {
             // set error to false
             Error = false;
 
-            // string uri = "https://ct.soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/shipment";
-            string uri = "https://soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/shipment";
+            string uri = "https://ct.soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/shipment";
+            // string uri = "https://soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/shipment";
 
             // create http post request
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
@@ -64,7 +63,7 @@ namespace Order_Manager.supportingClasses.Shipment
                 "<requested-shipping-point>L5J4S7</requested-shipping-point>" +
                 "<delivery-spec>";
             string serviceCode;
-            switch (value.Package.Service)
+            switch (package.Service)
             {
                 case "Regular Parcel":
                     serviceCode = "DOM.RP";
@@ -93,24 +92,24 @@ namespace Order_Manager.supportingClasses.Shipment
                  "</address-details>" +
                  "</sender>" +
                  "<destination>" +
-                 "<name>" + value.ShipTo.Name + "</name>" +
+                 "<name>" + address.Name + "</name>" +
                  "<address-details>" +
-                 "<address-line-1>" + value.ShipTo.Address1 + "</address-line-1>";
-            if (value.ShipTo.Address2 != "")
-                textXml += "<address-line-2>" + value.ShipTo.Address2 + "</address-line-2>";
+                 "<address-line-1>" + address.Address1 + "</address-line-1>";
+            if (address.Address2 != "")
+                textXml += "<address-line-2>" + address.Address2 + "</address-line-2>";
             textXml +=
-                 "<city>" + value.ShipTo.City + "</city>" +
-                 "<prov-state>" + value.ShipTo.State + "</prov-state>" +
+                 "<city>" + address.City + "</city>" +
+                 "<prov-state>" + address.State + "</prov-state>" +
                  "<country-code>CA</country-code>" +
-                 "<postal-zip-code>" + value.ShipTo.PostalCode + "</postal-zip-code>" +
+                 "<postal-zip-code>" + address.PostalCode + "</postal-zip-code>" +
                  "</address-details>" +
                  "</destination>" +
                  "<parcel-characteristics>" +
-                 "<weight>" + Math.Round(value.Package.Weight, 4) + "</weight>" +
+                 "<weight>" + Math.Round(package.Weight, 4) + "</weight>" +
                  "<dimensions>" +
-                 "<length>" + value.Package.Length + "</length>" +
-                 "<width>" + value.Package.Width + "</width>" +
-                 "<height>" + value.Package.Height + "</height>" +
+                 "<length>" + package.Length + "</length>" +
+                 "<width>" + package.Width + "</width>" +
+                 "<height>" + package.Height + "</height>" +
                  "</dimensions>" +
                  "</parcel-characteristics>" +
                  "<print-preferences>" +
@@ -235,8 +234,8 @@ namespace Order_Manager.supportingClasses.Shipment
             // set error to false
             Error = false;
 
-            // string uri = "https://ct.soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/manifest";
-            string uri = "https://soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/manifest";
+            string uri = "https://ct.soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/manifest";
+            // string uri = "https://soa-gw.canadapost.ca/rs/" + CUSTOMER_NUMBER + '/' + CUSTOMER_NUMBER + "/manifest";
 
             // create http post request
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
@@ -367,20 +366,20 @@ namespace Order_Manager.supportingClasses.Shipment
             if (label)
             {
                 // label case
-                file = SavePathLabelShopCa + "\\" + orderId + ".pdf";
+                file = SavePathLabel + "\\" + orderId + ".pdf";
 
                 // check if the save directory exist -> if not create it
-                if (!File.Exists(SavePathLabelShopCa))
-                    Directory.CreateDirectory(SavePathLabelShopCa);
+                if (!File.Exists(SavePathLabel))
+                    Directory.CreateDirectory(SavePathLabel);
             }
             else
             {
                 // manifest case
-                file = SavePathManifestShopCa + "\\" + orderId + ".pdf";
+                file = SavePathManifest + "\\" + orderId + ".pdf";
 
                 // check if the save directory exist -> if not create it
-                if (!File.Exists(SavePathManifestShopCa))
-                    Directory.CreateDirectory(SavePathManifestShopCa);
+                if (!File.Exists(SavePathManifest))
+                    Directory.CreateDirectory(SavePathManifest);
             }
 
             // save pdf

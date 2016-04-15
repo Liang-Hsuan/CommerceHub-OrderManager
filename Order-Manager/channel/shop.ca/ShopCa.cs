@@ -398,7 +398,7 @@ namespace Order_Manager.channel.shop.ca
                     // the case if the item is shipped -> show the shipping info
                     txt += "Shipped\t" + DateTime.Today.ToString("yyyy-MM-dd") + "\tCP\tCanada Post\t" + value.Package.Service + "\t" + value.Package.TrackingNumber + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n";
 
-                    // update item to cancelled to database
+                    // update item to shipped to database
                     command.CommandText = "UPDATE ShopCa_Order_Item SET Shipped = 'True' WHERE OrderItemId = \'" + value.OrderItemId[i] + "\'";
                     command.ExecuteNonQuery();
                 }
@@ -414,14 +414,14 @@ namespace Order_Manager.channel.shop.ca
 
             // master database update
             command.CommandText = "UPDATE ShopCa_Order SET TrackingNumber = \'" + value.Package.TrackingNumber + "\', CompleteDate = \'" + DateTime.Today.ToString("yyyy-MM-dd HH:mm:ss") + "\', SelfLink = \'" + value.Package.SelfLink + "\', LabelLink = \'" + value.Package.LabelLink + "\', "
-                                + "Complete = 'True' WHERE OrderId = \'" + value.OrderId + "\'";
+                                + "Complete = 'True' WHERE OrderId = \'" + value.OrderId + '\'';
             command.ExecuteNonQuery();
             connection.Close();
 
             // upload file to sftp server
-            sftp.Connect();
-            sftp.Put(path, CONFIRM_DIR);
-            sftp.Close();
+            // sftp.Connect();
+            // sftp.Put(path, CONFIRM_DIR);
+            // sftp.Close();
         }
 
         /* a method that generate ShopCaValues object for the given order number (first version -> take from local) */

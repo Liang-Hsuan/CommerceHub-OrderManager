@@ -8,6 +8,7 @@ using Order_Manager.supportingClasses.Shipment;
 using Order_Manager.channel.shop.ca;
 using System.Drawing;
 using System.Windows.Forms.DataVisualization.Charting;
+using Order_Manager.channel.giantTiger;
 
 namespace Order_Manager.mainForms
 {
@@ -16,6 +17,7 @@ namespace Order_Manager.mainForms
         // field for online shopping channels' order
         private readonly Sears sears = new Sears();
         private readonly ShopCa shopCa = new ShopCa();
+        private readonly GiantTiger giantTiger = new GiantTiger();
 
         // field for brightpearl connection
         private readonly BPconnect bp = new BPconnect();
@@ -120,7 +122,7 @@ namespace Order_Manager.mainForms
 
             // fields for message
             string message = "Packing Slip have successfully exported to";
-            bool[] channel = { false, false };  // [0] sears, [1] shop.ca
+            bool[] channel = { false, false, false };  // [0] sears, [1] shop.ca, [2] giant tiger
 
             foreach (Order order in from ListViewItem item in listview.CheckedItems
                                     select new Order
@@ -161,14 +163,31 @@ namespace Order_Manager.mainForms
                             channel[1] = true;
                         }
                         break;
+                    case "Giant Tiger":
+                        {
+                            // the case if it is giant tiger order
+                            try
+                            {
+                                GiantTigerPackingSlip.CreatePackingSlip(giantTiger.GenerateValue(order.TransactionId), new int[0], false);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                            channel[2] = true;
+                        }
+                        break;
                 }
             }
 
             // create message
             if (channel[0])
-                message += "\n" + SearsPackingSlip.SavePath;
+                message += '\n' + SearsPackingSlip.SavePath;
             if (channel[1])
-                message += "\n" + ShopCaPackingSlip.SavePath;
+                message += '\n' + ShopCaPackingSlip.SavePath;
+            if (channel[2])
+                message += '\n' + GiantTigerPackingSlip.SavePath;
 
             MessageBox.Show(message, "Congratulation");
         }
@@ -215,6 +234,13 @@ namespace Order_Manager.mainForms
                     {
                         // the case if it is shopl.ca order
                         ShopCaValues value = shopCa.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
+                        new DetailPage(value).ShowDialog(this);
+                    }
+                    break;
+                case "Giant Tiger":
+                    {
+                        // the case if it is giant tiger order
+                        GiantTigerValues value = giantTiger.GenerateValue(listview.CheckedItems[0].SubItems[4].Text);
                         new DetailPage(value).ShowDialog(this);
                     }
                     break;
@@ -286,7 +312,7 @@ namespace Order_Manager.mainForms
                                 value.Package = new Package(value);
 
                                 // second ship it
-                                string[] links = canadaPost.CreateShipment(value);
+                                string[] links = canadaPost.CreateShipment(value.ShipTo, value.Package);
                                 if (canadaPost.Error)
                                 {
                                     MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -305,6 +331,43 @@ namespace Order_Manager.mainForms
                                 canadaPost.ExportLabel(binary, value.OrderId, true, false);
                             }
                             shopCa.GenerateTxt(value, new System.Collections.Generic.Dictionary<int, string>());
+
+                            // post order to brightpearl with no cancellation
+                            bp.PostOrder(value, new int[0]);
+                            #endregion
+                        }
+                        break;
+                    case "Giant Tiger":
+                        {
+                            #region Giant Tiger Order
+                            // first get the detail for the order
+                            GiantTigerValues value = giantTiger.GenerateValue(order.TransactionId);
+
+                            // check if the order has been shipped before -> if not, ship it now
+                            if (value.Package.TrackingNumber == "")
+                            {
+                                value.Package = new Package(value);
+
+                                // second ship it
+                                string[] links = canadaPost.CreateShipment(value.ShipTo, value.Package);
+                                if (canadaPost.Error)
+                                {
+                                    MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+
+                                // get tracking, self link, label link and shipment confirm with no cancellation of item
+                                value.Package.TrackingNumber = links[0];
+                                value.Package.SelfLink = links[1];
+                                value.Package.LabelLink = links[2];
+
+                                System.Threading.Thread.Sleep(5000);
+
+                                // get artifact and export it
+                                byte[] binary = canadaPost.GetArtifact(links[2]);
+                                canadaPost.ExportLabel(binary, value.PoNumber, true, false);
+                            }
+                            giantTiger.GenerateCsv(value, new System.Collections.Generic.Dictionary<int, string>());
 
                             // post order to brightpearl with no cancellation
                             bp.PostOrder(value, new int[0]);
@@ -428,6 +491,42 @@ namespace Order_Manager.mainForms
                 listview.Items.Add(item);
             }
             #endregion
+
+            #region Giant Tiger
+            // get orders from giant tiger
+            giantTiger.GetOrder();
+            GiantTigerValues[] giantTigerValues = giantTiger.GetAllNewOrder();
+
+            // show giant tiger new orders to the list view
+            foreach (GiantTigerValues value in giantTigerValues)
+            {
+                ListViewItem item = new ListViewItem("Giant Tiger");
+
+                TimeSpan span = timeNow.Subtract(value.OrderDate);
+                item.SubItems.Add(span.Days + "d " + span.Hours + "h");
+
+                if (value.VendorSku.Count > 1)
+                {
+                    item.SubItems.Add("(Multiple Items)");
+                    item.SubItems.Add("(Multiple Items)");
+                }
+                else
+                {
+                    item.SubItems.Add("Host SKU: " + value.HostSku[0]);
+                    item.SubItems.Add(value.VendorSku[0]);
+                }
+
+                item.SubItems.Add(value.PoNumber);
+                item.SubItems.Add(value.OrderDate.ToString("yyyy-MM-dd"));
+                item.SubItems.Add(value.UnitCost.Sum().ToString());
+
+                int total = value.Quantity.Sum();
+                item.SubItems.Add(total.ToString());
+
+                item.SubItems.Add(value.ShipTo.Name);
+                listview.Items.Add(item);
+            }
+            #endregion
         }
 
         /* a supporting method that refresh the chart */
@@ -442,8 +541,8 @@ namespace Order_Manager.mainForms
             {
                 DateTime from = DateTime.Today.AddDays(i);
 
-                int order = sears.GetNumberOfOrder(from) + shopCa.GetNumberOfOrder(from);
-                int shipped = sears.GetNumberOfShipped(from) + shopCa.GetNumberOfShipped(from);
+                int order = sears.GetNumberOfOrder(from) + shopCa.GetNumberOfOrder(from) + giantTiger.GetNumberOfOrder(from);
+                int shipped = sears.GetNumberOfShipped(from) + shopCa.GetNumberOfShipped(from) + giantTiger.GetNumberOfShipped(from);
 
                 if (order < 1)
                 {
@@ -488,9 +587,9 @@ namespace Order_Manager.mainForms
             DateTime time = DateTime.ParseExact(dataPoint.AxisLabel, "MM/dd/yyyy", System.Globalization.CultureInfo.InvariantCulture);
 
             if (chart.Series["point"].Points.Contains(dataPoint))
-                e.Text = "Order\nSears: " + sears.GetNumberOfOrder(time) + ", Shop.ca: " + shopCa.GetNumberOfOrder(time);
+                e.Text = "Order\nSears: " + sears.GetNumberOfOrder(time) + ", Shop.ca: " + shopCa.GetNumberOfOrder(time) + ", Giant Tiger: " + giantTiger.GetNumberOfOrder(time);
             else if (chart.Series["shipment"].Points.Contains(dataPoint))
-                e.Text = "Shipment\nSears: " + sears.GetNumberOfShipped(time) + ", Shop.ca: " + shopCa.GetNumberOfShipped(time);
+                e.Text = "Shipment\nSears: " + sears.GetNumberOfShipped(time) + ", Shop.ca: " + shopCa.GetNumberOfShipped(time) + ", Giant Tiger: " + giantTiger.GetNumberOfShipped(time);
         }
 
         /* mouse wheel event on the chart that zoom in and out */
@@ -519,7 +618,7 @@ namespace Order_Manager.mainForms
                     chart.ChartAreas[0].AxisY.ScaleView.Zoom(posYStart, posYFinish);
                 }
             }
-            catch { /* ignore */ }
+            catch { /* ignore -> size out of bound */ }
         }
         #endregion
     }

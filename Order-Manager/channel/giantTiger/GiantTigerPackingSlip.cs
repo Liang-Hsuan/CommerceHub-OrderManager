@@ -45,7 +45,7 @@ namespace Order_Manager.channel.giantTiger
             // add barcode
             Barcode39 barcode128 = new Barcode39
             {
-                Code = "19791104008",
+                Code = value.OmsOrderNumber,
                 StartStopText = false,
                 Font = null,
                 Extended = true
@@ -353,6 +353,8 @@ namespace Order_Manager.channel.giantTiger
             #endregion
 
             doc.Close();
+
+            if (!preview) return;
 
             // start the pdf for previewing
             if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)

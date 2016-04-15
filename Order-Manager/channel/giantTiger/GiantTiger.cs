@@ -1,12 +1,12 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using Order_Manager.supportingClasses;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Order_Manager.channel.giantTiger
 {
@@ -63,10 +63,19 @@ namespace Order_Manager.channel.giantTiger
         public void GetOrder()
         {
             // get all the new file on the order directory to local new order storing directory
-            // IEnumerable<string> orderCheck = CheckOrderFile();
-            // GetOrder(newOrderDir, orderCheck);
+            IEnumerable<string> orderCheck = CheckOrderFile();
+            GetOrder(newOrderDir, orderCheck);
 
-            // return the transaction that haved not been processed
+            // return the po number that haved not been processed
+            Dictionary<string, string> dic = GetPoNumber();
+            dic = CheckOrder(dic);
+
+            // get information for each unprocessed order and update the them to the database
+            foreach (KeyValuePair<string, string> keyValue in dic)
+            {
+                GiantTigerValues value = GenerateValue(keyValue.Key, keyValue.Value);
+                AddNewOrder(value);
+            }
         }
 
         /* a method that return all the new order values */
@@ -79,7 +88,7 @@ namespace Order_Manager.channel.giantTiger
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 SqlCommand command = new SqlCommand("SELECT PoNumber, WebOrderNo, OrderDate, ShipMethod, ShipToFirstName, ShipToLastName, ShipToStreet, ShipToAddress2, ShipToCity, ShipToZip, ShipToPhone, " +
-                                                    "ShipToStoreNumber, OmsOrderNumber" +
+                                                    "ShipToStoreNumber, OmsOrderNumber " +
                                                     "FROM GiantTiger_Order WHERE Complete ='False' ORDER BY PoNumber", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
@@ -126,12 +135,40 @@ namespace Order_Manager.channel.giantTiger
         /* a method that return all shipped order */
         public GiantTigerValues[] GetAllShippedOrder()
         {
-            return null;
+            // local field for storing shipment value 
+            List<GiantTigerValues> list = new List<GiantTigerValues>();
+
+            // grab all shipped 
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            {
+                string date = DateTime.Today.ToString("yyyy-MM-dd");
+                SqlCommand command = new SqlCommand("SELECT PoNumber, TrackingNumber, SelfLink FROM GiantTiger_Order " +
+                                                    "WHERE EndofDay != 1 AND TrackingNumber != '' AND (ShipDate = \'" + date + "\' OR CompleteDate = \'" + date + "\')", connection);
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    GiantTigerValues value = new GiantTigerValues
+                    {
+                        PoNumber = reader.GetString(0),
+                        Package =
+                        {
+                            TrackingNumber = reader.GetString(1),
+                            SelfLink = reader.GetString(2)
+                        }
+                    };
+
+                    list.Add(value);
+                }
+            }
+
+            return list.ToArray();
         }
         #endregion
 
         #region Ship and Void
-        /* a method that mark the order as shipped but not posting a confirm order to shop.ca only for local reference */
+        /* a method that mark the order as shipped but not posting a confirm order to giant tiger only for local reference */
         public void PostShip(string trackingNumber, string selfLink, string labelLink, string poNumber)
         {
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
@@ -155,7 +192,7 @@ namespace Order_Manager.channel.giantTiger
             }
         }
 
-        /* a method that mark the order as cancelled but not posting a cancel order to shop.ca only for local reference */
+        /* a method that mark the order as cancelled but not posting a cancel order to giant tiger only for local reference */
         public void PostVoid(string[] poNumber)
         {
             // generate the range 
@@ -166,7 +203,7 @@ namespace Order_Manager.channel.giantTiger
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 // for entire order cancellation
-                SqlCommand command = new SqlCommand("UPDATE GiantTiger_Order SET TrackingNumber = '', SelfLink = '', LabelLink = '', ShipDate = NULL WHERE OrderId IN " + candidate, connection);
+                SqlCommand command = new SqlCommand("UPDATE GiantTiger_Order SET TrackingNumber = '', SelfLink = '', LabelLink = '', ShipDate = NULL WHERE PoNumber IN " + candidate, connection);
                 connection.Open();
                 command.ExecuteNonQuery();
             }
@@ -239,10 +276,25 @@ namespace Order_Manager.channel.giantTiger
                 TextFieldParser parser = new TextFieldParser(file.FullName) {TextFieldType = FieldType.Delimited};
                 parser.SetDelimiters(",");
 
-                
+                // read header first
+                parser.ReadFields();
+
+                // real thing
+                do
+                {
+                    string poNumber = parser.ReadFields()[0];
+
+                    try
+                    {
+                        // add po to the dictionary
+                        dic.Add(poNumber, file.FullName);
+                    }
+                    catch
+                    { /* ignore -> same po number has been added */}
+                } while (!parser.EndOfData);
             }
 
-            return null;
+            return dic;
         }
         #endregion
 
@@ -262,7 +314,7 @@ namespace Order_Manager.channel.giantTiger
         }
 
         /* a method that receive all the current order and check the duplicate then only return the ones that have not been processed 
-        -> receive and return dictionary <orderId, filePath> */
+        -> receive and return dictionary <poNumber, filePath> */
         private static Dictionary<string, string> CheckOrder(Dictionary<string, string> allOrderList)
         {
             // get all complete order id 
@@ -285,7 +337,101 @@ namespace Order_Manager.channel.giantTiger
         /* a method that generate csv order and upload to the sftp server and update database */
         public void GenerateCsv(GiantTigerValues value, Dictionary<int, string> cancelList)
         {
-            
+            // fields for database update
+            SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs);
+            SqlCommand command = new SqlCommand { Connection = connection };
+            connection.Open();
+
+            #region CSV Generation and Item Database Update
+            // fields for csv generation
+            const string delimiter = ",";
+            string[][] ship = new string[value.VendorSku.Count - cancelList.Count + 1][];
+            string[][] cancel = new string[cancelList.Count + 1][];
+            int shipIndex = 1;
+            int cancelIndex = 1;
+
+            // adding header
+            ship[0] = new[] { "PO#", "Item#", "Quantity", "shipMethod", "Tracking#", "Invoice#", "Tax", "Package Freight" };
+            cancel[0] = new[] {"PO#", "HostSKU#", "CancelQty", "CancelCode" };
+
+            // writing content of csv file
+            for (int i = 0; i < value.VendorSku.Count; i++)
+            {
+                // the case if the item is cancelled -> write it in cancel file
+                if (cancelList.Keys.Contains(i))
+                {
+                    string cancelCode;
+                    switch (cancelList[i])
+                    {
+                        case "Customer Request":
+                            cancelCode = "CR";
+                            break;
+                        case "Incorrect product setup":
+                            cancelCode = "IP";
+                            break;
+                        default:
+                            cancelCode = "OS";
+                            break;
+                    }
+
+                    cancel[cancelIndex] = new[] {value.PoNumber, value.HostSku[i], value.Quantity[i].ToString(), cancelCode};
+                    cancelIndex++;
+
+                    // update item to cancelled to database
+                    command.CommandText = "UPDATE GiantTiger_Order_Item SET Cancelled = 'True' WHERE ClientItemId = \'" + value.ClientItemId[i] + "\'";
+                    command.ExecuteNonQuery();
+
+                    continue;
+                }
+
+                ship[shipIndex] = new[] { value.PoNumber, value.HostSku[i], value.Quantity[i].ToString(), value.ShipMethod, value.Package.TrackingNumber, GetInvoiceNumber(), "1.16", "8.95" };
+                shipIndex++;
+
+                // update item to shipped to database
+                command.CommandText = "UPDATE GiantTiger_Order_Item SET Shipped = 'True' WHERE ClientItemId = \'" + value.ClientItemId[i] + "\'";
+                command.ExecuteNonQuery();
+            }
+            #endregion
+
+            #region CSV File Export
+            // the case if there is cancel file -> export and upload to server
+            if (cancelIndex > 1)
+            {
+                // writing csv file
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < cancel.GetLength(0); i++)
+                    sb.AppendLine(string.Join(delimiter, cancel[i]));
+
+                // save file to local
+                string path = completeOrderDir + "\\" + value.PoNumber + "_Cancel.csv";
+                File.WriteAllText(path, sb.ToString());
+
+                // upload file to ftp server
+                // ftp.Upload(CANCEL_DIR, path);
+            }
+
+            // the case if there is ship file -> export and upload to server
+            if (shipIndex > 1)
+            {
+                // writing csv file
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < ship.GetLength(0); i++)
+                    sb.AppendLine(string.Join(delimiter, ship[i]));
+
+                // save file to local
+                string path = completeOrderDir + "\\" + value.PoNumber + "_Ship.csv";
+                File.WriteAllText(path, sb.ToString());
+
+                // upload file to ftp server
+                // ftp.Upload(SHIP_DIR, path);
+            }
+            #endregion
+
+            // master database update
+            command.CommandText = "UPDATE GiantTiger_Order SET TrackingNumber = \'" + value.Package.TrackingNumber + "\', CompleteDate = \'" + DateTime.Today.ToString("yyyy-MM-dd HH:mm:ss") + "\', SelfLink = \'" + value.Package.SelfLink + "\', LabelLink = \'" + value.Package.LabelLink + "\', "
+                                + "Complete = 'True' WHERE PoNumber = \'" + value.PoNumber + '\'';
+            command.ExecuteNonQuery();
+            connection.Close();
         }
 
         /* a method that generate GiantTigerValues object for the given po number (first version -> take from local) */
@@ -393,7 +539,7 @@ namespace Order_Manager.channel.giantTiger
 
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("SELECT PoNumber, WebOrderNo, OrderDate, ShipMethod, ShipToFirstName, ShipToLastName, ShipToStreet, ShipToAddress2, ShipToCity, ShipToZip, ShipToPhone, " +
+                SqlCommand command = new SqlCommand("SELECT PoNumber, WebOrderNo, OrderDate, ShipMethod, ShipToFirstName, ShipToLastName, ShipToStreet, ShipToAddress2, ShipToCity, ShipToState, ShipToZip, ShipToPhone, " +
                                                     "ShipToStoreNumber, OmsOrderNumber, TrackingNumber, SelfLink, LabelLink " +
                                                     "FROM GiantTiger_Order WHERE PoNumber = \'" + targetPo + '\'', connection);
                 connection.Open();
@@ -409,13 +555,14 @@ namespace Order_Manager.channel.giantTiger
                 value.ShipTo.Address1 = reader.GetString(6);
                 value.ShipTo.Address2 = reader.GetString(7);
                 value.ShipTo.City = reader.GetString(8);
-                value.ShipTo.PostalCode = reader.GetString(9);
-                value.ShipTo.DayPhone = reader.GetString(10);
-                value.StoreNumber = reader.GetString(11);
-                value.OmsOrderNumber = reader.GetString(12);
-                value.Package.TrackingNumber = reader.GetString(13);
-                value.Package.SelfLink = reader.GetString(14);
-                value.Package.LabelLink = reader.GetString(15);
+                value.ShipTo.State = reader.GetString(9);
+                value.ShipTo.PostalCode = reader.GetString(10);
+                value.ShipTo.DayPhone = reader.GetString(11);
+                value.StoreNumber = reader.GetString(12);
+                value.OmsOrderNumber = reader.GetString(13);
+                value.Package.TrackingNumber = reader.GetString(14);
+                value.Package.SelfLink = reader.GetString(15);
+                value.Package.LabelLink = reader.GetString(16);
 
                 SqlDataAdapter adatper = new SqlDataAdapter("SELECT VendorSku, HostSku, Quantity, UnitCost, ClientItemId " +
                                                             "FROM GiantTiger_Order_Item WHERE PoNumber = \'" + poNumber + "\' ORDER BY ClientItemId", connection);
@@ -497,6 +644,28 @@ namespace Order_Manager.channel.giantTiger
 
             // Local Delete
             new DirectoryInfo(newOrderDir).Delete(true);
+        }
+
+        /* a supporting method that get invoice number */
+        private static string GetInvoiceNumber()
+        {
+            // get iterator
+            int iterator = !Properties.Settings.Default.Date.Equals(DateTime.Today) ? 1 : Properties.Settings.Default.Iterator;
+
+            // create invoice number
+            string invoice = "2001";
+            invoice += DateTime.Today.ToString("yyyyMMdd");
+
+            for (int i = 0; i < 3 - iterator.ToString().Length; i++)
+                invoice += '0';
+
+            invoice += iterator.ToString();
+
+            // save iterator
+            iterator++;
+            Properties.Settings.Default.Iterator = iterator;
+
+            return invoice;
         }
     }
 }

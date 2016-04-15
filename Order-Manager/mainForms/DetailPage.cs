@@ -10,6 +10,7 @@ using Order_Manager.supportingClasses;
 using Order_Manager.supportingClasses.Address;
 using Order_Manager.supportingClasses.Shipment;
 using Order_Manager.channel.shop.ca;
+using Order_Manager.channel.giantTiger;
 
 namespace Order_Manager.mainForms
 {
@@ -18,6 +19,7 @@ namespace Order_Manager.mainForms
         // field for storing order details
         private readonly SearsValues searsValues;
         private readonly ShopCaValues shopCaValues;
+        private readonly GiantTigerValues giantTigerValues;
         private readonly string CHANNEL;
 
         // field for brightpearl connection
@@ -54,6 +56,18 @@ namespace Order_Manager.mainForms
             // set flag to shop.ca
             CHANNEL = "Shop.ca";
         }
+
+        /* third constructor that show giant tiger order */
+        public DetailPage(GiantTigerValues value)
+        {
+            InitializeComponent();
+
+            giantTigerValues = value;
+            ShowResult(value);
+
+            // set flag to giant tiger
+            CHANNEL = "Giant Tiger";
+        }
         #endregion
 
         /* print packing slip button clicks that print the packing slip for the order item(s) */
@@ -86,6 +100,17 @@ namespace Order_Manager.mainForms
                         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                     break;
+                case "Giant Tiger":
+                    // the case if the order is from giant tiger
+                    try
+                    {
+                        GiantTigerPackingSlip.CreatePackingSlip(giantTigerValues, cancelIndex, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    break;
             }
         }
 
@@ -103,6 +128,9 @@ namespace Order_Manager.mainForms
                     break;
                 case "Shop.ca":
                     flag = AddressValidation.Validate(shopCaValues.ShipTo);
+                    break;
+                case "Giant Tiger":
+                    flag = AddressValidation.Validate(giantTigerValues.ShipTo);
                     break;
             }
 
@@ -215,6 +243,17 @@ namespace Order_Manager.mainForms
                             skuDetail[j] += detailList[j];
                     }
                     break;
+                case "Giant Tiger":
+                    for (int i = 0; i < giantTigerValues.VendorSku.Count; i++)
+                    {
+                        if (listview.Items[i].SubItems[5].Text != "") continue;
+                        decimal[] detailList = Package.GetSkuDetail(giantTigerValues.VendorSku[i]);
+
+                        if (detailList == null) continue;
+                        for (int j = 0; j < 4; j++)
+                            skuDetail[j] += detailList[j];
+                    }
+                    break;
             }
 
             // show result to shipping info
@@ -268,6 +307,9 @@ namespace Order_Manager.mainForms
                 case "Shop.ca":
                     shopCaValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
                     break;
+                case "Giant Tiger":
+                    giantTigerValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
+                    break;
             }
 
             if (!backgroundWorkerShip.IsBusy)
@@ -317,42 +359,86 @@ namespace Order_Manager.mainForms
                     #endregion
                 case "Shop.ca":
                     #region Canada Post
-                    // initialize field for shipment
-                    CanadaPost canadaPost = new CanadaPost();
-
-                    // create shipment for canada post
-                    string[] result = canadaPost.CreateShipment(shopCaValues);
-
-                    // error checking
-                    if (canadaPost.Error)
                     {
-                        MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        e.Result = true;
-                        return;
+                        // initialize field for shipment
+                        CanadaPost canadaPost = new CanadaPost();
+
+                        // create shipment for canada post
+                        string[] result = canadaPost.CreateShipment(shopCaValues.ShipTo, shopCaValues.Package);
+
+                        // error checking
+                        if (canadaPost.Error)
+                        {
+                            MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            e.Result = true;
+                            return;
+                        }
+
+                        // retrieve tracking number, refund link and label link
+                        shopCaValues.Package.TrackingNumber = result[0];
+                        shopCaValues.Package.SelfLink = result[1];
+                        shopCaValues.Package.LabelLink = result[2];
+
+                        // update database set the order's tracking number refund link and label link
+                        new ShopCa().PostShip(shopCaValues.Package.TrackingNumber, shopCaValues.Package.SelfLink, shopCaValues.Package.LabelLink, shopCaValues.OrderId);
+
+                        // get artifect
+                        Thread.Sleep(5000);
+                        byte[] artifect = canadaPost.GetArtifact(result[2]);
+
+                        // error checking
+                        if (canadaPost.Error)
+                        {
+                            MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            e.Result = true;
+                            return;
+                        }
+
+                        // get the shipment label and show it
+                        canadaPost.ExportLabel(artifect, shopCaValues.OrderId, true, true);
                     }
-
-                    // retrieve tracking number, refund link and label link
-                    shopCaValues.Package.TrackingNumber = result[0];
-                    shopCaValues.Package.SelfLink = result[1];
-                    shopCaValues.Package.LabelLink = result[2];
-
-                    // update database set the order's tracking number refund link and label link
-                    new ShopCa().PostShip(shopCaValues.Package.TrackingNumber, shopCaValues.Package.SelfLink, shopCaValues.Package.LabelLink, shopCaValues.OrderId);
-
-                    // get artifect
-                    Thread.Sleep(5000);
-                    byte[] artifect = canadaPost.GetArtifact(result[2]);
-
-                    // error checking
-                    if (canadaPost.Error)
+                    break;
+                #endregion
+                case "Giant Tiger":
+                    #region Canada Post
                     {
-                        MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        e.Result = true;
-                        return;
-                    }
+                        // initialize field for shipment
+                        CanadaPost canadaPost = new CanadaPost();
 
-                    // get the shipment label and show it
-                    canadaPost.ExportLabel(artifect, shopCaValues.OrderId, true, true);
+                        // create shipment for canada post
+                        string[] result = canadaPost.CreateShipment(giantTigerValues.ShipTo, giantTigerValues.Package);
+
+                        // error checking
+                        if (canadaPost.Error)
+                        {
+                            MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            e.Result = true;
+                            return;
+                        }
+
+                        // retrieve tracking number, refund link and label link
+                        giantTigerValues.Package.TrackingNumber = result[0];
+                        giantTigerValues.Package.SelfLink = result[1];
+                        giantTigerValues.Package.LabelLink = result[2];
+
+                        // update database set the order's tracking number refund link and label link
+                        new GiantTiger().PostShip(giantTigerValues.Package.TrackingNumber, giantTigerValues.Package.SelfLink, giantTigerValues.Package.LabelLink, giantTigerValues.PoNumber);
+
+                        // get artifect
+                        Thread.Sleep(5000);
+                        byte[] artifect = canadaPost.GetArtifact(result[2]);
+
+                        // error checking
+                        if (canadaPost.Error)
+                        {
+                            MessageBox.Show(canadaPost.ErrorMessage, "Sorry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            e.Result = true;
+                            return;
+                        }
+
+                        // get the shipment label and show it
+                        canadaPost.ExportLabel(artifect, giantTigerValues.PoNumber, true, true);
+                    }
                     break;
                     #endregion
             }
@@ -372,6 +458,9 @@ namespace Order_Manager.mainForms
                     break;
                 case "Shop.ca":
                     trackingNumberTextbox.Text = shopCaValues.Package.TrackingNumber;
+                    break;
+                case "Giant Tiger":
+                    trackingNumberTextbox.Text = giantTigerValues.Package.TrackingNumber;
                     break;
             }
 
@@ -431,25 +520,50 @@ namespace Order_Manager.mainForms
                     #endregion
                 case "Shop.ca":
                     #region Canada Post
-                    // post void shipment request and get the response
-                    CanadaPost canadaPost = new CanadaPost();
-                    canadaPost.DeleteShipment(shopCaValues.Package.SelfLink);
-
-                    // the cas if is bad request
-                    if (canadaPost.Error)
                     {
-                        MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
+                        // post void shipment request and get the response
+                        CanadaPost canadaPost = new CanadaPost();
+                        canadaPost.DeleteShipment(shopCaValues.Package.SelfLink);
+
+                        // the cas if is bad request
+                        if (canadaPost.Error)
+                        {
+                            MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // mar order as not shipped
+                        new ShopCa().PostVoid(new[] { shopCaValues.OrderId });
+
+                        // set tracking, self link, label link to nothing
+                        shopCaValues.Package.TrackingNumber = "";
+                        shopCaValues.Package.SelfLink = "";
+                        shopCaValues.Package.LabelLink = "";
                     }
+                    break;
+                #endregion
+                case "Giant Tiger":
+                    #region Canada Post
+                    {
+                        // post void shipment request and get the response
+                        CanadaPost canadaPost = new CanadaPost();
+                        canadaPost.DeleteShipment(giantTigerValues.Package.SelfLink);
 
-                    // mar order as not shipped
-                    new ShopCa().PostVoid(new[] { shopCaValues.OrderId });
+                        // the cas if is bad request
+                        if (canadaPost.Error)
+                        {
+                            MessageBox.Show(canadaPost.ErrorMessage, "Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
 
-                    // set tracking, self link, label link to nothing
-                    shopCaValues.Package.TrackingNumber = "";
-                    shopCaValues.Package.SelfLink = "";
-                    shopCaValues.Package.LabelLink = "";
+                        // mar order as not shipped
+                        new GiantTiger().PostVoid(new[] { giantTigerValues.PoNumber });
 
+                        // set tracking, self link, label link to nothing
+                        giantTigerValues.Package.TrackingNumber = "";
+                        giantTigerValues.Package.SelfLink = "";
+                        giantTigerValues.Package.LabelLink = "";
+                    }
                     break;
                     #endregion
             }
@@ -502,6 +616,11 @@ namespace Order_Manager.mainForms
                 MessageBox.Show("There are items that are not shipped", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+            if (CHANNEL == "Giant Tiger" && cancelList.Count < giantTigerValues.VendorSku.Count && giantTigerValues.Package.TrackingNumber == "")
+            {
+                MessageBox.Show("There are items that are not shipped", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             progressbar.Visible = true;
 
@@ -528,13 +647,24 @@ namespace Order_Manager.mainForms
                     break;
                 case "Shop.ca":
                     // shop.ca case
-                    // export csv file
+                    // export txt file
                     new ShopCa().GenerateTxt(shopCaValues, cancelList);
 
                     Simulate(40, 70);
 
                     // post order to brightpearl
                     bp.PostOrder(shopCaValues, new List<int>(cancelList.Keys).ToArray());
+
+                    break;
+                case "Giant Tiger":
+                    // giant tiger case
+                    // export csv file
+                    new GiantTiger().GenerateCsv(giantTigerValues, cancelList);
+
+                    Simulate(40, 70);
+
+                    // post order to brightpearl
+                    bp.PostOrder(giantTigerValues, new List<int>(cancelList.Keys).ToArray());
 
                     break;
             }
@@ -807,6 +937,112 @@ namespace Order_Manager.mainForms
             #endregion
         }
 
+        /* a method that show the information of the given GiantTigerValues object */
+        private void ShowResult(GiantTigerValues value)
+        {
+            // title bar set up
+            logoPicturebox.Image = Image.FromFile(@"..\..\image\giantTiger.png");
+            topOrderNumberTextbox.Text = value.PoNumber;
+
+            #region Order Summary
+            // date
+            orderDateTextbox.Text = value.OrderDate.ToString("MM/dd/yyyy");
+            paidDateTextbox.Text = value.OrderDate.ToString("MM/dd/yyyy");
+            shipByDateTextbox.Text = DateTime.Today.ToString("MM/dd/yyyy");
+
+            // unit price
+            unitPriceTotalTextbox.Text = value.UnitCost.Sum().ToString();
+
+            // GST and HST
+            gsthstTextbox.Text = "0.00";
+
+            // PST
+            pstTextbox.Text = "0.00";
+
+            // other fee
+            otherFeeTextbox.Text = "0.00";
+
+            // total 
+            totalOrderTextbox.Text = value.UnitCost.Sum().ToString();
+            #endregion
+
+            #region Buyer / Recipient Info
+            // sold to 
+            soldToTextbox.Text = value.ShipTo.Name;
+            soldToPhoneTextbox.Text = value.ShipTo.DayPhone;
+
+            // ship to
+            shipToNameTextbox.Text = value.ShipTo.Name;
+            shipToAddress1Textbox.Text = value.ShipTo.Address1;
+            shipToAddress2Textbox.Text = value.ShipTo.Address2;
+            shipToCombineTextbox.Text = value.ShipTo.City + ", " + value.ShipTo.State + ", " + value.ShipTo.PostalCode;
+            shipToPhoneTextbox.Text = value.ShipTo.DayPhone;
+            #endregion
+
+            #region Listview and Shipping Info
+            // adding items to service combobox
+            serviceCombobox.Items.Clear();
+            serviceCombobox.Items.Add("Expedited Parcel");
+            serviceCombobox.Items.Add("Regular Parcel");
+            serviceCombobox.Items.Add("Xpresspost");
+            serviceCombobox.Items.Add("Priority");
+            serviceCombobox.SelectedIndex = 0;
+
+            // adding items to reason combobox
+            reasonCombobox.Items.Clear();
+            reasonCombobox.Items.Add("Select Reason");
+            reasonCombobox.Items.Add("Out of Stock");
+            reasonCombobox.Items.Add("Customer Request");
+            reasonCombobox.Items.Add("Incorrect product setup");
+            reasonCombobox.SelectedIndex = 0;
+
+            // initialize field for sku detail -> [0] weight, [1] length, [2] width, [3] height
+            decimal[] skuDetail = { 0, 0, 0, 0 };
+
+            // adding list to listview and getting sku detail
+            for (int i = 0; i < value.VendorSku.Count; i++)
+            {
+                // add item to list
+                ListViewItem item = new ListViewItem(value.ClientItemId[i].ToString());
+
+                item.SubItems.Add("Host SKU: " + value.HostSku[i] + "  - Ashlin SKU: " + value.VendorSku[i]);
+                item.SubItems.Add("$ " + value.UnitCost[i]);
+                item.SubItems.Add(value.Quantity[i].ToString());
+                item.SubItems.Add("$ " + value.UnitCost[i]);
+                item.SubItems.Add("");
+                item.SubItems.Add("");
+
+                listview.Items.Add(item);
+
+                // generate sku detail
+                decimal[] detailList = Package.GetSkuDetail(value.VendorSku[i]);
+
+                // the case if bad sku
+                if (detailList == null)
+                    item.BackColor = Color.FromArgb(254, 126, 116);
+                else
+                {
+                    for (int j = 0; j < 4; j++)
+                        skuDetail[j] += detailList[j];
+                }
+            }
+
+            // show result to shipping info
+            weightKgUpdown.Value = skuDetail[0] / 1000;
+            weightLbUpdown.Value = skuDetail[0] / 453.592m;
+            lengthUpdown.Value = skuDetail[1];
+            widthUpdown.Value = skuDetail[2];
+            heightUpdown.Value = skuDetail[3];
+
+            // shipment status -> the case if the order has already shipped
+            if (value.Package.TrackingNumber == "") return;
+
+            createLabelButton.Enabled = false;
+            trackingNumberTextbox.Text = value.Package.TrackingNumber;
+            voidShipmentButton.Visible = true;
+            #endregion
+        }
+
         /* a method that get the current cancel items' idexes */
         private int[] GetCancelIndex()
         {
@@ -875,6 +1111,13 @@ namespace Order_Manager.mainForms
                         shopCaValues.ShipTo.State = addressNew.Substring(0, addressNew.IndexOf(','));
                         addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
                         shopCaValues.ShipTo.PostalCode = addressNew.Substring(0);
+                        break;
+                    case "Giant Tiger":
+                        giantTigerValues.ShipTo.City = addressNew.Substring(0, addressNew.IndexOf(','));
+                        addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
+                        giantTigerValues.ShipTo.State = addressNew.Substring(0, addressNew.IndexOf(','));
+                        addressNew = addressNew.Substring(addressNew.IndexOf(',') + 1);
+                        giantTigerValues.ShipTo.PostalCode = addressNew.Substring(0);
                         break;
                 }
             }

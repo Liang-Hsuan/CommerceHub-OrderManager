@@ -22,7 +22,7 @@ namespace Order_Manager.supportingClasses.Shipment
         private readonly string SEARS_ACCOUNT_NUMBER;
 
         /* a Get for savepath for shipment label */
-        public string SavePathSears { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Sears_ShippingLabel";
+        public string SavePath { get; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\UPS_ShippingLabel";
 
         /* constructor that initialize UPS credentials */
         public Ups()
@@ -51,8 +51,8 @@ namespace Order_Manager.supportingClasses.Shipment
             // set error to false
             Error = false;
 
-            // const string shipmentConfirmUri = "https://wwwcie.ups.com/ups.app/xml/ShipConfirm";
-            const string shipmentConfirmUri = "https://onlinetools.ups.com/ups.app/xml/ShipConfirm";
+            const string shipmentConfirmUri = "https://wwwcie.ups.com/ups.app/xml/ShipConfirm";
+            // const string shipmentConfirmUri = "https://onlinetools.ups.com/ups.app/xml/ShipConfirm";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentConfirmUri);
             request.Method = "POST";
@@ -240,8 +240,8 @@ namespace Order_Manager.supportingClasses.Shipment
             // set error to false
             Error = false;
 
-            // const string shipmentAcceptmUri = "https://wwwcie.ups.com/ups.app/xml/ShipAccept";
-            const string shipmentAcceptmUri = "https://onlinetools.ups.com/ups.app/xml/ShipAccept";
+            const string shipmentAcceptmUri = "https://wwwcie.ups.com/ups.app/xml/ShipAccept";
+            // const string shipmentAcceptmUri = "https://onlinetools.ups.com/ups.app/xml/ShipAccept";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentAcceptmUri);
             request.Method = "POST";
@@ -309,8 +309,8 @@ namespace Order_Manager.supportingClasses.Shipment
             // set error to false
             Error = false;
 
-            // const string shipmentVoidUri = "https://wwwcie.ups.com/ups.app/xml/Void";
-            const string shipmentVoidUri = "https://onlinetools.ups.com/ups.app/xml/Void";
+            const string shipmentVoidUri = "https://wwwcie.ups.com/ups.app/xml/Void";
+            // const string shipmentVoidUri = "https://onlinetools.ups.com/ups.app/xml/Void";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(shipmentVoidUri);
             request.Method = "POST";
@@ -374,11 +374,11 @@ namespace Order_Manager.supportingClasses.Shipment
 
             // save image
             // check if the save directory exist -> if not create it
-            if (!File.Exists(SavePathSears))
-                Directory.CreateDirectory(SavePathSears);
+            if (!File.Exists(SavePath))
+                Directory.CreateDirectory(SavePath);
 
             // save the image
-            string file = SavePathSears + "\\" + transactionId + ".gif";
+            string file = SavePath + "\\" + transactionId + ".gif";
             image.Save(file, System.Drawing.Imaging.ImageFormat.Gif);
 
             // show the image if user want to preview

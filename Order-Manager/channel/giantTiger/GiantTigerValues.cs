@@ -37,6 +37,7 @@ namespace Order_Manager.channel.giantTiger
             ShipTo = new Address();
             StoreNumber = "";
             OmsOrderNumber = "";
+            Package = new Package();
 
             VendorSku = new List<string>();
             HostSku = new List<string>();
@@ -46,7 +47,7 @@ namespace Order_Manager.channel.giantTiger
         }
 
         /* second constructor that take all the parametoers */
-        public GiantTigerValues(string poNumber, string webOrderNo, DateTime orderDate, string shipMethod, Address shipTo, string storeName, string omsOrderNumber,
+        public GiantTigerValues(string poNumber, string webOrderNo, DateTime orderDate, string shipMethod, Address shipTo, string storeName, string omsOrderNumber, Package package,
                                 List<string> vendorSku, List<string> hostSku, List<string> clientItemId, List<double> unitCost, List<int> quantity)
         {
             PoNumber = poNumber;
@@ -56,6 +57,7 @@ namespace Order_Manager.channel.giantTiger
             ShipTo = shipTo;
             StoreNumber = storeName;
             OmsOrderNumber = omsOrderNumber;
+            Package = package;
 
             VendorSku = vendorSku;
             HostSku = hostSku;

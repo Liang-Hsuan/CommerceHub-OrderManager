@@ -65,7 +65,7 @@ namespace Order_Manager.channel.shop.ca
             ct.Go();
 
             // ship to address
-            text = new Phrase(value.ShipTo.Name + "\n" + value.ShipTo.Address1 + "\n" + value.ShipTo.Address2 + "\n" + value.ShipTo.City + ' ' + value.ShipTo.State + " , CA\n" + value.ShipTo.PostalCode, 
+            text = new Phrase(value.ShipTo.Name + "\n" + value.ShipTo.Address1 + "\n" + value.ShipTo.Address2 + "\n" + value.ShipTo.City + ' ' + value.ShipTo.State + " , CA\n" + value.ShipTo.PostalCode,
                    new Font(baseFont, 10));
             ct.SetSimpleColumn(text, 40f, 630f, 175f, 700f, 12f, Element.ALIGN_LEFT);
             ct.Go();
@@ -287,12 +287,11 @@ namespace Order_Manager.channel.shop.ca
 
             doc.Close();
 
-            if (preview)
-            {
-                // start the pdf for previewing
-                if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)
-                    System.Diagnostics.Process.Start(file);
-            }
+            if (!preview) return;
+
+            // start the pdf for previewing
+            if (System.Diagnostics.Process.GetProcessesByName(file).Length < 1)
+                System.Diagnostics.Process.Start(file);
         }
     }
 }
