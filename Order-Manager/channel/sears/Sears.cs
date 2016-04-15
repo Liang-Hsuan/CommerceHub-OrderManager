@@ -923,7 +923,7 @@ namespace Order_Manager.channel.sears
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 // get all the transaction id that are obsolete
-                SqlCommand command = new SqlCommand("SELECT TransactionId FROM Sears_Order WHERE CompleteDate < \'" + DateTime.Today.AddDays(-120).ToString("yyyy-MM-dd") + "\'", connection);
+                SqlCommand command = new SqlCommand("SELECT TransactionId FROM Sears_Order WHERE CompleteDate < \'" + DateTime.Today.AddDays(-120).ToString("yyyy-MM-dd") + '\'', connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 

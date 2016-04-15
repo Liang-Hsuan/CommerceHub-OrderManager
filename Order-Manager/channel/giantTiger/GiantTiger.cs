@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic.FileIO;
+using Order_Manager.supportingClasses;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,7 +7,6 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using Tamir.SharpSsh;
 
 namespace Order_Manager.channel.giantTiger
 {
@@ -16,9 +16,9 @@ namespace Order_Manager.channel.giantTiger
     public class GiantTiger : Channel
     {
         // fields for directory on sftp server
-        private const string GET_DIR = "/get";
-        private const string SHIP_DIR = "/put/ship";
-        private const string CANCEL_DIR = "/put/cancel";
+        private const string GET_DIR = "get";
+        private const string SHIP_DIR = "put/ship";
+        private const string CANCEL_DIR = "put/cancel";
 
         // field for directory on local
         private readonly string rootDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\GiantTigerOrders";
@@ -26,7 +26,7 @@ namespace Order_Manager.channel.giantTiger
         private readonly string completeOrderDir;
 
         // field for sftp connection
-        private readonly Sftp sftp;
+        private readonly Ftp ftp;
 
         /* constructor that initialize folders for csv feed */
         public GiantTiger()
@@ -54,7 +54,7 @@ namespace Order_Manager.channel.giantTiger
                 reader.Read();
 
                 // initialize Sftp
-                sftp = new Sftp(reader.GetString(0), reader.GetString(1), reader.GetString(2));
+                ftp = new Ftp(reader.GetString(0), reader.GetString(1), reader.GetString(2));
             }
         }
 
@@ -209,34 +209,17 @@ namespace Order_Manager.channel.giantTiger
         /* method that get the new order from sftp server */
         private void GetOrder(string filePath, IEnumerable<string> fileList)
         {
-            // connection to sftp server and read all the list of file
-            sftp.Connect();
-
             foreach (string file in fileList)
             {
                 if (file == "." || file == "..") continue;
 
                 // change file to txt and save file to local
                 string fileNameCsv = file.Replace("txt", "csv");
-                sftp.Get(SHIP_DIR + "/" + file, filePath + "\\" + fileNameCsv);
+                ftp.Download(SHIP_DIR + '/' + file, filePath + "\\" + fileNameCsv);
 
                 // after download the file delete it on the server (no need it anymore)
-                // ServerDelete.Delete(sftp.Host, sftp.Username, sftp.Password, SHIP_DIR + "/" + file);
+                // ftp.Delete(SHIP_DIR + '/' + file);
             }
-
-            sftp.Close();
-        }
-
-        /* method that get the shipment order file name from sftp server */
-        private IEnumerable<string> GetOrderName(string serverDir)
-        {
-            // connection to sftp server and read all the list of file
-            sftp.Connect();
-            ArrayList list = sftp.GetFileList(serverDir);
-            sftp.Close();
-
-            // retrieve all the files name to the list
-            return (from object item in list select item.ToString()).ToArray();
         }
 
         /* method that return <poNumber, filepath> */
@@ -253,8 +236,7 @@ namespace Order_Manager.channel.giantTiger
             foreach (FileInfo file in filesLocal)
             {
                 // read the csv file to get all po number
-                TextFieldParser parser = new TextFieldParser(file.FullName);
-                parser.TextFieldType = FieldType.Delimited;
+                TextFieldParser parser = new TextFieldParser(file.FullName) {TextFieldType = FieldType.Delimited};
                 parser.SetDelimiters(",");
 
                 
@@ -273,7 +255,7 @@ namespace Order_Manager.channel.giantTiger
             FileInfo[] filesLocal = dirInfo.GetFiles("*.csv");       // getting all file that have been on local
 
             // get all order file on server
-            IEnumerable<string> fileOnServer = GetOrderName(SHIP_DIR);
+            string[] fileOnServer = ftp.GetFileList(SHIP_DIR);
 
             // check the number of new order on the server compare to ones on the computer
             return (from file1 in fileOnServer let found = filesLocal.Select(file2 => file2.ToString()).Any(file2Copy => file1.Remove(file1.LastIndexOf('.')) == file2Copy.Remove(file2Copy.LastIndexOf('.'))) where !found select file1).ToArray();
@@ -287,7 +269,7 @@ namespace Order_Manager.channel.giantTiger
             List<string> completeOrderList = new List<string>();
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("SELECT OrderId FROM ShopCa_Order;", connection);
+                SqlCommand command = new SqlCommand("SELECT PoNumber FROM GiantTiger_Order", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
@@ -483,6 +465,36 @@ namespace Order_Manager.channel.giantTiger
         /* a method that delete obsolete orders in database and clear all local files */
         public void Delete()
         {
+            #region Database Delete
+            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            {
+                // get all the transaction id that are obsolete
+                SqlCommand command = new SqlCommand("SELECT PoNumber FROM GiantTiger_Order WHERE CompleteDate < \'" + DateTime.Today.AddDays(-120).ToString("yyyy-MM-dd") + '\'', connection);
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                // add transaction id range
+                string range = "(";
+                while (reader.Read())
+                    range += '\'' + reader.GetString(0) + "\',";
+                reader.Close();
+
+                // the case if has something to delete
+                if (range != "(")
+                {
+                    range = range.Remove(range.Length - 1) + ')';
+
+                    // delete items
+                    command.CommandText = "DELETE FROM GiantTiger_Order_Item WHERE PoNumber IN " + range;
+                    command.ExecuteNonQuery();
+
+                    // delete orders
+                    command.CommandText = "DELETE FROM GiantTiger_Order WHERE PoNumber IN " + range;
+                    command.ExecuteNonQuery();
+                }
+            }
+            #endregion
+
             // Local Delete
             new DirectoryInfo(newOrderDir).Delete(true);
         }

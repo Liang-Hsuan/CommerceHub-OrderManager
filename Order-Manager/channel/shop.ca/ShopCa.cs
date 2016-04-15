@@ -197,7 +197,7 @@ namespace Order_Manager.channel.shop.ca
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET TrackingNumber = \'" + trackingNumber + "\', SelfLink = \'" + selfLink + "\', LabelLink = \'" + labelLink + "\', "
-                                                  + "ShipDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\' WHERE OrderId = \'" + orderId + "\';", connection);
+                                                  + "ShipDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\' WHERE OrderId = \'" + orderId + '\'', connection);
                 connection.Open();
                 command.ExecuteNonQuery();
             }
@@ -209,7 +209,7 @@ namespace Order_Manager.channel.shop.ca
             string date = shipDate.ToString("yyyy-MM-dd");
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET EndofDay = \'" + endOfDay + "\' WHERE ShipDate = \'" + date + "\' OR CompleteDate = \'" + date + "\'", connection);
+                SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET EndofDay = \'" + endOfDay + "\' WHERE ShipDate = \'" + date + "\' OR CompleteDate = \'" + date + '\'', connection);
                 connection.Open();
                 command.ExecuteNonQuery();
             }
@@ -241,7 +241,7 @@ namespace Order_Manager.channel.shop.ca
 
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("SELECT COUNT(*) FROM ShopCa_Order WHERE OrderCreateDate = \'" + time.ToString("yyyy-MM-dd") + "\';", connection);
+                SqlCommand command = new SqlCommand("SELECT COUNT(*) FROM ShopCa_Order WHERE OrderCreateDate = \'" + time.ToString("yyyy-MM-dd") + '\'', connection);
                 connection.Open();
 
                 count = (int)command.ExecuteScalar();
@@ -255,7 +255,7 @@ namespace Order_Manager.channel.shop.ca
 
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("SELECT COUNT(*) FROM ShopCa_Order WHERE Complete = 'True' AND OrderCreateDate = \'" + time.ToString("yyyy-MM-dd") + "\';", connection);
+                SqlCommand command = new SqlCommand("SELECT COUNT(*) FROM ShopCa_Order WHERE Complete = 'True' AND OrderCreateDate = \'" + time.ToString("yyyy-MM-dd") + '\'', connection);
                 connection.Open();
 
                 count = (int)command.ExecuteScalar();
@@ -364,12 +364,12 @@ namespace Order_Manager.channel.shop.ca
         }
         #endregion
 
-        #region CSV Generation
+        #region TXT Generation
         /* a method that generate xml order and upload to the sftp server and update database */
-        public void GenerateCsv(ShopCaValues value, Dictionary<int, string> cancelList)
+        public void GenerateTxt(ShopCaValues value, Dictionary<int, string> cancelList)
         {
-            // adding csv file header
-            string csv = "Base Data\tfeed_id=shop.ca_order_update_01\t(For internal processing. Do not remove rows 1 and 2)\n" +
+            // adding txt file header
+            string txt = "Base Data\tfeed_id=shop.ca_order_update_01\t(For internal processing. Do not remove rows 1 and 2)\n" +
                          "supplier_id\tstore_name\torder_id\torder_item_id\titem_state\titem_state_date\tcarrier_code\tcarrier_name\tshipping_method\ttracking_number\texpected_shipping_date\tcancel_reason\tfulfillment_center_name\tfullfillment_center_address1\tfullfillment_center_address2\tfullfillment_center_city\tfullfillment_center_postalcode\tfullfillment_center_country\tbackorder_replacement_sku\tbackorder_replacement_sku_title\tbackorder_replacement_sku_price\tsupplier_order_number\treturn_grade\treturn_instructions_confirmation\trma_number\trecovery_amount\n";
 
             // fields for database update
@@ -377,17 +377,17 @@ namespace Order_Manager.channel.shop.ca
             SqlCommand command = new SqlCommand {Connection = connection};
             connection.Open();
 
-            // start adding content to the csv file
+            // start adding content to the txt file
             for (int i = 0; i < value.OrderItemId.Count; i++)
             {
                 // this is necessary fields
-                csv += value.SupplierId + "\t" + value.StoreName + "\t" + value.OrderId + "\t" + value.OrderItemId[i] + "\t";
+                txt += value.SupplierId + "\t" + value.StoreName + "\t" + value.OrderId + "\t" + value.OrderItemId[i] + "\t";
 
-                #region CSV Generation and Database Item Update
+                #region TXT Generation and Database Item Update
                 if (cancelList.Keys.Contains(i))
                 {
                     // the case if the item is cancelled -> show the cancel reason
-                    csv += "Cancelled\t" + DateTime.Today.ToString("yyyy-MM-dd") + "\t\t\t\t\t\t" + cancelList[i] + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n";
+                    txt += "Cancelled\t" + DateTime.Today.ToString("yyyy-MM-dd") + "\t\t\t\t\t\t" + cancelList[i] + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n";
 
                     // update item to cancelled to database
                     command.CommandText = "UPDATE ShopCa_Order_Item SET Cancelled = 'True' WHERE OrderItemId = \'" + value.OrderItemId[i] + "\'";
@@ -396,7 +396,7 @@ namespace Order_Manager.channel.shop.ca
                 else
                 {
                     // the case if the item is shipped -> show the shipping info
-                    csv += "Shipped\t" + DateTime.Today.ToString("yyyy-MM-dd") + "\tCP\tCanada Post\t" + value.Package.Service + "\t" + value.Package.TrackingNumber + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n";
+                    txt += "Shipped\t" + DateTime.Today.ToString("yyyy-MM-dd") + "\tCP\tCanada Post\t" + value.Package.Service + "\t" + value.Package.TrackingNumber + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n";
 
                     // update item to cancelled to database
                     command.CommandText = "UPDATE ShopCa_Order_Item SET Shipped = 'True' WHERE OrderItemId = \'" + value.OrderItemId[i] + "\'";
@@ -408,7 +408,7 @@ namespace Order_Manager.channel.shop.ca
             // convert txt to xsd file
             string path = completeOrderDir + "\\" + value.OrderId + ".txt";
             StreamWriter writer = new StreamWriter(path);
-            writer.WriteLine(csv);
+            writer.WriteLine(txt);
             writer.Close();
 
 

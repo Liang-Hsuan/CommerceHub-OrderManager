@@ -304,7 +304,7 @@ namespace Order_Manager.mainForms
                                 byte[] binary = canadaPost.GetArtifact(links[2]);
                                 canadaPost.ExportLabel(binary, value.OrderId, true, false);
                             }
-                            shopCa.GenerateCsv(value, new System.Collections.Generic.Dictionary<int, string>());
+                            shopCa.GenerateTxt(value, new System.Collections.Generic.Dictionary<int, string>());
 
                             // post order to brightpearl with no cancellation
                             bp.PostOrder(value, new int[0]);

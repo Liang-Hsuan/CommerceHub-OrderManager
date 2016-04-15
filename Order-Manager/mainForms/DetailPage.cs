@@ -529,7 +529,7 @@ namespace Order_Manager.mainForms
                 case "Shop.ca":
                     // shop.ca case
                     // export csv file
-                    new ShopCa().GenerateCsv(shopCaValues, cancelList);
+                    new ShopCa().GenerateTxt(shopCaValues, cancelList);
 
                     Simulate(40, 70);
 

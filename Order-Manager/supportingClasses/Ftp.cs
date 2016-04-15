@@ -4,12 +4,15 @@ using System.Net;
 
 namespace Order_Manager.supportingClasses
 {
+    /*
+     * A class for FTP server connection
+     */
     public class Ftp
     {
         // fields for credentials
-        public string Host { get; private set; }
-        public string Username { get; private set; }
-        public string Password { get; private set; }
+        public string Host { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
 
         /* constructor that initialize ftp connection credentials */
         public Ftp(string host, string username, string password)
@@ -52,45 +55,50 @@ namespace Order_Manager.supportingClasses
         /* a method that download file on the ftp server from the path provided */
         public void Download(string remoteFile, string localFile)
         {
-            // create an FTP Request
-            FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create(Host + "/" + remoteFile);
+            // get the object used to communicate with the server
+            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(Host + '/' + remoteFile);
+            request.Method = WebRequestMethods.Ftp.DownloadFile;
 
-            // log in to the FTP Server with the username and password provided
-            ftpRequest.Credentials = new NetworkCredential(Username, Password);
+            // declare credentials
+            request.Credentials = new NetworkCredential(Username, Password);
 
-            // When in doubt, use these options
-            ftpRequest.UseBinary = true;
-            ftpRequest.UsePassive = true;
-            ftpRequest.KeepAlive = true;
+            // get response from the server
+            FtpWebResponse response = (FtpWebResponse)request.GetResponse();
 
-            // specify the Type of FTP request
-            ftpRequest.Method = WebRequestMethods.Ftp.DownloadFile;
+            Stream responseStream = response.GetResponseStream();
+            StreamReader reader = new StreamReader(responseStream);
 
-            // establish return communication with the FTP Server
-            FtpWebResponse ftpResponse = (FtpWebResponse)ftpRequest.GetResponse();
+            // save file
+            StreamWriter writer = new StreamWriter(localFile);
+            writer.WriteLine(reader.ReadToEnd());
 
-            // get the server's response stream
-            Stream ftpStream = ftpResponse.GetResponseStream();
+            writer.Close();
+            reader.Close();
+            response.Close();
+        }
 
-            // open file stream to download file that has been downloaded 
-            FileStream localFileStream = new FileStream(localFile, FileMode.Create);
-
-            // fields for data download
-            byte[] byteBuffer = new byte[2048];
-            int bytesRead = ftpStream.Read(byteBuffer, 0, 2048);
-
-            // start downloading
-            while (bytesRead > 0)
+        /* a method that delete file on the ftp server from the path provided */
+        public bool Delete(string remoteFile)
+        {
+            try
             {
-                localFileStream.Write(byteBuffer, 0, bytesRead);
-                bytesRead = ftpStream.Read(byteBuffer, 0, 2048);
-            }
+                // get the object used to communicate with the server
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(Host + '/' + remoteFile);
+                request.Method = WebRequestMethods.Ftp.DeleteFile;
 
-            // ending job
-            localFileStream.Close();
-            ftpStream.Close();
-            ftpResponse.Close();
-            ftpRequest = null;
+                // declare credentials
+                request.Credentials = new NetworkCredential(Username, Password);
+
+                // get response from the server
+                FtpWebResponse response = (FtpWebResponse)request.GetResponse();
+
+                response.Close();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
