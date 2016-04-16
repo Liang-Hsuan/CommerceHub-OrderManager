@@ -154,10 +154,10 @@ namespace Order_Manager.channel.sears
                         value.UnitPrice.Add(Convert.ToDouble(table.Rows[i][9]));
                         value.LineHandling.Add(Convert.ToDouble(table.Rows[i][10]));
                         value.ExpectedShipDate.Add(Convert.ToDateTime(table.Rows[i][11]));
-                        value.GST_HST_Extended.Add(Convert.ToDouble(table.Rows[i][12]));
-                        value.PST_Extended.Add(Convert.ToDouble(table.Rows[i][13]));
-                        value.GST_HST_Total.Add(Convert.ToDouble(table.Rows[i][14]));
-                        value.PST_Total.Add(Convert.ToDouble(table.Rows[i][15]));
+                        value.GstHstExtended.Add(Convert.ToDouble(table.Rows[i][12]));
+                        value.PstExtended.Add(Convert.ToDouble(table.Rows[i][13]));
+                        value.GstHstTotal.Add(Convert.ToDouble(table.Rows[i][14]));
+                        value.PstTotal.Add(Convert.ToDouble(table.Rows[i][15]));
                         value.EncodedPrice.Add(table.Rows[i][16].ToString());
                         value.ReceivingInstructions.Add(table.Rows[i][17].ToString());
                     }
@@ -549,7 +549,7 @@ namespace Order_Manager.channel.sears
 
                 // transaction id
                 copy = SubstringMethod(copy, targetTransaction, 0);
-                copy = copy.Remove(copy.IndexOf("/hubOrder>"));
+                copy = copy.Remove(copy.IndexOf("/hubOrder>", StringComparison.Ordinal));
                 value.TransactionId = GetTarget(copy);
 
                 // line count
@@ -669,22 +669,22 @@ namespace Order_Manager.channel.sears
                     // gst and hst extended
                     copy = SubstringMethod(copy, "GST_HST_Extended", 16);
                     copy = SubstringMethod(copy, ">", 1);
-                    value.GST_HST_Extended.Add(Convert.ToDouble(GetTarget(copy)));
+                    value.GstHstExtended.Add(Convert.ToDouble(GetTarget(copy)));
 
                     // pst extended
                     copy = SubstringMethod(copy, "PST_Extended", 12);
                     copy = SubstringMethod(copy, ">", 1);
-                    value.PST_Extended.Add(Convert.ToDouble(GetTarget(copy)));
+                    value.PstExtended.Add(Convert.ToDouble(GetTarget(copy)));
 
                     // gst and hst
                     copy = SubstringMethod(copy, "GST_HST_Total", 16);
                     copy = SubstringMethod(copy, ">", 1);
-                    value.GST_HST_Total.Add(Convert.ToDouble(GetTarget(copy)));
+                    value.GstHstTotal.Add(Convert.ToDouble(GetTarget(copy)));
 
                     // pst
                     copy = SubstringMethod(copy, "PST_Total", 13);
                     copy = SubstringMethod(copy, ">", 1);
-                    value.PST_Total.Add(Convert.ToDouble(GetTarget(copy)));
+                    value.PstTotal.Add(Convert.ToDouble(GetTarget(copy)));
 
                     // encoded price 
                     copy = SubstringMethod(copy, "encodedPrice", 13);
@@ -704,7 +704,7 @@ namespace Order_Manager.channel.sears
                 value.BillTo.Name = GetTarget(copyCopy);
 
                 // bill to address
-                copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
+                copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>", StringComparison.Ordinal));
                 copyCopy = SubstringMethod(copyCopy, "address1", 9);
                 value.BillTo.Address1 = GetTarget(copyCopy);
                 if (copyCopy.Contains("address2"))
@@ -739,7 +739,7 @@ namespace Order_Manager.channel.sears
                 value.Recipient.Name = GetTarget(copyCopy);
 
                 // recipient address
-                copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
+                copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>", StringComparison.Ordinal));
                 copyCopy = SubstringMethod(copyCopy, "address1", 9);
                 value.Recipient.Address1 = GetTarget(copyCopy);
                 if (copyCopy.Contains("address2"))
@@ -774,7 +774,7 @@ namespace Order_Manager.channel.sears
                 value.ShipTo.Name = GetTarget(copyCopy);
 
                 // ship to
-                copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>"));
+                copyCopy = copyCopy.Remove(copyCopy.IndexOf("personPlace>", StringComparison.Ordinal));
                 copyCopy = SubstringMethod(copyCopy, "address1", 9);
                 value.ShipTo.Address1 = GetTarget(copyCopy);
                 if (copyCopy.Contains("address2"))
@@ -840,7 +840,7 @@ namespace Order_Manager.channel.sears
             {
                 SqlCommand command = new SqlCommand("SELECT LineCount, PoNumber, TrxBalanceDue, ServiceLevel, OrderDate, paymentMethod, CustOrderNumber, CustOrderDate, PackSlipmessage, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, " +
                                                     "RecipientName, RecipientAddress1, RecipientAddress2, RecipientCity, RecipientState, RecipientPostalCode, RecipientPhone, ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, PartnerPersonPlaceId, FreightLane, Spur, " + 
-                                                    "TrackingNumber, ShipmentIdentificationNumber FROM Sears_Order WHERE TransactionId = \'" + targetTransaction + "\'", connection);
+                                                    "TrackingNumber, ShipmentIdentificationNumber FROM Sears_Order WHERE TransactionId = \'" + targetTransaction + '\'', connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 reader.Read();
@@ -885,7 +885,7 @@ namespace Order_Manager.channel.sears
 
                 SqlDataAdapter adatper = new SqlDataAdapter("SELECT LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, LineHandling, " +
                                                             "ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions " +
-                                                            "FROM Sears_Order_Item WHERE TransactionId = \'" + targetTransaction + "\' ORDER BY MerchantLineNumber;", connection);
+                                                            "FROM Sears_Order_Item WHERE TransactionId = \'" + targetTransaction + "\' ORDER BY MerchantLineNumber", connection);
                 DataTable table = new DataTable();
                 adatper.Fill(table);
 
@@ -903,10 +903,10 @@ namespace Order_Manager.channel.sears
                     value.UnitPrice.Add(Convert.ToDouble(table.Rows[i][9]));
                     value.LineHandling.Add(Convert.ToDouble(table.Rows[i][10]));
                     value.ExpectedShipDate.Add(Convert.ToDateTime(table.Rows[i][11]));
-                    value.GST_HST_Extended.Add(Convert.ToDouble(table.Rows[i][12]));
-                    value.PST_Extended.Add(Convert.ToDouble(table.Rows[i][13]));
-                    value.GST_HST_Total.Add(Convert.ToDouble(table.Rows[i][14]));
-                    value.PST_Total.Add(Convert.ToDouble(table.Rows[i][15]));
+                    value.GstHstExtended.Add(Convert.ToDouble(table.Rows[i][12]));
+                    value.PstExtended.Add(Convert.ToDouble(table.Rows[i][13]));
+                    value.GstHstTotal.Add(Convert.ToDouble(table.Rows[i][14]));
+                    value.PstTotal.Add(Convert.ToDouble(table.Rows[i][15]));
                     value.EncodedPrice.Add(table.Rows[i][16].ToString());
                     value.ReceivingInstructions.Add(table.Rows[i][17].ToString());
                 }
@@ -973,7 +973,7 @@ namespace Order_Manager.channel.sears
                     command.CommandText = "INSERT INTO Sears_Order_Item " +
                                           "(TransactionId, LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, LineHandling, ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions, Shipped, Cancelled) Values" +
                                           "(\'" + value.TransactionId + "\'," + value.LineBalanceDue[i] + "," + value.MerchantLineNumber[i] + ",\'" + value.TrxVendorSku[i] + "\',\'" + value.TrxMerchantSku[i] + "\',\'" + value.Upc[i] + "\'," + value.TrxQty[i] + "," + value.TrxUnitCost[i] + ",\'" + value.Description[i].Replace("'", "''") + "\',\'" + value.Description2[i].Replace("'", "''") +
-                                          "\'," + value.UnitPrice[i] + "," + value.LineHandling[i] + ",\'" + value.ExpectedShipDate[i].ToString("yyyy-MM-dd") + "\',\'" + value.GST_HST_Extended[i] + "\',\'" + value.PST_Extended[i] + "\',\'" + value.GST_HST_Total[i] + "\',\'" + value.PST_Total[i] + "\',\'" + value.EncodedPrice[i] + "\',\'" + value.ReceivingInstructions[i] + "\',\'False\',\'False\')";
+                                          "\'," + value.UnitPrice[i] + "," + value.LineHandling[i] + ",\'" + value.ExpectedShipDate[i].ToString("yyyy-MM-dd") + "\',\'" + value.GstHstExtended[i] + "\',\'" + value.PstExtended[i] + "\',\'" + value.GstHstTotal[i] + "\',\'" + value.PstTotal[i] + "\',\'" + value.EncodedPrice[i] + "\',\'" + value.ReceivingInstructions[i] + "\',\'False\',\'False\')";
                     command.ExecuteNonQuery();
                 }
             }

@@ -252,7 +252,7 @@ namespace Order_Manager.channel.giantTiger
 
                 // change file to txt and save file to local
                 string fileNameCsv = file.Replace("txt", "csv");
-                ftp.Download(SHIP_DIR + '/' + file, filePath + "\\" + fileNameCsv);
+                ftp.Download(GET_DIR + '/' + file, filePath + "\\" + fileNameCsv);
 
                 // after download the file delete it on the server (no need it anymore)
                 // ftp.Delete(SHIP_DIR + '/' + file);
@@ -307,7 +307,7 @@ namespace Order_Manager.channel.giantTiger
             FileInfo[] filesLocal = dirInfo.GetFiles("*.csv");       // getting all file that have been on local
 
             // get all order file on server
-            string[] fileOnServer = ftp.GetFileList(SHIP_DIR);
+            string[] fileOnServer = ftp.GetFileList(GET_DIR);
 
             // check the number of new order on the server compare to ones on the computer
             return (from file1 in fileOnServer let found = filesLocal.Select(file2 => file2.ToString()).Any(file2Copy => file1.Remove(file1.LastIndexOf('.')) == file2Copy.Remove(file2Copy.LastIndexOf('.'))) where !found select file1).ToArray();
@@ -384,7 +384,7 @@ namespace Order_Manager.channel.giantTiger
                     continue;
                 }
 
-                ship[shipIndex] = new[] { value.PoNumber, value.HostSku[i], value.Quantity[i].ToString(), value.ShipMethod, value.Package.TrackingNumber, GetInvoiceNumber(), "1.16", "8.95" };
+                ship[shipIndex] = new[] { value.PoNumber, value.HostSku[i], value.Quantity[i].ToString(), value.ShipMethod, value.Package.TrackingNumber, GetInvoiceNumber(), "", "" };
                 shipIndex++;
 
                 // update item to shipped to database

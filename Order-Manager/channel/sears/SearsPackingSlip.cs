@@ -250,11 +250,11 @@ namespace Order_Manager.channel.sears
 
                     // price number
                     char temp;
-                    if (value.GST_HST_Extended[i] > 0 && value.PST_Extended[i] > 0)
+                    if (value.GstHstExtended[i] > 0 && value.PstExtended[i] > 0)
                         temp = 'B';
-                    else if (value.GST_HST_Extended[i] > 0)
+                    else if (value.GstHstExtended[i] > 0)
                         temp = 'T';
-                    else if (value.PST_Extended[i] > 0)
+                    else if (value.PstExtended[i] > 0)
                         temp = 'P';
                     else
                         temp = ' ';
@@ -267,16 +267,16 @@ namespace Order_Manager.channel.sears
                     switch (temp)
                     {
                         case 'B':
-                            tempTax[0] = value.GST_HST_Extended[i].ToString(CultureInfo.InvariantCulture);
-                            tempTax[1] = value.PST_Extended[i].ToString(CultureInfo.InvariantCulture);
+                            tempTax[0] = value.GstHstExtended[i].ToString(CultureInfo.InvariantCulture);
+                            tempTax[1] = value.PstExtended[i].ToString(CultureInfo.InvariantCulture);
                             break;
                         case 'T':
-                            tempTax[0] = value.GST_HST_Extended[i].ToString(CultureInfo.InvariantCulture);
+                            tempTax[0] = value.GstHstExtended[i].ToString(CultureInfo.InvariantCulture);
                             tempTax[1] = "";
                             break;
                         case 'P':
                             tempTax[0] = "";
-                            tempTax[1] = value.PST_Extended[i].ToString(CultureInfo.InvariantCulture);
+                            tempTax[1] = value.PstExtended[i].ToString(CultureInfo.InvariantCulture);
                             break;
                         default:
                             tempTax[0] = "";
@@ -289,15 +289,15 @@ namespace Order_Manager.channel.sears
                     text = new Phrase(tempTax[1], new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 252f, 579f, 292f, 594f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
-                    text = new Phrase((value.UnitPrice[i] + value.GST_HST_Extended[i] + value.PST_Extended[i]).ToString(CultureInfo.InvariantCulture), new Font(baseFont, 9));
+                    text = new Phrase((value.UnitPrice[i] + value.GstHstExtended[i] + value.PstExtended[i]).ToString(CultureInfo.InvariantCulture), new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 252f, 562f, 292f, 582f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
 
-                    if (value.GST_HST_Total[i] > 0 && value.PST_Total[i] > 0)
+                    if (value.GstHstTotal[i] > 0 && value.PstTotal[i] > 0)
                         temp = 'B';
-                    else if (value.GST_HST_Total[i] > 0)
+                    else if (value.GstHstTotal[i] > 0)
                         temp = 'T';
-                    else if (value.PST_Total[i] > 0)
+                    else if (value.PstTotal[i] > 0)
                         temp = 'P';
                     else
                         temp = ' ';
@@ -305,16 +305,16 @@ namespace Order_Manager.channel.sears
                     switch (temp)
                     {
                         case 'B':
-                            tempTax[0] = value.GST_HST_Total[i].ToString(CultureInfo.InvariantCulture);
-                            tempTax[1] = value.PST_Total[i].ToString(CultureInfo.InvariantCulture);
+                            tempTax[0] = value.GstHstTotal[i].ToString(CultureInfo.InvariantCulture);
+                            tempTax[1] = value.PstTotal[i].ToString(CultureInfo.InvariantCulture);
                             break;
                         case 'T':
-                            tempTax[0] = value.GST_HST_Total[i].ToString(CultureInfo.InvariantCulture);
+                            tempTax[0] = value.GstHstTotal[i].ToString(CultureInfo.InvariantCulture);
                             tempTax[1] = "";
                             break;
                         case 'P':
                             tempTax[0] = "";
-                            tempTax[1] = value.PST_Total[i].ToString(CultureInfo.InvariantCulture);
+                            tempTax[1] = value.PstTotal[i].ToString(CultureInfo.InvariantCulture);
                             break;
                         default:
                             tempTax[0] = "";

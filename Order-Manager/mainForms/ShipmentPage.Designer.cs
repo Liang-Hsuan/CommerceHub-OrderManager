@@ -54,7 +54,7 @@
             this.IdentificationHeader});
             this.listview.Location = new System.Drawing.Point(11, 52);
             this.listview.Name = "listview";
-            this.listview.Size = new System.Drawing.Size(486, 332);
+            this.listview.Size = new System.Drawing.Size(575, 332);
             this.listview.TabIndex = 3;
             this.listview.UseCompatibleStateImageBehavior = false;
             this.listview.View = System.Windows.Forms.View.Details;
@@ -63,7 +63,7 @@
             // selectionHeader
             // 
             this.selectionHeader.Text = "";
-            this.selectionHeader.Width = 74;
+            this.selectionHeader.Width = 107;
             // 
             // transactionIdHeader
             // 
@@ -78,7 +78,7 @@
             // IdentificationHeader
             // 
             this.IdentificationHeader.Text = "Identification";
-            this.IdentificationHeader.Width = 147;
+            this.IdentificationHeader.Width = 203;
             // 
             // selectAllCheckbox
             // 
@@ -98,7 +98,7 @@
             this.voidShipmentButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.voidShipmentButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.voidShipmentButton.ForeColor = System.Drawing.Color.White;
-            this.voidShipmentButton.Location = new System.Drawing.Point(358, 12);
+            this.voidShipmentButton.Location = new System.Drawing.Point(447, 12);
             this.voidShipmentButton.Name = "voidShipmentButton";
             this.voidShipmentButton.Size = new System.Drawing.Size(139, 34);
             this.voidShipmentButton.TabIndex = 2;
@@ -126,7 +126,7 @@
             this.endOfDayButton.FlatAppearance.BorderSize = 0;
             this.endOfDayButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.endOfDayButton.Image = ((System.Drawing.Image)(resources.GetObject("endOfDayButton.Image")));
-            this.endOfDayButton.Location = new System.Drawing.Point(305, 11);
+            this.endOfDayButton.Location = new System.Drawing.Point(394, 11);
             this.endOfDayButton.Name = "endOfDayButton";
             this.endOfDayButton.Size = new System.Drawing.Size(47, 34);
             this.endOfDayButton.TabIndex = 1;
@@ -138,7 +138,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(245)))), ((int)(((byte)(255)))));
-            this.ClientSize = new System.Drawing.Size(511, 396);
+            this.ClientSize = new System.Drawing.Size(600, 396);
             this.Controls.Add(this.endOfDayButton);
             this.Controls.Add(this.backButton);
             this.Controls.Add(this.voidShipmentButton);

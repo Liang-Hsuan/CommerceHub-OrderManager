@@ -39,10 +39,10 @@ namespace Order_Manager.channel.sears
         public List<double> UnitPrice { get; set; }
         public List<double> LineHandling { get; set; }
         public List<DateTime> ExpectedShipDate { get; set; }
-        public List<double> GST_HST_Extended { get; set; }
-        public List<double> PST_Extended { get; set; }
-        public List<double> GST_HST_Total { get; set; }
-        public List<double> PST_Total { get; set; }
+        public List<double> GstHstExtended { get; set; }
+        public List<double> PstExtended { get; set; }
+        public List<double> GstHstTotal { get; set; }
+        public List<double> PstTotal { get; set; }
         public List<string> EncodedPrice { get; set; }
         public List<string> ReceivingInstructions { get; set; }
         public Address BillTo { get; set; }
@@ -83,10 +83,10 @@ namespace Order_Manager.channel.sears
             UnitPrice = new List<double>();
             LineHandling = new List<double>();
             ExpectedShipDate = new List<DateTime>();
-            GST_HST_Extended = new List<double>();
-            PST_Extended = new List<double>();
-            GST_HST_Total = new List<double>();
-            PST_Total = new List<double>();
+            GstHstExtended = new List<double>();
+            PstExtended = new List<double>();
+            GstHstTotal = new List<double>();
+            PstTotal = new List<double>();
             EncodedPrice = new List<string>();
             ReceivingInstructions = new List<string>();
             BillTo = new Address();
@@ -131,10 +131,10 @@ namespace Order_Manager.channel.sears
             UnitPrice = unitPrice;
             LineHandling = lineHandling;
             ExpectedShipDate = expectedShipDate;
-            GST_HST_Extended = gstHstExtended;
-            PST_Extended = pstExtended;
-            GST_HST_Total = gstHstTotal;
-            PST_Total = pstTotal;
+            GstHstExtended = gstHstExtended;
+            PstExtended = pstExtended;
+            GstHstTotal = gstHstTotal;
+            PstTotal = pstTotal;
             EncodedPrice = encodedPrice;
             ReceivingInstructions = receivingInstructions;
             BillTo = billTo;

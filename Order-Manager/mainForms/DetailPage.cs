@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
@@ -708,22 +709,22 @@ namespace Order_Manager.mainForms
 
             // unit price
             double price = value.UnitPrice.Sum();
-            unitPriceTotalTextbox.Text = price.ToString();
+            unitPriceTotalTextbox.Text = price.ToString(CultureInfo.InvariantCulture);
 
             // GST and HST
-            price = value.GST_HST_Extended.Sum() + value.GST_HST_Total.Sum();
-            gsthstTextbox.Text = price.ToString();
+            price = value.GstHstExtended.Sum() + value.GstHstTotal.Sum();
+            gsthstTextbox.Text = price.ToString(CultureInfo.InvariantCulture);
 
             // PST
-            price = value.PST_Extended.Sum() + value.PST_Total.Sum();
-            pstTextbox.Text = price.ToString();
+            price = value.PstExtended.Sum() + value.PstTotal.Sum();
+            pstTextbox.Text = price.ToString(CultureInfo.InvariantCulture);
 
             // other fee
             price = value.LineHandling.Sum();
-            otherFeeTextbox.Text = price.ToString();
+            otherFeeTextbox.Text = price.ToString(CultureInfo.InvariantCulture);
 
             // total 
-            totalOrderTextbox.Text = value.TrxBalanceDue.ToString();
+            totalOrderTextbox.Text = value.TrxBalanceDue.ToString(CultureInfo.InvariantCulture);
             #endregion
 
             #region Buyer / Recipient Info
@@ -842,19 +843,19 @@ namespace Order_Manager.mainForms
             shipByDateTextbox.Text = DateTime.Today.ToString("MM/dd/yyyy");
 
             // unit price
-            unitPriceTotalTextbox.Text = value.TotalPrice.ToString();
+            unitPriceTotalTextbox.Text = value.TotalPrice.ToString(CultureInfo.InvariantCulture);
 
             // GST and HST
-            gsthstTextbox.Text = value.TotalTax.ToString();
+            gsthstTextbox.Text = value.TotalTax.ToString(CultureInfo.InvariantCulture);
 
             // PST
             pstTextbox.Text = "0.00";
 
             // other fee
-            otherFeeTextbox.Text = (value.ItemShippingCost.Sum() - value.ItemDiscount.Sum()).ToString();
+            otherFeeTextbox.Text = (value.ItemShippingCost.Sum() - value.ItemDiscount.Sum()).ToString(CultureInfo.InvariantCulture);
 
             // total 
-            totalOrderTextbox.Text = value.GrandTotal.ToString();
+            totalOrderTextbox.Text = value.GrandTotal.ToString(CultureInfo.InvariantCulture);
             #endregion
 
             #region Buyer / Recipient Info
@@ -897,7 +898,7 @@ namespace Order_Manager.mainForms
             for (int i = 0; i < value.OrderItemId.Count; i++)
             {
                 // add item to list
-                ListViewItem item = new ListViewItem(value.OrderItemId[i].ToString());
+                ListViewItem item = new ListViewItem(value.OrderItemId[i]);
 
                 item.SubItems.Add(value.Title[i] + "  SKU: " + value.Sku[i]);
                 item.SubItems.Add("$ " + value.ItemPrice[i]);
@@ -963,7 +964,7 @@ namespace Order_Manager.mainForms
             otherFeeTextbox.Text = "0.00";
 
             // total 
-            totalOrderTextbox.Text = value.UnitCost.Sum().ToString();
+            totalOrderTextbox.Text = value.UnitCost.Sum().ToString(CultureInfo.InvariantCulture);
             #endregion
 
             #region Buyer / Recipient Info
@@ -1003,7 +1004,7 @@ namespace Order_Manager.mainForms
             for (int i = 0; i < value.VendorSku.Count; i++)
             {
                 // add item to list
-                ListViewItem item = new ListViewItem(value.ClientItemId[i].ToString());
+                ListViewItem item = new ListViewItem(value.ClientItemId[i]);
 
                 item.SubItems.Add("Host SKU: " + value.HostSku[i] + "  - Ashlin SKU: " + value.VendorSku[i]);
                 item.SubItems.Add("$ " + value.UnitCost[i]);

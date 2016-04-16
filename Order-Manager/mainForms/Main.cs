@@ -7,6 +7,7 @@ using Order_Manager.supportingClasses;
 using Order_Manager.supportingClasses.Shipment;
 using Order_Manager.channel.shop.ca;
 using System.Drawing;
+using System.Globalization;
 using System.Windows.Forms.DataVisualization.Charting;
 using Order_Manager.channel.giantTiger;
 
@@ -446,7 +447,7 @@ namespace Order_Manager.mainForms
 
                 item.SubItems.Add(value.TransactionId);
                 item.SubItems.Add(value.CustOrderDate.ToString("yyyy-MM-dd"));
-                item.SubItems.Add(value.TrxBalanceDue.ToString());
+                item.SubItems.Add(value.TrxBalanceDue.ToString(CultureInfo.InvariantCulture));
 
                 int total = value.TrxQty.Sum();
                 item.SubItems.Add(total.ToString());
@@ -482,7 +483,7 @@ namespace Order_Manager.mainForms
 
                 item.SubItems.Add(value.OrderId);
                 item.SubItems.Add(value.OrderCreateDate.ToString("yyyy-MM-dd"));
-                item.SubItems.Add(value.GrandTotal.ToString());
+                item.SubItems.Add(value.GrandTotal.ToString(CultureInfo.InvariantCulture));
 
                 int total = value.Quantity.Sum();
                 item.SubItems.Add(total.ToString());
@@ -518,7 +519,7 @@ namespace Order_Manager.mainForms
 
                 item.SubItems.Add(value.PoNumber);
                 item.SubItems.Add(value.OrderDate.ToString("yyyy-MM-dd"));
-                item.SubItems.Add(value.UnitCost.Sum().ToString());
+                item.SubItems.Add(value.UnitCost.Sum().ToString(CultureInfo.InvariantCulture));
 
                 int total = value.Quantity.Sum();
                 item.SubItems.Add(total.ToString());
@@ -584,7 +585,7 @@ namespace Order_Manager.mainForms
 
             // get selected data point and its x-axis label
             DataPoint dataPoint = (DataPoint)e.HitTestResult.Object;
-            DateTime time = DateTime.ParseExact(dataPoint.AxisLabel, "MM/dd/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+            DateTime time = DateTime.ParseExact(dataPoint.AxisLabel, "MM/dd/yyyy", CultureInfo.InvariantCulture);
 
             if (chart.Series["point"].Points.Contains(dataPoint))
                 e.Text = "Order\nSears: " + sears.GetNumberOfOrder(time) + ", Shop.ca: " + shopCa.GetNumberOfOrder(time) + ", Giant Tiger: " + giantTiger.GetNumberOfOrder(time);
