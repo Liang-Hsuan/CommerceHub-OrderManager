@@ -529,9 +529,9 @@ namespace Order_Manager.channel.sears
             connection.Close();
 
             // upload file to sftp server
-            // sftp.Connect();
-            // sftp.Put(path, CONFIRM_DIR);
-            // sftp.Close();
+            sftp.Connect();
+            sftp.Put(path, CONFIRM_DIR);
+            sftp.Close();
         }
 
         /* a method that generate SearsValues object for the given transaction number (first version -> take from local) */
@@ -674,8 +674,8 @@ namespace Order_Manager.channel.sears
                     }
                     else
                     {
-                        value.LineBalanceDue.Add(value.TrxUnitCost[i - 1]);
-                        value.TrxBalanceDue += value.TrxUnitCost[i - 1];
+                        value.LineBalanceDue.Add(value.TrxUnitCost[i - 1] * value.TrxQty[i - 1]);
+                        value.TrxBalanceDue += value.LineBalanceDue[i - 1];
                     }
 
                     // expected ship date

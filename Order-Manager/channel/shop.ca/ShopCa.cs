@@ -419,9 +419,9 @@ namespace Order_Manager.channel.shop.ca
             connection.Close();
 
             // upload file to sftp server
-            // sftp.Connect();
-            // sftp.Put(path, CONFIRM_DIR);
-            // sftp.Close();
+            sftp.Connect();
+            sftp.Put(path, CONFIRM_DIR);
+            sftp.Close();
         }
 
         /* a method that generate ShopCaValues object for the given order number (first version -> take from local) */

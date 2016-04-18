@@ -45,7 +45,7 @@ namespace Order_Manager.channel.giantTiger
                 Directory.CreateDirectory(completeOrderDir);
             #endregion
 
-            // get credentials for giant tiger sftp log on and initialize the field
+            // get credentials for giant tiger ftp log on and initialize the field
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.ASCMcs))
             {
                 SqlCommand command = new SqlCommand("SELECT Field1_Value, Field2_Value, Field3_Value FROM ASCM_Credentials WHERE Source = 'Vendornet' and Client = 'GiantTiger'", connection);
@@ -53,7 +53,7 @@ namespace Order_Manager.channel.giantTiger
                 SqlDataReader reader = command.ExecuteReader();
                 reader.Read();
 
-                // initialize Sftp
+                // initialize Ftp
                 ftp = new Ftp(reader.GetString(0), reader.GetString(1), reader.GetString(2));
             }
         }
@@ -243,7 +243,7 @@ namespace Order_Manager.channel.giantTiger
         #endregion
 
         #region Get Order Infomation
-        /* method that get the new order from sftp server */
+        /* method that get the new order from ftp server */
         private void GetOrder(string filePath, IEnumerable<string> fileList)
         {
             foreach (string file in fileList)
@@ -255,7 +255,7 @@ namespace Order_Manager.channel.giantTiger
                 ftp.Download(GET_DIR + '/' + file, filePath + "\\" + fileNameCsv);
 
                 // after download the file delete it on the server (no need it anymore)
-                // ftp.Delete(SHIP_DIR + '/' + file);
+                // ftp.Delete(GET_DIR + '/' + file);
             }
         }
 
@@ -307,7 +307,7 @@ namespace Order_Manager.channel.giantTiger
             FileInfo[] filesLocal = dirInfo.GetFiles("*.csv");       // getting all file that have been on local
 
             // get all order file on server
-            string[] fileOnServer = ftp.GetFileList(GET_DIR);
+            string[] fileOnServer = ftp.GetFileList(GET_DIR + '/');
 
             // check the number of new order on the server compare to ones on the computer
             return (from file1 in fileOnServer let found = filesLocal.Select(file2 => file2.ToString()).Any(file2Copy => file1.Remove(file1.LastIndexOf('.')) == file2Copy.Remove(file2Copy.LastIndexOf('.'))) where !found select file1).ToArray();
@@ -334,7 +334,7 @@ namespace Order_Manager.channel.giantTiger
         #endregion
 
         #region CSV Generation
-        /* a method that generate csv order and upload to the sftp server and update database */
+        /* a method that generate csv order and upload to the ftp server and update database */
         public void GenerateCsv(GiantTigerValues value, Dictionary<int, string> cancelList)
         {
             // fields for database update
@@ -407,7 +407,7 @@ namespace Order_Manager.channel.giantTiger
                 File.WriteAllText(path, sb.ToString());
 
                 // upload file to ftp server
-                // ftp.Upload(CANCEL_DIR, path);
+                // ftp.Upload(CANCEL_DIR + '/' + value.PoNumber + "_Cancel.csv", path);
             }
 
             // the case if there is ship file -> export and upload to server
@@ -423,7 +423,7 @@ namespace Order_Manager.channel.giantTiger
                 File.WriteAllText(path, sb.ToString());
 
                 // upload file to ftp server
-                // ftp.Upload(SHIP_DIR, path);
+                // ftp.Upload(SHIP_DIR + '/' + value.PoNumber + "_Ship.csv", path);
             }
             #endregion
 
