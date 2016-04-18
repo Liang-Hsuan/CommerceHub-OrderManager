@@ -43,7 +43,7 @@ namespace Order_Manager.channel.giantTiger
             doc.Add(logo);
 
             // add barcode
-            Barcode39 barcode128 = new Barcode39
+            Barcode39 barcode39 = new Barcode39
             {
                 Code = value.OmsOrderNumber,
                 StartStopText = false,
@@ -51,7 +51,7 @@ namespace Order_Manager.channel.giantTiger
                 Extended = true
             };
 
-            Image image = barcode128.CreateImageWithBarcode(contentByte, BaseColor.BLACK, BaseColor.BLACK);
+            Image image = barcode39.CreateImageWithBarcode(contentByte, BaseColor.BLACK, BaseColor.BLACK);
             image.ScaleAbsoluteHeight(40f);
             image.SetAbsolutePosition(340f, doc.PageSize.Height - 80f);
             contentByte.AddImage(image);

@@ -187,7 +187,7 @@ namespace Order_Manager.supportingClasses.Shipment
         {
             // post request to uri
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(labelLink);
-            request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(USER_ID + ":" + PASSWORD)));
+            request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(USER_ID + ':' + PASSWORD)));
             request.Method = "GET";
             request.Accept = "application/pdf";
 
@@ -208,7 +208,7 @@ namespace Order_Manager.supportingClasses.Shipment
             Error = false;
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(selfLink);
-            request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(USER_ID + ":" + PASSWORD)));
+            request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(USER_ID + ':' + PASSWORD)));
             request.Method = "DELETE";
 
             // get the response from the server
@@ -239,7 +239,7 @@ namespace Order_Manager.supportingClasses.Shipment
 
             // create http post request
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-            request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(USER_ID + ":" + PASSWORD)));
+            request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(USER_ID + ':' + PASSWORD)));
             request.Method = "POST";
             request.ContentType = "application/vnd.cpc.manifest-v8+xml";
             request.Accept = "application/vnd.cpc.manifest-v8+xml";
@@ -316,7 +316,7 @@ namespace Order_Manager.supportingClasses.Shipment
 
             // post request to uri
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(manifestLink);
-            request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(USER_ID + ":" + PASSWORD)));
+            request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(USER_ID + ':' + PASSWORD)));
             request.Method = "GET";
             request.Accept = "application/vnd.cpc.manifest-v8+xml";
 

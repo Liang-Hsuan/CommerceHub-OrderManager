@@ -65,7 +65,7 @@ namespace Order_Manager.channel.shop.ca
             ct.Go();
 
             // ship to address
-            text = new Phrase(value.ShipTo.Name + "\n" + value.ShipTo.Address1 + "\n" + value.ShipTo.Address2 + "\n" + value.ShipTo.City + ' ' + value.ShipTo.State + " , CA\n" + value.ShipTo.PostalCode,
+            text = new Phrase(value.ShipTo.Name + '\n' + value.ShipTo.Address1 + '\n' + value.ShipTo.Address2 + '\n' + value.ShipTo.City + ' ' + value.ShipTo.State + " , CA\n" + value.ShipTo.PostalCode,
                    new Font(baseFont, 10));
             ct.SetSimpleColumn(text, 40f, 630f, 175f, 700f, 12f, Element.ALIGN_LEFT);
             ct.Go();
@@ -87,7 +87,7 @@ namespace Order_Manager.channel.shop.ca
             ct.Go();
 
             // order number & order placed date
-            text = new Phrase(value.OrderId + "\n" + value.OrderCreateDate.ToString("yyyy-MM-dd"), new Font(baseFont, 10));
+            text = new Phrase(value.OrderId + '\n' + value.OrderCreateDate.ToString("yyyy-MM-dd"), new Font(baseFont, 10));
             ct.SetSimpleColumn(text, 439f, 655f, 509f, 685f, 15f, Element.ALIGN_LEFT);
             ct.Go();
             #endregion

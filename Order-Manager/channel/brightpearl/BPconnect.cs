@@ -31,7 +31,7 @@ namespace Order_Manager.channel.brightpearl
         {
             // initialize API authentication
             SqlConnection authenticationConnection = new SqlConnection(Properties.Settings.Default.ASCMcs);
-            SqlCommand getAuthetication = new SqlCommand("SELECT Field3_Value, Field1_Value FROM ASCM_Credentials WHERE Source = \'Brightpearl\';", authenticationConnection);
+            SqlCommand getAuthetication = new SqlCommand("SELECT Field3_Value, Field1_Value FROM ASCM_Credentials WHERE Source = 'Brightpearl'", authenticationConnection);
             authenticationConnection.Open();
             SqlDataReader reader = getAuthetication.ExecuteReader();
             reader.Read();

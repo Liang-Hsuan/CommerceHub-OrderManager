@@ -93,7 +93,7 @@ namespace Order_Manager.channel.shop.ca
             {
                 SqlCommand command = new SqlCommand("SELECT OrderId, SupplierId, StoreName, OrderCreateDate, GrandTotal, TotalPrice, TotalTax, TotalShippingCost, TotalDiscount, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, " +
                                                     "ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, OptionIn, ShippingMethod " +
-                                                    "FROM ShopCa_Order WHERE Complete ='False' ORDER BY OrderId;", connection);
+                                                    "FROM ShopCa_Order WHERE Complete ='False' ORDER BY OrderId", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
@@ -128,7 +128,7 @@ namespace Order_Manager.channel.shop.ca
                     value.ShippingMethod = reader.GetString(24);
 
                     SqlDataAdapter adatper = new SqlDataAdapter("SELECT OrderItemId, Sku, Title, Ssrp, SsrpTax, Quantity, ItemPrice, ExtendedItemPrice, ItemTax, ItemShippingCost, ItemDiscount " +
-                                                                "FROM ShopCa_Order_Item WHERE OrderId = \'" + orderId + "\';", connection);
+                                                                "FROM ShopCa_Order_Item WHERE OrderId = \'" + orderId + '\'', connection);
                     adatper.Fill(table);
 
                     for (int i = 0; i < table.Rows.Count; i++)
@@ -275,10 +275,10 @@ namespace Order_Manager.channel.shop.ca
             // download the files from the given list
             foreach (string file in fileList.Where(file => file != "." && file != ".."))
             {
-                sftp.Get(SHIPMENT_DIR + "/" + file, filePath + "\\" + file);
+                sftp.Get(SHIPMENT_DIR + '/' + file, filePath + "\\" + file);
 
                 // after download the file delete it on the server (no need it anymore)
-                ServerDelete.Delete(sftp.Host, sftp.Username, sftp.Password, SHIPMENT_DIR + "/" + file);
+                ServerDelete.Delete(sftp.Host, sftp.Username, sftp.Password, SHIPMENT_DIR + '/' + file);
             }
 
             sftp.Close();
@@ -352,7 +352,7 @@ namespace Order_Manager.channel.shop.ca
             List<string> completeOrderList = new List<string>();
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("SELECT OrderId FROM ShopCa_Order;", connection);
+                SqlCommand command = new SqlCommand("SELECT OrderId FROM ShopCa_Order", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
@@ -381,7 +381,7 @@ namespace Order_Manager.channel.shop.ca
             for (int i = 0; i < value.OrderItemId.Count; i++)
             {
                 // this is necessary fields
-                txt += value.SupplierId + "\t" + value.StoreName + "\t" + value.OrderId + "\t" + value.OrderItemId[i] + "\t";
+                txt += value.SupplierId + '\t' + value.StoreName + '\t' + value.OrderId + '\t' + value.OrderItemId[i] + '\t';
 
                 #region TXT Generation and Database Item Update
                 if (cancelList.Keys.Contains(i))
@@ -396,10 +396,10 @@ namespace Order_Manager.channel.shop.ca
                 else
                 {
                     // the case if the item is shipped -> show the shipping info
-                    txt += "Shipped\t" + DateTime.Today.ToString("yyyy-MM-dd") + "\tCP\tCanada Post\t" + value.Package.Service + "\t" + value.Package.TrackingNumber + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n";
+                    txt += "Shipped\t" + DateTime.Today.ToString("yyyy-MM-dd") + "\tCP\tCanada Post\t" + value.Package.Service + '\t' + value.Package.TrackingNumber + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n";
 
                     // update item to shipped to database
-                    command.CommandText = "UPDATE ShopCa_Order_Item SET Shipped = 'True' WHERE OrderItemId = \'" + value.OrderItemId[i] + "\'";
+                    command.CommandText = "UPDATE ShopCa_Order_Item SET Shipped = 'True' WHERE OrderItemId = \'" + value.OrderItemId[i] + '\'';
                     command.ExecuteNonQuery();
                 }
                 #endregion
@@ -620,7 +620,7 @@ namespace Order_Manager.channel.shop.ca
             {
                 SqlCommand command = new SqlCommand("SELECT OrderId, SupplierId, StoreName, OrderCreateDate, GrandTotal, TotalPrice, TotalTax, TotalShippingCost, TotalDiscount, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, " 
                                                   + "ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, OptionIn, ShippingMethod, TrackingNumber, SelfLink, LabelLink " 
-                                                  + "FROM ShopCa_Order WHERE OrderId = \'" + targetOrder + "\'", connection);
+                                                  + "FROM ShopCa_Order WHERE OrderId = \'" + targetOrder + '\'', connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 reader.Read();
@@ -655,7 +655,7 @@ namespace Order_Manager.channel.shop.ca
                 value.Package.LabelLink = reader.GetString(27);
 
                 SqlDataAdapter adatper = new SqlDataAdapter("SELECT OrderItemId, Sku, Title, Ssrp, SsrpTax, Quantity, ItemPrice, ExtendedItemPrice, ItemTax, ItemShippingCost, ItemDiscount " +
-                                                            "FROM ShopCa_Order_Item WHERE OrderId = \'" + targetOrder + "\' ORDER BY OrderItemId;", connection);
+                                                            "FROM ShopCa_Order_Item WHERE OrderId = \'" + targetOrder + "\' ORDER BY OrderItemId", connection);
                 DataTable table = new DataTable();
                 adatper.Fill(table);
 
@@ -698,8 +698,8 @@ namespace Order_Manager.channel.shop.ca
                 {
                     command.CommandText = "INSERT INTO ShopCa_Order_Item " +
                                           "(OrderId, OrderItemId, Sku, Title, Ssrp, SsrpTax, Quantity, ItemPrice, ExtendedItemPrice, ItemTax, ItemShippingCost, ItemDiscount, Shipped, Cancelled) Values" +
-                                          "(\'" + value.OrderId + "\',\'" + value.OrderItemId[i] + "\',\'" + value.Sku[i] + "\',\'" + value.Title[i].Replace("'", "''") + "\'," + value.Ssrp[i] + "," + value.SsrpTax[i] + "," + value.Quantity[i] + "," +
-                                          value.ItemPrice[i] + "," + value.ExtendedItemPrice[i] + "," + value.ItemTax[i] + "," + value.ItemShippingCost[i] + "," + value.ItemDiscount[i] + ",\'False\',\'False\')";
+                                          "(\'" + value.OrderId + "\',\'" + value.OrderItemId[i] + "\',\'" + value.Sku[i] + "\',\'" + value.Title[i].Replace("'", "''") + "\'," + value.Ssrp[i] + ',' + value.SsrpTax[i] + ',' + value.Quantity[i] + ',' +
+                                          value.ItemPrice[i] + ',' + value.ExtendedItemPrice[i] + ',' + value.ItemTax[i] + ',' + value.ItemShippingCost[i] + ',' + value.ItemDiscount[i] + ",'False','False')";
                     command.ExecuteNonQuery();
                 }
             }
@@ -712,7 +712,7 @@ namespace Order_Manager.channel.shop.ca
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
                 // get all the transaction id that are obsolete
-                SqlCommand command = new SqlCommand("SELECT OrderId FROM ShopCa_Order WHERE CompleteDate < \'" + DateTime.Today.AddDays(-120).ToString("yyyy-MM-dd") + "\';", connection);
+                SqlCommand command = new SqlCommand("SELECT OrderId FROM ShopCa_Order WHERE CompleteDate < \'" + DateTime.Today.AddDays(-120).ToString("yyyy-MM-dd") + '\'', connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 

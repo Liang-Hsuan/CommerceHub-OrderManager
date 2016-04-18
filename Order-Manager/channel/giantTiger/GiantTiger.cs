@@ -186,7 +186,7 @@ namespace Order_Manager.channel.giantTiger
             string date = shipDate.ToString("yyyy-MM-dd");
             using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
             {
-                SqlCommand command = new SqlCommand("UPDATE GiantTiger_Order SET EndofDay = \'" + endOfDay + "\' WHERE ShipDate = \'" + date + "\' OR CompleteDate = \'" + date + "\'", connection);
+                SqlCommand command = new SqlCommand("UPDATE GiantTiger_Order SET EndofDay = \'" + endOfDay + "\' WHERE ShipDate = \'" + date + "\' OR CompleteDate = \'" + date + '\'', connection);
                 connection.Open();
                 command.ExecuteNonQuery();
             }
@@ -378,7 +378,7 @@ namespace Order_Manager.channel.giantTiger
                     cancelIndex++;
 
                     // update item to cancelled to database
-                    command.CommandText = "UPDATE GiantTiger_Order_Item SET Cancelled = 'True' WHERE ClientItemId = \'" + value.ClientItemId[i] + "\'";
+                    command.CommandText = "UPDATE GiantTiger_Order_Item SET Cancelled = 'True' WHERE ClientItemId = \'" + value.ClientItemId[i] + '\'';
                     command.ExecuteNonQuery();
 
                     continue;
@@ -388,7 +388,7 @@ namespace Order_Manager.channel.giantTiger
                 shipIndex++;
 
                 // update item to shipped to database
-                command.CommandText = "UPDATE GiantTiger_Order_Item SET Shipped = 'True' WHERE ClientItemId = \'" + value.ClientItemId[i] + "\'";
+                command.CommandText = "UPDATE GiantTiger_Order_Item SET Shipped = 'True' WHERE ClientItemId = \'" + value.ClientItemId[i] + '\'';
                 command.ExecuteNonQuery();
             }
             #endregion

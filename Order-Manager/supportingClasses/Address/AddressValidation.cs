@@ -20,9 +20,9 @@ namespace Order_Manager.supportingClasses.Address
             // generate uri
             string uri = "https://maps.googleapis.com/maps/api/geocode/json?address=";
 
-            uri += address.Address1.Replace(' ', '+') + ",";
-            uri += address.City.Replace(' ', '+') + ",";
-            uri += address.State.Replace(' ', '+') + ",";
+            uri += address.Address1.Replace(' ', '+') + ',';
+            uri += address.City.Replace(' ', '+') + ',';
+            uri += address.State.Replace(' ', '+') + ',';
             uri += address.PostalCode.Replace(' ', '+');
 
             uri += "&key=AIzaSyASdOsY2T3vBfYn1lBE5VQl7nZ-ivp1vKs";

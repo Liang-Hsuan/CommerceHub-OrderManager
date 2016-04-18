@@ -37,7 +37,7 @@ namespace Order_Manager.channel.sears
                 {
                     // initialize PdfWriter object
                     Document doc = new Document(PageSize.LETTER, 0, 0, 0, 35);
-                    string file = SavePath + "\\" + value.TransactionId + "_" + (i + 1) + ".pdf";
+                    string file = SavePath + "\\" + value.TransactionId + '_' + (i + 1) + ".pdf";
                     PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(file, FileMode.Create));
 
                     // open the document 
@@ -65,10 +65,10 @@ namespace Order_Manager.channel.sears
                     ct.Go();
 
                     // bill recipient and address
-                    text = new Phrase(value.BillTo.Name + "\n" + value.BillTo.Address1 + "\n" + value.BillTo.Address2 + "\n" + value.BillTo.City, new Font(baseFont, 9));
+                    text = new Phrase(value.BillTo.Name + '\n' + value.BillTo.Address1 + '\n' + value.BillTo.Address2 + '\n' + value.BillTo.City, new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 10f, 726f, 150f, 771f, 9f, Element.ALIGN_LEFT);
                     ct.Go();
-                    text = new Phrase(value.BillTo.State + "\n" + value.BillTo.PostalCode, new Font(baseFont, 9));
+                    text = new Phrase(value.BillTo.State + '\n' + value.BillTo.PostalCode, new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 120f, 704f, 170f, 744f, 9f, Element.ALIGN_LEFT);
                     ct.Go();
 
@@ -79,10 +79,10 @@ namespace Order_Manager.channel.sears
                     ct.Go();
 
                     // ship recipient and address
-                    text = new Phrase(value.Recipient.Name + "\n" + value.Recipient.Address1 + "\n" + value.Recipient.Address2 + "\n" + value.Recipient.City, new Font(baseFont, 9));
+                    text = new Phrase(value.Recipient.Name + '\n' + value.Recipient.Address1 + '\n' + value.Recipient.Address2 + '\n' + value.Recipient.City, new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 10f, 666f, 150f, 711f, 9f, Element.ALIGN_LEFT);
                     ct.Go();
-                    text = new Phrase(value.Recipient.State + "\n" + value.Recipient.PostalCode, new Font(baseFont, 9));
+                    text = new Phrase(value.Recipient.State + '\n' + value.Recipient.PostalCode, new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 120f, 643f, 170f, 683f, 9f, Element.ALIGN_LEFT);
                     ct.Go();
                     text = new Phrase(value.Recipient.DayPhone, new Font(baseFont, 9));
@@ -111,7 +111,7 @@ namespace Order_Manager.channel.sears
                     #endregion
 
                     // sku description
-                    text = new Phrase(value.Description[i] + "\n" + value.Description2[i], new Font(baseFont, 9));
+                    text = new Phrase(value.Description[i] + '\n' + value.Description2[i], new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 10f, 616f, 150f, 646f, 10f, Element.ALIGN_LEFT);
                     ct.Go();
 
@@ -506,7 +506,7 @@ namespace Order_Manager.channel.sears
                     #region Barcode Two
                     string code = value.TrxMerchantSku[i].Replace(" ", string.Empty);
                     if (code.Length % 2 != 0)
-                        code += "0";
+                        code += '0';
 
                     BarcodeInter25 barcode25 = new BarcodeInter25
                     {
@@ -522,7 +522,7 @@ namespace Order_Manager.channel.sears
                     contentByte.AddImage(image);
 
                     // barcode text
-                    text = new Phrase(value.TrxMerchantSku[i] + "\n" + value.Description[i], new Font(baseFont, 9));
+                    text = new Phrase(value.TrxMerchantSku[i] + '\n' + value.Description[i], new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 16f, 48f, 156f, 68f, 9f, Element.ALIGN_LEFT);
                     ct.Go();
 
@@ -548,15 +548,15 @@ namespace Order_Manager.channel.sears
                     ct.Go();
 
                     // ship to recipient and address
-                    text = new Phrase(value.Recipient.Name + "\n" + value.Recipient.Address1 + "\n" + value.Recipient.Address2 + "\n" + value.Recipient.City, new Font(baseFont, 9));
+                    text = new Phrase(value.Recipient.Name + '\n' + value.Recipient.Address1 + '\n' + value.Recipient.Address2 + '\n' + value.Recipient.City, new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 318f, 726f, 458f, 771f, 9f, Element.ALIGN_LEFT);
                     ct.Go();
-                    text = new Phrase(value.Recipient.State + "\n" + value.Recipient.PostalCode + "\n" + value.ExpectedShipDate[i].ToString("MM/dd/yy"), new Font(baseFont, 9));
+                    text = new Phrase(value.Recipient.State + '\n' + value.Recipient.PostalCode + '\n' + value.ExpectedShipDate[i].ToString("MM/dd/yy"), new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 428f, 704f, 488f, 744f, 9f, Element.ALIGN_LEFT);
                     ct.Go();
 
                     // ship to phone and total price
-                    text = new Phrase(value.Recipient.DayPhone + "\n" + value.LineBalanceDue[i], new Font(baseFont, 9));
+                    text = new Phrase(value.Recipient.DayPhone + '\n' + value.LineBalanceDue[i], new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 515f, 729f, 605f, 779f, 17f, Element.ALIGN_LEFT);
                     ct.Go();
                     #endregion
@@ -648,7 +648,7 @@ namespace Order_Manager.channel.sears
                     #endregion
 
                     // sku description
-                    text = new Phrase(value.Description[i] + "\n" + value.Description2[i], new Font(baseFont, 9));
+                    text = new Phrase(value.Description[i] + '\n' + value.Description2[i], new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 318f, 560f, 458f, 585f, 10f, Element.ALIGN_LEFT);
                     ct.Go();
 
@@ -666,10 +666,10 @@ namespace Order_Manager.channel.sears
                     if (take != "DIRECT")
                     {
                         // strange address
-                        text = new Phrase(value.ShipTo.Name + "\n" + value.ShipTo.Address1 + "\n" + value.ShipTo.Address2 + "\n" + value.ShipTo.City, new Font(baseFont, 9));
+                        text = new Phrase(value.ShipTo.Name + '\n' + value.ShipTo.Address1 + '\n' + value.ShipTo.Address2 + '\n' + value.ShipTo.City, new Font(baseFont, 9));
                         ct.SetSimpleColumn(text, 318f, 481f, 468f, 526f, 9f, Element.ALIGN_LEFT);
                         ct.Go();
-                        text = new Phrase(value.ShipTo.State + "\n" + value.ShipTo.PostalCode, new Font(baseFont, 9));
+                        text = new Phrase(value.ShipTo.State + '\n' + value.ShipTo.PostalCode, new Font(baseFont, 9));
                         ct.SetSimpleColumn(text, 428f, 459f, 488f, 499f, 9f, Element.ALIGN_LEFT);
                         ct.Go();
 
@@ -692,10 +692,10 @@ namespace Order_Manager.channel.sears
                     ct.Go();
 
                     // address
-                    text = new Phrase(value.Recipient.Name + "\n" + value.ShipTo.Address1 + "\n" + value.ShipTo.Address2 + "\n" + value.ShipTo.City, new Font(baseFont, 9));
+                    text = new Phrase(value.Recipient.Name + '\n' + value.ShipTo.Address1 + '\n' + value.ShipTo.Address2 + '\n' + value.ShipTo.City, new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 318f, 375f, 468f, 420f, 9f, Element.ALIGN_LEFT);
                     ct.Go();
-                    text = new Phrase(value.ShipTo.State + "\n" + value.ShipTo.PostalCode, new Font(baseFont, 9));
+                    text = new Phrase(value.ShipTo.State + '\n' + value.ShipTo.PostalCode, new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 428f, 362f, 488f, 392f, 9f, Element.ALIGN_LEFT);
                     ct.Go();
 
@@ -720,7 +720,7 @@ namespace Order_Manager.channel.sears
                     // add barcode
                     code = value.ReceivingInstructions[i].Replace(" ", string.Empty);
                     if (code.Length % 2 != 0)
-                        code += "0";
+                        code += '0';
 
                     barcode25 = new BarcodeInter25
                     {
