@@ -49,7 +49,7 @@ namespace Order_Manager.mainForms
         }
 
         #region Close Events
-        /* save data when form close */
+        /* save data when form is close */
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.Date = DateTime.Today;
@@ -58,9 +58,10 @@ namespace Order_Manager.mainForms
             parent.Close();
         }
 
-        /* delete data that are too old after program is closed */
+        /* delete data that are too old after the program is closed */
         private void Main_FormClosed(object sender, FormClosedEventArgs e)
         {
+            giantTiger.Delete();
             sears.Delete();
             shopCa.Delete();
         }

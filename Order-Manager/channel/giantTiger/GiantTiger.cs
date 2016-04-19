@@ -11,11 +11,11 @@ using System.Text;
 namespace Order_Manager.channel.giantTiger
 {
     /*
-     * A class that connect to Giant Tiger sftp server and manage all the orders for Giant Tiger
+     * A class that connect to Giant Tiger ftp server and manage all the orders for Giant Tiger
      */
     public class GiantTiger : Channel
     {
-        // fields for directory on sftp server
+        // fields for directory on ftp server
         private const string GET_DIR = "get";
         private const string SHIP_DIR = "put/ship";
         private const string CANCEL_DIR = "put/cancel";
@@ -25,7 +25,7 @@ namespace Order_Manager.channel.giantTiger
         private readonly string newOrderDir;
         private readonly string completeOrderDir;
 
-        // field for sftp connection
+        // field for ftp connection
         private readonly Ftp ftp;
 
         /* constructor that initialize folders for csv feed */
@@ -255,7 +255,7 @@ namespace Order_Manager.channel.giantTiger
                 ftp.Download(GET_DIR + '/' + file, filePath + "\\" + fileNameCsv);
 
                 // after download the file delete it on the server (no need it anymore)
-                // ftp.Delete(GET_DIR + '/' + file);
+                ftp.Delete(GET_DIR + '/' + file);
             }
         }
 
@@ -378,7 +378,7 @@ namespace Order_Manager.channel.giantTiger
                     cancelIndex++;
 
                     // update item to cancelled to database
-                    command.CommandText = "UPDATE GiantTiger_Order_Item SET Cancelled = 'True' WHERE ClientItemId = \'" + value.ClientItemId[i] + '\'';
+                    command.CommandText = "UPDATE GiantTiger_Order_Item SET Cancelled = 'True' WHERE PoNumber = \'" + value.PoNumber + "\' AND ClientItemId = \'" + value.ClientItemId[i] + '\'';
                     command.ExecuteNonQuery();
 
                     continue;
@@ -388,7 +388,7 @@ namespace Order_Manager.channel.giantTiger
                 shipIndex++;
 
                 // update item to shipped to database
-                command.CommandText = "UPDATE GiantTiger_Order_Item SET Shipped = 'True' WHERE ClientItemId = \'" + value.ClientItemId[i] + '\'';
+                command.CommandText = "UPDATE GiantTiger_Order_Item SET Shipped = 'True' WHERE PoNumber = \'" + value.PoNumber + "\' AND ClientItemId = \'" + value.ClientItemId[i] + '\'';
                 command.ExecuteNonQuery();
             }
             #endregion
@@ -407,7 +407,7 @@ namespace Order_Manager.channel.giantTiger
                 File.WriteAllText(path, sb.ToString());
 
                 // upload file to ftp server
-                // ftp.Upload(CANCEL_DIR + '/' + value.PoNumber + "_Cancel.csv", path);
+                ftp.Upload(CANCEL_DIR + '/' + value.PoNumber + "_Cancel.csv", path);
             }
 
             // the case if there is ship file -> export and upload to server
@@ -423,7 +423,7 @@ namespace Order_Manager.channel.giantTiger
                 File.WriteAllText(path, sb.ToString());
 
                 // upload file to ftp server
-                // ftp.Upload(SHIP_DIR + '/' + value.PoNumber + "_Ship.csv", path);
+                ftp.Upload(SHIP_DIR + '/' + value.PoNumber + "_Ship.csv", path);
             }
             #endregion
 
@@ -515,13 +515,13 @@ namespace Order_Manager.channel.giantTiger
                             case "UnitCost":
                                 value.UnitCost.Add(double.Parse(data[i]));
                                 break;
-                            case "HostSKU#":
+                            case "Item#":
                                 value.HostSku.Add(data[i]);
                                 break;
                             case "ClientItemID":
                                 value.ClientItemId.Add(data[i]);
                                 break;
-                            case "OMSOrder#":
+                            case "OrderNo":
                                 value.OmsOrderNumber = data[i];
                                 break;
                         }
