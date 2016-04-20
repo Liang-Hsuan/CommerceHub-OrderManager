@@ -38,7 +38,7 @@ namespace Order_Manager.channel.giantTiger
             #region Logo and Barcode Set Up
             // add giant tiger logo
             Image logo = Image.GetInstance(@"..\..\image\giant tiger.jpg");
-            logo.ScalePercent(4.5f);
+            logo.ScalePercent(20f);
             logo.SetAbsolutePosition(40f, doc.PageSize.Height - 100f);
             doc.Add(logo);
 
@@ -69,8 +69,8 @@ namespace Order_Manager.channel.giantTiger
             ct.Go();
 
             // sold to address
-            text = new Phrase(value.ShipTo.Name + '\n' + value.ShipTo.Address1 + '\n' + value.ShipTo.Address2 + '\n' + value.ShipTo.City + ", " + value.ShipTo.State + ' ' + value.ShipTo.PostalCode + "\nCanada"
-                 , new Font(baseFont, 9));
+            text = new Phrase(value.ShipTo.Name + '\n' + value.ShipTo.Address1 + '\n' + value.ShipTo.Address2 + '\n' + value.ShipTo.City + ", " + value.ShipTo.State + ' ' + value.ShipTo.PostalCode + "\nCanada\n"
+                 + value.ShipTo.DayPhone, new Font(baseFont, 9));
             ct.SetSimpleColumn(text, 42f, 568f, 177f, 668f, 10f, Element.ALIGN_LEFT);
             ct.Go();
             #endregion

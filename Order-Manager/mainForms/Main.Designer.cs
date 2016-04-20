@@ -151,7 +151,7 @@
             this.listview.Location = new System.Drawing.Point(12, 378);
             this.listview.Name = "listview";
             this.listview.Size = new System.Drawing.Size(1404, 473);
-            this.listview.TabIndex = 7;
+            this.listview.TabIndex = 8;
             this.listview.UseCompatibleStateImageBehavior = false;
             this.listview.View = System.Windows.Forms.View.Details;
             // 
@@ -250,7 +250,7 @@
             this.selectionAllCheckbox.Location = new System.Drawing.Point(16, 383);
             this.selectionAllCheckbox.Name = "selectionAllCheckbox";
             this.selectionAllCheckbox.Size = new System.Drawing.Size(15, 14);
-            this.selectionAllCheckbox.TabIndex = 8;
+            this.selectionAllCheckbox.TabIndex = 7;
             this.selectionAllCheckbox.UseVisualStyleBackColor = true;
             this.selectionAllCheckbox.CheckedChanged += new System.EventHandler(this.selectionAllCheckbox_CheckedChanged);
             // 

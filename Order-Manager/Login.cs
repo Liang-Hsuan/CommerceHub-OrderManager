@@ -28,6 +28,9 @@ namespace Order_Manager
         /* sign in button event that check if the user put in right credentials */
         private void signInButton_Click(object sender, EventArgs e)
         {
+            // set invalid inidicator to invisible
+            invalidLabel.Visible = false;
+
             // get username and password
             string userName = usernameTextbox.Text.Trim();
             string password = passwordTextbox.Text;

@@ -55,7 +55,7 @@
             this.listview.Location = new System.Drawing.Point(11, 52);
             this.listview.Name = "listview";
             this.listview.Size = new System.Drawing.Size(575, 332);
-            this.listview.TabIndex = 3;
+            this.listview.TabIndex = 4;
             this.listview.UseCompatibleStateImageBehavior = false;
             this.listview.View = System.Windows.Forms.View.Details;
             this.listview.ColumnWidthChanging += new System.Windows.Forms.ColumnWidthChangingEventHandler(this.listview_ColumnWidthChanging);
@@ -86,7 +86,7 @@
             this.selectAllCheckbox.Location = new System.Drawing.Point(15, 57);
             this.selectAllCheckbox.Name = "selectAllCheckbox";
             this.selectAllCheckbox.Size = new System.Drawing.Size(15, 14);
-            this.selectAllCheckbox.TabIndex = 1;
+            this.selectAllCheckbox.TabIndex = 3;
             this.selectAllCheckbox.UseVisualStyleBackColor = true;
             this.selectAllCheckbox.CheckedChanged += new System.EventHandler(this.selectAllCheckbox_CheckedChanged);
             // 
@@ -144,6 +144,7 @@
             this.Controls.Add(this.voidShipmentButton);
             this.Controls.Add(this.selectAllCheckbox);
             this.Controls.Add(this.listview);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "ShipmentPage";

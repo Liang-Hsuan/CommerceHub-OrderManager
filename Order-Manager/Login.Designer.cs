@@ -134,7 +134,7 @@
             this.rememberCheckbox.Location = new System.Drawing.Point(342, 305);
             this.rememberCheckbox.Name = "rememberCheckbox";
             this.rememberCheckbox.Size = new System.Drawing.Size(95, 17);
-            this.rememberCheckbox.TabIndex = 14;
+            this.rememberCheckbox.TabIndex = 7;
             this.rememberCheckbox.Text = "Remember Me";
             this.rememberCheckbox.UseVisualStyleBackColor = true;
             this.rememberCheckbox.CheckedChanged += new System.EventHandler(this.rememberCheckbox_CheckedChanged);
