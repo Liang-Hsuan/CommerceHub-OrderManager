@@ -60,6 +60,8 @@ namespace Order_Manager.channel.giantTiger
             // initialize local fields for text
             BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
             BaseFont boldFont = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, BaseFont.CP1252, false);
+            CMYKColor white = new CMYKColor(0f, 0f, 0f, 0f);
+            CMYKColor black = new CMYKColor(0f, 0f, 0f, 1f);
             ColumnText ct = new ColumnText(draw);
 
             #region Sold To
@@ -89,61 +91,79 @@ namespace Order_Manager.channel.giantTiger
             #endregion
 
             #region Draw First Box
+            draw.SetColorFill(black);
             draw.MoveTo(40f, 580f);
             draw.LineTo(doc.PageSize.Width - 40f, 580f);
+            draw.LineTo(doc.PageSize.Width - 40f, 543f);
+            draw.LineTo(40f, 543f);
+            draw.LineTo(40f, 580f);
+            draw.ClosePathFillStroke();
+
+            draw.SetColorStroke(white);
+            draw.MoveTo(160f, 580f);
+            draw.LineTo(160f, 543f);
             draw.Stroke();
 
-            draw.MoveTo(doc.PageSize.Width - 40f, 580f);
-            draw.LineTo(doc.PageSize.Width - 40f, 530f);
+            draw.MoveTo(280f, 580f);
+            draw.LineTo(280f, 543f);
             draw.Stroke();
 
-            draw.MoveTo(doc.PageSize.Width - 40f, 530f);
+            draw.MoveTo(320f, 580f);
+            draw.LineTo(320f, 543f);
+            draw.Stroke();
+
+            draw.MoveTo(500f, 580f);
+            draw.LineTo(500f, 543f);
+            draw.Stroke();
+
+            draw.SetColorStroke(black);
+            draw.MoveTo(40f, 543f);
             draw.LineTo(40f, 530f);
             draw.Stroke();
 
             draw.MoveTo(40f, 530f);
-            draw.LineTo(40f, 580f);
+            draw.LineTo(doc.PageSize.Width - 40f, 530f);
             draw.Stroke();
 
-            draw.MoveTo(160f, 580f);
+            draw.MoveTo(doc.PageSize.Width - 40f, 530f);
+            draw.LineTo(doc.PageSize.Width - 40f, 543f);
+            draw.Stroke();
+
+            draw.MoveTo(160f, 543f);
             draw.LineTo(160f, 530f);
             draw.Stroke();
 
-            draw.MoveTo(280f, 580f);
+            draw.MoveTo(280f, 543f);
             draw.LineTo(280f, 530f);
             draw.Stroke();
 
-            draw.MoveTo(320f, 580f);
+            draw.MoveTo(320f, 543f);
             draw.LineTo(320f, 530f);
             draw.Stroke();
 
-            draw.MoveTo(500f, 580f);
+            draw.MoveTo(500f, 543f);
             draw.LineTo(500f, 530f);
-            draw.Stroke();
-
-            draw.MoveTo(40f, 543f);
-            draw.LineTo(doc.PageSize.Width - 40f, 543f);
             draw.Stroke();
             #endregion
 
             #region Messgae in First Box
-            text = new Phrase("SHIPPING METHOD \\\nMODE D'EXPEDITION", new Font(boldFont, 10));
+            text = new Phrase("SHIPPING METHOD \\\nMODE D'EXPEDITION", new Font(boldFont, 10, Font.NORMAL, white));
             ct.SetSimpleColumn(text, 40f, 550f, 160f, 580f, 11f, Element.ALIGN_CENTER);
             ct.Go();
 
-            text = new Phrase("ORDER DATE \\\nDATE DE LA\nCOMMANDE", new Font(boldFont, 10));
+            text = new Phrase("ORDER DATE \\\nDATE DE LA\nCOMMANDE", new Font(boldFont, 10, Font.NORMAL, white));
             ct.SetSimpleColumn(text, 160f, 540f, 280f, 580f, 11f, Element.ALIGN_CENTER);
             ct.Go();
 
-            text = new Phrase("PAGE", new Font(boldFont, 10));
+            text = new Phrase("PAGE", new Font(boldFont, 10, Font.NORMAL, new CMYKColor(0f, 0f, 0f, 0f)));
             ct.SetSimpleColumn(text, 280f, 550f, 320f, 580f, 11f, Element.ALIGN_CENTER);
             ct.Go();
 
-            text = new Phrase("ORDER NUMBER \\\nNUMERO DE COMMANDE", new Font(boldFont, 10));
+            text = new Phrase("ORDER NUMBER \\\nNUMERO DE COMMANDE", new Font(boldFont, 10, Font.NORMAL, white));
             ct.SetSimpleColumn(text, 320f, 550f, 500f, 580f, 11f, Element.ALIGN_CENTER);
             ct.Go();
 
-            text = new Phrase("PO NUMBER \\\nBON DE\nCOMMANDE", new Font(boldFont, 10));
+            text = new Phrase("PO NUMBER \\\nBON DE\nCOMMANDE", new Font(boldFont, 10, Font.NORMAL, white));
             ct.SetSimpleColumn(text, 500f, 540f, doc.PageSize.Width - 40f, 580f, 11f, Element.ALIGN_CENTER);
             ct.Go();
 
@@ -171,20 +191,12 @@ namespace Order_Manager.channel.giantTiger
             #region Draw Second Box
             draw.MoveTo(40f, 520f);
             draw.LineTo(doc.PageSize.Width - 40f, 520f);
-            draw.Stroke();
-
-            draw.MoveTo(doc.PageSize.Width - 40f, 520f);
             draw.LineTo(doc.PageSize.Width - 40f, 483f);
-            draw.Stroke();
-
-            draw.MoveTo(doc.PageSize.Width - 40f, 483f);
             draw.LineTo(40f, 483f);
-            draw.Stroke();
-
-            draw.MoveTo(40f, 483f);
             draw.LineTo(40f, 520f);
-            draw.Stroke();
+            draw.ClosePathFillStroke();
 
+            draw.SetColorStroke(white);
             draw.MoveTo(130f, 520f);
             draw.LineTo(130f, 483f);
             draw.Stroke();
@@ -203,27 +215,28 @@ namespace Order_Manager.channel.giantTiger
             #endregion
 
             #region Message in Second Box
-            text = new Phrase("QTY ORDERED \\\nQTE\nCOMMANDEE", new Font(boldFont, 10));
+            text = new Phrase("QTY ORDERED \\\nQTE\nCOMMANDEE", new Font(boldFont, 10, Font.NORMAL, white));
             ct.SetSimpleColumn(text, 40f, 480f, 130f, 520f, 11f, Element.ALIGN_CENTER);
             ct.Go();
 
-            text = new Phrase("ITEM \\\nARTICLE", new Font(boldFont, 10));
+            text = new Phrase("ITEM \\\nARTICLE", new Font(boldFont, 10, Font.NORMAL, white));
             ct.SetSimpleColumn(text, 130f, 480f, 220f, 520f, 11f, Element.ALIGN_CENTER);
             ct.Go();
 
-            text = new Phrase("DESCRIPTION", new Font(boldFont, 10));
+            text = new Phrase("DESCRIPTION", new Font(boldFont, 10, Font.NORMAL, white));
             ct.SetSimpleColumn(text, 220f, 480f, 400f, 520f, 11f, Element.ALIGN_CENTER);
             ct.Go();
 
-            text = new Phrase("QTY SHIPPED \\\nQTE EXPEDIEE", new Font(boldFont, 10));
+            text = new Phrase("QTY SHIPPED \\\nQTE EXPEDIEE", new Font(boldFont, 10, Font.NORMAL, white));
             ct.SetSimpleColumn(text, 400f, 480f, 480f, 520f, 11f, Element.ALIGN_CENTER);
             ct.Go();
 
-            text = new Phrase("VENDOR SKU \\\nNO D'ARTICLE DU\nFOURNISSEUR", new Font(boldFont, 10));
+            text = new Phrase("VENDOR SKU \\\nNO D'ARTICLE DU\nFOURNISSEUR", new Font(boldFont, 10, Font.NORMAL, white));
             ct.SetSimpleColumn(text, 480f, 480f, doc.PageSize.Width - 40f, 520f, 11f, Element.ALIGN_CENTER);
             ct.Go();
 
             // item addition
+            draw.SetColorStroke(black);
             draw.SetLineWidth(0.25f);
             float height = 480f;
 
@@ -294,19 +307,13 @@ namespace Order_Manager.channel.giantTiger
             // draw box
             draw.MoveTo(40f, 250f);
             draw.LineTo(doc.PageSize.Width - 40f, 250f);
-            draw.Stroke();
-            draw.MoveTo(doc.PageSize.Width - 40f, 250f);
             draw.LineTo(doc.PageSize.Width - 40f, 235f);
-            draw.Stroke();
-            draw.MoveTo(doc.PageSize.Width - 40f, 235f);
             draw.LineTo(40f, 235f);
-            draw.Stroke();
-            draw.MoveTo(40f, 235f);
             draw.LineTo(40f, 250f);
-            draw.Stroke();
+            draw.ClosePathFillStroke();
 
             // message in the box
-            text = new Phrase("Thank you for ordering from Giant Tiger!        Merci d'avoir place une commande chez Tigre Geant!", new Font(boldFont, 10f));
+            text = new Phrase("Thank you for ordering from Giant Tiger!        Merci d'avoir place une commande chez Tigre Geant!", new Font(boldFont, 10f, Font.NORMAL, white));
             ct.SetSimpleColumn(text, 40f, 224f, doc.PageSize.Width - 40f, 239f, 0f, Element.ALIGN_CENTER);
             ct.Go();
             #endregion

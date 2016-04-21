@@ -151,6 +151,7 @@
     <EmbeddedResource Include="supportingClasses\ConfirmPanel.resx">
       <DependentUpon>ConfirmPanel.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="image\Thumbs.db" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -167,7 +168,21 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="Ashlin.ico" />
+    <Content Include="image\Ashlin.ico" />
+    <Content Include="image\AshlinIcon.png" />
+    <Content Include="image\back.png" />
+    <Content Include="image\box.png" />
+    <Content Include="image\delivery.png" />
+    <Content Include="image\end of day.png" />
+    <Content Include="image\giant tiger.jpg" />
+    <Content Include="image\giantTiger.png" />
+    <Content Include="image\house.png" />
+    <Content Include="image\money.png" />
     <Content Include="image\refresh.png" />
+    <Content Include="image\sears.png" />
+    <Content Include="image\shopCa.jpg" />
+    <Content Include="image\shopca.png" />
+    <Content Include="image\thunder.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
