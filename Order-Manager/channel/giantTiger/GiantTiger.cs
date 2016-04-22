@@ -46,7 +46,7 @@ namespace Order_Manager.channel.giantTiger
             #endregion
 
             // get credentials for giant tiger ftp log on and initialize the field
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.ASCMcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.AscmCon))
             {
                 SqlCommand command = new SqlCommand("SELECT Field1_Value, Field2_Value, Field3_Value FROM ASCM_Credentials WHERE Source = 'Vendornet' and Client = 'GiantTiger'", connection);
                 connection.Open();
@@ -85,7 +85,7 @@ namespace Order_Manager.channel.giantTiger
             List<GiantTigerValues> list = new List<GiantTigerValues>();
             DataTable table = new DataTable();
 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT PoNumber, WebOrderNo, OrderDate, ShipMethod, ShipToFirstName, ShipToLastName, ShipToStreet, ShipToAddress2, ShipToCity, ShipToZip, ShipToPhone, " +
                                                     "ShipToStoreNumber, OmsOrderNumber " +
@@ -139,7 +139,7 @@ namespace Order_Manager.channel.giantTiger
             List<GiantTigerValues> list = new List<GiantTigerValues>();
 
             // grab all shipped 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 string date = DateTime.Today.ToString("yyyy-MM-dd");
                 SqlCommand command = new SqlCommand("SELECT PoNumber, TrackingNumber, SelfLink FROM GiantTiger_Order " +
@@ -171,7 +171,7 @@ namespace Order_Manager.channel.giantTiger
         /* a method that mark the order as shipped but not posting a confirm order to giant tiger only for local reference */
         public void PostShip(string trackingNumber, string selfLink, string labelLink, string poNumber)
         {
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("UPDATE GiantTiger_Order SET TrackingNumber = \'" + trackingNumber + "\', SelfLink = \'" + selfLink + "\', LabelLink = \'" + labelLink + "\', "
                                                   + "ShipDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\' WHERE PoNumber = \'" + poNumber + '\'', connection);
@@ -184,7 +184,7 @@ namespace Order_Manager.channel.giantTiger
         public void PostShip(bool endOfDay, DateTime shipDate)
         {
             string date = shipDate.ToString("yyyy-MM-dd");
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("UPDATE GiantTiger_Order SET EndofDay = \'" + endOfDay + "\' WHERE ShipDate = \'" + date + "\' OR CompleteDate = \'" + date + '\'', connection);
                 connection.Open();
@@ -200,7 +200,7 @@ namespace Order_Manager.channel.giantTiger
             candidate = candidate.Remove(candidate.Length - 1) + ')';
 
             // update to not shipped 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 // for entire order cancellation
                 SqlCommand command = new SqlCommand("UPDATE GiantTiger_Order SET TrackingNumber = '', SelfLink = '', LabelLink = '', ShipDate = NULL WHERE PoNumber IN " + candidate, connection);
@@ -216,7 +216,7 @@ namespace Order_Manager.channel.giantTiger
         {
             int count;
 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT COUNT(*) FROM GiantTiger_Order WHERE OrderDate = \'" + time.ToString("yyyy-MM-dd") + '\'', connection);
                 connection.Open();
@@ -230,7 +230,7 @@ namespace Order_Manager.channel.giantTiger
         {
             int count;
 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT COUNT(*) FROM GiantTiger_Order WHERE Complete = 'True' AND OrderDate = \'" + time.ToString("yyyy-MM-dd") + '\'', connection);
                 connection.Open();
@@ -319,7 +319,7 @@ namespace Order_Manager.channel.giantTiger
         {
             // get all complete order id 
             List<string> completeOrderList = new List<string>();
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT PoNumber FROM GiantTiger_Order", connection);
                 connection.Open();
@@ -338,7 +338,7 @@ namespace Order_Manager.channel.giantTiger
         public void GenerateCsv(GiantTigerValues value, Dictionary<int, string> cancelList)
         {
             // fields for database update
-            SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs);
+            SqlConnection connection = new SqlConnection(Credentials.OrderHubCon);
             SqlCommand command = new SqlCommand { Connection = connection };
             connection.Open();
 
@@ -537,7 +537,7 @@ namespace Order_Manager.channel.giantTiger
             // local field for storing values
             GiantTigerValues value = new GiantTigerValues();
 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT PoNumber, WebOrderNo, OrderDate, ShipMethod, ShipToFirstName, ShipToLastName, ShipToStreet, ShipToAddress2, ShipToCity, ShipToState, ShipToZip, ShipToPhone, " +
                                                     "ShipToStoreNumber, OmsOrderNumber, TrackingNumber, SelfLink, LabelLink " +
@@ -586,7 +586,7 @@ namespace Order_Manager.channel.giantTiger
         /* a method that add a new order to database */
         private static void AddNewOrder(GiantTigerValues value)
         {
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 // add new order to database
                 string firstName = value.ShipTo.Name.Remove(value.ShipTo.Name.IndexOf(' '));
@@ -613,7 +613,7 @@ namespace Order_Manager.channel.giantTiger
         public void Delete()
         {
             #region Database Delete
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 // get all the transaction id that are obsolete
                 SqlCommand command = new SqlCommand("SELECT PoNumber FROM GiantTiger_Order WHERE CompleteDate < \'" + DateTime.Today.AddDays(-120).ToString("yyyy-MM-dd") + '\'', connection);

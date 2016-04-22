@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -24,11 +23,11 @@ namespace Order_Manager.supportingClasses.Shipment
         public CanadaPost()
         {
             // get credentials from database
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.ASCMcs))
+            using (var connection = new System.Data.SqlClient.SqlConnection(Credentials.AscmCon))
             {
-                SqlCommand command = new SqlCommand("SELECT Field1_Value, Field2_Value, Field3_Value, Field4_Value FROM ASCM_Credentials WHERE Source = 'Canada Post' and Client = 'ASHLIN-BPG MARKETING Inc.'", connection);
+                var command = new System.Data.SqlClient.SqlCommand("SELECT Field1_Value, Field2_Value, Field3_Value, Field4_Value FROM ASCM_Credentials WHERE Source = 'Canada Post' and Client = 'ASHLIN-BPG MARKETING Inc.'", connection);
                 connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
+                var reader = command.ExecuteReader();
                 reader.Read();
 
                 // allocate data

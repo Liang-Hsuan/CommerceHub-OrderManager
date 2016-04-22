@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -30,18 +29,19 @@ namespace Order_Manager.channel.brightpearl
         public BPconnect()
         {
             // initialize API authentication
-            SqlConnection authenticationConnection = new SqlConnection(Properties.Settings.Default.ASCMcs);
-            SqlCommand getAuthetication = new SqlCommand("SELECT Field3_Value, Field1_Value FROM ASCM_Credentials WHERE Source = 'Brightpearl'", authenticationConnection);
-            authenticationConnection.Open();
-            SqlDataReader reader = getAuthetication.ExecuteReader();
-            reader.Read();
-            string appRef = reader.GetString(0);
-            string appToken = reader.GetString(1);
-            authenticationConnection.Close();
+            using (var authCon = new System.Data.SqlClient.SqlConnection(Credentials.AscmCon))
+            {
+                var auth = new System.Data.SqlClient.SqlCommand("SELECT Field3_Value, Field1_Value FROM ASCM_Credentials WHERE Source = 'Brightpearl'", authCon);
+                authCon.Open();
+                var reader = auth.ExecuteReader();
+                reader.Read();
+                string appRef = reader.GetString(0);
+                string appToken = reader.GetString(1);
 
-            // initializes request fields
-            get = new GetRequest(appRef, appToken);
-            post = new PostRequest(appRef, appToken);
+                // initializes request fields
+                get = new GetRequest(appRef, appToken);
+                post = new PostRequest(appRef, appToken);
+            }
         }
 
         /* a method that post sears order to brightpearl on sears account */

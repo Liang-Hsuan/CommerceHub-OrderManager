@@ -720,7 +720,7 @@ namespace Order_Manager.mainForms
             pstTextbox.Text = price.ToString(CultureInfo.InvariantCulture);
 
             // other fee
-            price = value.LineHandling.Sum();
+            price = value.LineShipping.Sum() + value.LineHandling.Sum();
             otherFeeTextbox.Text = price.ToString(CultureInfo.InvariantCulture);
 
             // total 

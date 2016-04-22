@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Net;
@@ -28,11 +27,11 @@ namespace Order_Manager.supportingClasses.Shipment
         public Ups()
         {
             // get credentials from database
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.ASCMcs))
+            using (var connection = new System.Data.SqlClient.SqlConnection(Credentials.AscmCon))
             {
-                SqlCommand command = new SqlCommand("SELECT Username, [Password], Field1_Value, Field2_Value, Field3_Value FROM ASCM_Credentials WHERE Source = 'UPS'", connection);
+                var command = new System.Data.SqlClient.SqlCommand("SELECT Username, [Password], Field1_Value, Field2_Value, Field3_Value FROM ASCM_Credentials WHERE Source = 'UPS'", connection);
                 connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
+                var reader = command.ExecuteReader();
                 reader.Read();
 
                 // allocate data

@@ -47,7 +47,7 @@ namespace Order_Manager.channel.shop.ca
             #endregion
 
             // get credentials for shop.ca sftp log on and initialize the field
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.ASCMcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.AscmCon))
             {
                 SqlCommand command = new SqlCommand("SELECT Field1_Value, Username, Password From ASCM_Credentials WHERE Source='Shop.ca - SFTP';", connection);
                 connection.Open();
@@ -89,7 +89,7 @@ namespace Order_Manager.channel.shop.ca
             List<ShopCaValues> list = new List<ShopCaValues>();
             DataTable table = new DataTable();
 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT OrderId, SupplierId, StoreName, OrderCreateDate, GrandTotal, TotalPrice, TotalTax, TotalShippingCost, TotalDiscount, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, " +
                                                     "ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, OptionIn, ShippingMethod " +
@@ -162,7 +162,7 @@ namespace Order_Manager.channel.shop.ca
             List<ShopCaValues> list = new List<ShopCaValues>();
 
             // grab all shipped 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 string date = DateTime.Today.ToString("yyyy-MM-dd");
                 SqlCommand command = new SqlCommand("SELECT OrderId, TrackingNumber, SelfLink FROM ShopCa_Order " +
@@ -194,7 +194,7 @@ namespace Order_Manager.channel.shop.ca
         /* a method that mark the order as shipped but not posting a confirm order to shop.ca only for local reference */
         public void PostShip(string trackingNumber, string selfLink, string labelLink, string orderId)
         {
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET TrackingNumber = \'" + trackingNumber + "\', SelfLink = \'" + selfLink + "\', LabelLink = \'" + labelLink + "\', "
                                                   + "ShipDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\' WHERE OrderId = \'" + orderId + '\'', connection);
@@ -207,7 +207,7 @@ namespace Order_Manager.channel.shop.ca
         public void PostShip(bool endOfDay, DateTime shipDate)
         {
             string date = shipDate.ToString("yyyy-MM-dd");
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET EndofDay = \'" + endOfDay + "\' WHERE ShipDate = \'" + date + "\' OR CompleteDate = \'" + date + '\'', connection);
                 connection.Open();
@@ -223,7 +223,7 @@ namespace Order_Manager.channel.shop.ca
             candidate = candidate.Remove(candidate.Length - 1) + ')';
 
             // update to not shipped 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 // for entire order cancellation
                 SqlCommand command = new SqlCommand("UPDATE ShopCa_Order SET TrackingNumber = '', SelfLink = '', LabelLink = '', ShipDate = NULL WHERE OrderId IN " + candidate, connection);
@@ -239,7 +239,7 @@ namespace Order_Manager.channel.shop.ca
         {
             int count;
 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT COUNT(*) FROM ShopCa_Order WHERE OrderCreateDate = \'" + time.ToString("yyyy-MM-dd") + '\'', connection);
                 connection.Open();
@@ -253,7 +253,7 @@ namespace Order_Manager.channel.shop.ca
         {
             int count;
 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT COUNT(*) FROM ShopCa_Order WHERE Complete = 'True' AND OrderCreateDate = \'" + time.ToString("yyyy-MM-dd") + '\'', connection);
                 connection.Open();
@@ -350,7 +350,7 @@ namespace Order_Manager.channel.shop.ca
         {
             // get all complete order id 
             List<string> completeOrderList = new List<string>();
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT OrderId FROM ShopCa_Order", connection);
                 connection.Open();
@@ -373,7 +373,7 @@ namespace Order_Manager.channel.shop.ca
                          "supplier_id\tstore_name\torder_id\torder_item_id\titem_state\titem_state_date\tcarrier_code\tcarrier_name\tshipping_method\ttracking_number\texpected_shipping_date\tcancel_reason\tfulfillment_center_name\tfullfillment_center_address1\tfullfillment_center_address2\tfullfillment_center_city\tfullfillment_center_postalcode\tfullfillment_center_country\tbackorder_replacement_sku\tbackorder_replacement_sku_title\tbackorder_replacement_sku_price\tsupplier_order_number\treturn_grade\treturn_instructions_confirmation\trma_number\trecovery_amount\n";
 
             // fields for database update
-            SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs);
+            SqlConnection connection = new SqlConnection(Credentials.OrderHubCon);
             SqlCommand command = new SqlCommand {Connection = connection};
             connection.Open();
 
@@ -616,7 +616,7 @@ namespace Order_Manager.channel.shop.ca
             // local field for storing values
             ShopCaValues value = new ShopCaValues();
 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT OrderId, SupplierId, StoreName, OrderCreateDate, GrandTotal, TotalPrice, TotalTax, TotalShippingCost, TotalDiscount, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, " 
                                                   + "ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, OptionIn, ShippingMethod, TrackingNumber, SelfLink, LabelLink " 
@@ -682,7 +682,7 @@ namespace Order_Manager.channel.shop.ca
         /* a method that add a new order to database */
         private static void AddNewOrder(ShopCaValues value)
         {
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 // add new order to database
                 SqlCommand command = new SqlCommand("INSERT INTO ShopCa_Order " +
@@ -709,7 +709,7 @@ namespace Order_Manager.channel.shop.ca
         public void Delete()
         {
             #region Database Delete
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 // get all the transaction id that are obsolete
                 SqlCommand command = new SqlCommand("SELECT OrderId FROM ShopCa_Order WHERE CompleteDate < \'" + DateTime.Today.AddDays(-120).ToString("yyyy-MM-dd") + '\'', connection);

@@ -46,7 +46,7 @@ namespace Order_Manager.channel.sears
             #endregion
 
             // get credentials for sears sftp log on and initialize the field
-            using (SqlConnection authCon = new SqlConnection(Properties.Settings.Default.ASCMcs))
+            using (SqlConnection authCon = new SqlConnection(Credentials.AscmCon))
             {
                 SqlCommand command = new SqlCommand("SELECT Field1_Value, Field2_Value, Field3_Value FROM ASCM_Credentials WHERE Source = 'CommerceHub' and Client = 'Sears'", authCon);
                 authCon.Open();
@@ -88,7 +88,7 @@ namespace Order_Manager.channel.sears
             List<SearsValues> list = new List<SearsValues>();
             DataTable table = new DataTable();
 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT TransactionId, LineCount, PoNumber, TrxBalanceDue, ServiceLevel, OrderDate, paymentMethod, CustOrderNumber, CustOrderDate, PackSlipmessage, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, " +
                                                     "RecipientName, RecipientAddress1, RecipientAddress2, RecipientCity, RecipientState, RecipientPostalCode, RecipientPhone, ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, FreightLane, Spur " +
@@ -134,10 +134,9 @@ namespace Order_Manager.channel.sears
                     value.FreightLane = reader.GetString(31);
                     value.Spur = reader.GetString(32);
 
-                    SqlDataAdapter adatper = new SqlDataAdapter("SELECT LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, LineHandling, " +
-                                                                "ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions " +
-                                                                "FROM Sears_Order_Item WHERE TransactionId = \'" + transactionId + "\' ORDER BY MerchantLineNumber", connection);
-                    
+                    SqlDataAdapter adatper = new SqlDataAdapter("SELECT LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, " +
+                                                                "LineShipping, LineHandling, ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions " +
+                                                                "FROM Sears_Order_Item WHERE TransactionId = \'" + transactionId + "\' ORDER BY MerchantLineNumber", connection);     
                     adatper.Fill(table);
 
                     for (int i = 0; i < table.Rows.Count; i++)
@@ -152,18 +151,18 @@ namespace Order_Manager.channel.sears
                         value.Description.Add(table.Rows[i][7].ToString());
                         value.Description2.Add(table.Rows[i][8].ToString());
                         value.UnitPrice.Add(Convert.ToDouble(table.Rows[i][9]));
-                        value.LineHandling.Add(Convert.ToDouble(table.Rows[i][10]));
-                        value.ExpectedShipDate.Add(Convert.ToDateTime(table.Rows[i][11]));
-                        value.GstHstExtended.Add(Convert.ToDouble(table.Rows[i][12]));
-                        value.PstExtended.Add(Convert.ToDouble(table.Rows[i][13]));
-                        value.GstHstTotal.Add(Convert.ToDouble(table.Rows[i][14]));
-                        value.PstTotal.Add(Convert.ToDouble(table.Rows[i][15]));
-                        value.EncodedPrice.Add(table.Rows[i][16].ToString());
-                        value.ReceivingInstructions.Add(table.Rows[i][17].ToString());
+                        value.LineShipping.Add(Convert.ToDouble(table.Rows[i][10]));
+                        value.LineHandling.Add(Convert.ToDouble(table.Rows[i][11]));
+                        value.ExpectedShipDate.Add(Convert.ToDateTime(table.Rows[i][12]));
+                        value.GstHstExtended.Add(Convert.ToDouble(table.Rows[i][13]));
+                        value.PstExtended.Add(Convert.ToDouble(table.Rows[i][14]));
+                        value.GstHstTotal.Add(Convert.ToDouble(table.Rows[i][15]));
+                        value.PstTotal.Add(Convert.ToDouble(table.Rows[i][16]));
+                        value.EncodedPrice.Add(table.Rows[i][17].ToString());
+                        value.ReceivingInstructions.Add(table.Rows[i][18].ToString());
                     }
 
                     table.Reset();
-
                     list.Add(value);
                 }
             }
@@ -178,7 +177,7 @@ namespace Order_Manager.channel.sears
             List<SearsValues> list = new List<SearsValues>();
 
             // grab all shipped 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 string date = DateTime.Today.ToString("yyyy-MM-dd");
                 SqlCommand command = new SqlCommand("SELECT TransactionId, TrackingNumber, ShipmentIdentificationNumber FROM Sears_Order " +
@@ -210,7 +209,7 @@ namespace Order_Manager.channel.sears
         /* a method that mark the order as shipped but not readlly posting a confirm order to sears only for local reference */
         public void PostShip(string trackingNumber, string shipmentIdentificationNumber, string transactionId)
         {
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("UPDATE Sears_Order SET TrackingNumber = \'" + trackingNumber + "\', ShipmentIdentificationNumber = \'" + shipmentIdentificationNumber + "\', " 
                                                   + "ShipDate = \'" + DateTime.Today.ToString("yyyy-MM-dd") + "\' WHERE TransactionId = \'" + transactionId + '\'', connection);
@@ -227,7 +226,7 @@ namespace Order_Manager.channel.sears
             candidate = candidate.Remove(candidate.Length - 1) + ')';
 
             // update to not shipped 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 // for entire order cancellation
                 SqlCommand command = new SqlCommand("UPDATE Sears_Order SET TrackingNumber = '', ShipmentIdentificationNumber = '', ShipDate = NULL WHERE TransactionId IN " + candidate, connection);
@@ -243,7 +242,7 @@ namespace Order_Manager.channel.sears
         {
             int count;
 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand( "SELECT COUNT(*) FROM Sears_Order WHERE CustOrderDate = \'" + time.ToString("yyyy-MM-dd") + '\'', connection);
                 connection.Open();
@@ -257,7 +256,7 @@ namespace Order_Manager.channel.sears
         {
             int count;
 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT COUNT(*) FROM Sears_Order WHERE Complete = 'True' AND CustOrderDate = \'" + time.ToString("yyyy-MM-dd") + '\'', connection);
                 connection.Open();
@@ -364,7 +363,7 @@ namespace Order_Manager.channel.sears
 
             // get all complete transaction 
             List<string> completeTransactionList = new List<string>();
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT TransactionId FROM Sears_Order", connection);
                 connection.Open();
@@ -387,7 +386,7 @@ namespace Order_Manager.channel.sears
             value.PackageDetailId = GetPackageId();
 
             // fields for database update
-            SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs);
+            SqlConnection connection = new SqlConnection(Credentials.OrderHubCon);
             SqlCommand command = new SqlCommand {Connection = connection};
             connection.Open();
 
@@ -649,6 +648,15 @@ namespace Order_Manager.channel.sears
                     // unit cost
                     value.TrxUnitCost.Add(Convert.ToDouble(GetTarget(copy)));
 
+                    // line shipping
+                    if (copy.Contains("lineShipping"))
+                    {
+                        copy = SubstringMethod(copy, "lineShipping", 13);
+                        value.LineShipping.Add(Convert.ToDouble(GetTarget(copy)));
+                    }
+                    else
+                        value.LineShipping.Add(0);
+
                     // line handling
                     if (copy.Contains("lineHandling"))
                     {
@@ -852,7 +860,7 @@ namespace Order_Manager.channel.sears
             // local field for storing values
             SearsValues value = new SearsValues();
 
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 SqlCommand command = new SqlCommand("SELECT LineCount, PoNumber, TrxBalanceDue, ServiceLevel, OrderDate, paymentMethod, CustOrderNumber, CustOrderDate, PackSlipmessage, BillToName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToPostalCode, BillToPhone, " +
                                                     "RecipientName, RecipientAddress1, RecipientAddress2, RecipientCity, RecipientState, RecipientPostalCode, RecipientPhone, ShipToName, ShipToAddress1, ShipToAddress2, ShipToCity, ShipToState, ShipToPostalCode, ShipToPhone, PartnerPersonPlaceId, FreightLane, Spur, " + 
@@ -899,8 +907,8 @@ namespace Order_Manager.channel.sears
                 value.Package.TrackingNumber = reader.GetString(33);
                 value.Package.IdentificationNumber = reader.GetString(34);
 
-                SqlDataAdapter adatper = new SqlDataAdapter("SELECT LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, LineHandling, " +
-                                                            "ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions " +
+                SqlDataAdapter adatper = new SqlDataAdapter("SELECT LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, " +
+                                                            "LineShipping, LineHandling, ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions " +
                                                             "FROM Sears_Order_Item WHERE TransactionId = \'" + targetTransaction + "\' ORDER BY MerchantLineNumber", connection);
                 DataTable table = new DataTable();
                 adatper.Fill(table);
@@ -917,14 +925,15 @@ namespace Order_Manager.channel.sears
                     value.Description.Add(table.Rows[i][7].ToString());
                     value.Description2.Add(table.Rows[i][8].ToString());
                     value.UnitPrice.Add(Convert.ToDouble(table.Rows[i][9]));
-                    value.LineHandling.Add(Convert.ToDouble(table.Rows[i][10]));
-                    value.ExpectedShipDate.Add(Convert.ToDateTime(table.Rows[i][11]));
-                    value.GstHstExtended.Add(Convert.ToDouble(table.Rows[i][12]));
-                    value.PstExtended.Add(Convert.ToDouble(table.Rows[i][13]));
-                    value.GstHstTotal.Add(Convert.ToDouble(table.Rows[i][14]));
-                    value.PstTotal.Add(Convert.ToDouble(table.Rows[i][15]));
-                    value.EncodedPrice.Add(table.Rows[i][16].ToString());
-                    value.ReceivingInstructions.Add(table.Rows[i][17].ToString());
+                    value.LineShipping.Add(Convert.ToDouble(table.Rows[i][10]));
+                    value.LineHandling.Add(Convert.ToDouble(table.Rows[i][11]));
+                    value.ExpectedShipDate.Add(Convert.ToDateTime(table.Rows[i][12]));
+                    value.GstHstExtended.Add(Convert.ToDouble(table.Rows[i][13]));
+                    value.PstExtended.Add(Convert.ToDouble(table.Rows[i][14]));
+                    value.GstHstTotal.Add(Convert.ToDouble(table.Rows[i][15]));
+                    value.PstTotal.Add(Convert.ToDouble(table.Rows[i][16]));
+                    value.EncodedPrice.Add(table.Rows[i][17].ToString());
+                    value.ReceivingInstructions.Add(table.Rows[i][18].ToString());
                 }
             }
 
@@ -936,7 +945,7 @@ namespace Order_Manager.channel.sears
         public void Delete()
         {
             #region Database Delete
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 // get all the transaction id that are obsolete
                 SqlCommand command = new SqlCommand("SELECT TransactionId FROM Sears_Order WHERE CompleteDate < \'" + DateTime.Today.AddDays(-120).ToString("yyyy-MM-dd") + '\'', connection);
@@ -972,7 +981,7 @@ namespace Order_Manager.channel.sears
         /* a method that add a new transaction order to database */
         private static void AddNewOrder(SearsValues value)
         {
-            using (SqlConnection connection = new SqlConnection(Properties.Settings.Default.CHcs))
+            using (SqlConnection connection = new SqlConnection(Credentials.OrderHubCon))
             {
                 // add new transaction to order
                 SqlCommand command = new SqlCommand("INSERT INTO Sears_Order " +
@@ -987,9 +996,9 @@ namespace Order_Manager.channel.sears
                 for (int i = 0; i < value.LineCount; i++)
                 {
                     command.CommandText = "INSERT INTO Sears_Order_Item " +
-                                          "(TransactionId, LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, LineHandling, ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions, Shipped, Cancelled) Values" +
+                                          "(TransactionId, LineBalanceDue, MerchantLineNumber, TrxVendorSKU, TrxMerchantSKU, UPC, TrxQty, TrxUnitCost, Description1, Description2, UnitPrice, LineShipping, LineHandling, ExpectedShipDate, GST_HST_Extended, PST_Extended, GST_HST_Total, PST_Total, EncodedPrice, ReceivingInstructions, Shipped, Cancelled) Values" +
                                           "(\'" + value.TransactionId + "\'," + value.LineBalanceDue[i] + "," + value.MerchantLineNumber[i] + ",\'" + value.TrxVendorSku[i] + "\',\'" + value.TrxMerchantSku[i] + "\',\'" + value.Upc[i] + "\'," + value.TrxQty[i] + ',' + value.TrxUnitCost[i] + ",\'" + value.Description[i].Replace("'", "''") + "\',\'" + value.Description2[i].Replace("'", "''") +
-                                          "\'," + value.UnitPrice[i] + ',' + value.LineHandling[i] + ",\'" + value.ExpectedShipDate[i].ToString("yyyy-MM-dd") + "\',\'" + value.GstHstExtended[i] + "\',\'" + value.PstExtended[i] + "\',\'" + value.GstHstTotal[i] + "\',\'" + value.PstTotal[i] + "\',\'" + value.EncodedPrice[i] + "\',\'" + value.ReceivingInstructions[i] + "\','False','False')";
+                                          "\'," + value.UnitPrice[i] + ',' + value.LineShipping[i] + ',' + value.LineHandling[i] + ",\'" + value.ExpectedShipDate[i].ToString("yyyy-MM-dd") + "\',\'" + value.GstHstExtended[i] + "\',\'" + value.PstExtended[i] + "\',\'" + value.GstHstTotal[i] + "\',\'" + value.PstTotal[i] + "\',\'" + value.EncodedPrice[i] + "\',\'" + value.ReceivingInstructions[i] + "\','False','False')";
                     command.ExecuteNonQuery();
                 }
             }
@@ -1004,12 +1013,12 @@ namespace Order_Manager.channel.sears
 
             // create invoice number
             string invoice = "2002";
-            invoice += DateTime.Today.ToString("yyyyMMdd");
+            invoice += DateTime.Today.ToString("yyMMdd");
 
-            for (int i = 0; i < 3 - iterator.ToString().Length; i++)
+            for (int i = 0; i < 2 - iterator.ToString().Length; i++)
                 invoice += '0';
 
-            invoice += iterator.ToString();
+            invoice += iterator;
 
             // save iterator
             iterator++;

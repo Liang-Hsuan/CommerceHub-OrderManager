@@ -55,9 +55,9 @@ namespace Order_Manager
             // if connections are true -> open sku manager
             if (IsConnected(connection[0]) && IsConnected(connection[1]) && IsConnected(connection[2]))
             {
-                Properties.Settings.Default.CHcs = connectionString[0];
-                Properties.Settings.Default.Designcs = connectionString[1];
-                Properties.Settings.Default.ASCMcs = connectionString[2];
+                Credentials.OrderHubCon = connectionString[0];
+                Credentials.DesignCon = connectionString[1];
+                Credentials.AscmCon = connectionString[2];
                 Properties.Settings.Default.Username = userName;
                 Properties.Settings.Default.Password = password;
                 Hide();

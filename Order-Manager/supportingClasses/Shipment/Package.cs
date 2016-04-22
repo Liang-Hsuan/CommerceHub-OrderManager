@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Linq;
 using Order_Manager.channel.sears;
 using Order_Manager.channel.shop.ca;
@@ -141,13 +140,13 @@ namespace Order_Manager.supportingClasses.Shipment
             decimal[] list = new decimal[4];
 
             // [0] weight, [1] length, [2] width, [3] height
-            using (SqlConnection conneciton = new SqlConnection(Properties.Settings.Default.Designcs))
+            using (var conneciton = new System.Data.SqlClient.SqlConnection(Credentials.DesignCon))
             {
-                SqlCommand command = new SqlCommand("SELECT Weight_grams, Shippable_Height_cm, Shippable_Width_cm, Shippable_Depth_cm " +
+                var command = new System.Data.SqlClient.SqlCommand("SELECT Weight_grams, Shippable_Height_cm, Shippable_Width_cm, Shippable_Depth_cm " +
                                                     "FROM master_Design_Attributes design JOIN master_SKU_Attributes sku ON (design.Design_Service_Code = sku.Design_Service_Code) " +
                                                     "WHERE SKU_Ashlin = \'" + sku + '\'', conneciton);
                 conneciton.Open();
-                SqlDataReader reader = command.ExecuteReader();
+                var reader = command.ExecuteReader();
                 reader.Read();
 
                 // check if there is result

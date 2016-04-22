@@ -83,6 +83,7 @@
     <Compile Include="channel\shop.ca\ShopCa.cs" />
     <Compile Include="channel\shop.ca\ShopCaPackingSlip.cs" />
     <Compile Include="channel\shop.ca\ShopCaValues.cs" />
+    <Compile Include="Credentials.cs" />
     <Compile Include="Login.cs">
       <SubType>Form</SubType>
     </Compile>

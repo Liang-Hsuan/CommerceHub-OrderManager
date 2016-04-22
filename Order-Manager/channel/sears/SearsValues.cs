@@ -37,6 +37,7 @@ namespace Order_Manager.channel.sears
         public List<string> Description { get; set; }
         public List<string> Description2 { get; set; }
         public List<double> UnitPrice { get; set; }
+        public List<double> LineShipping { get; set; }
         public List<double> LineHandling { get; set; }
         public List<DateTime> ExpectedShipDate { get; set; }
         public List<double> GstHstExtended { get; set; }
@@ -81,6 +82,7 @@ namespace Order_Manager.channel.sears
             Description = new List<string>();
             Description2 = new List<string>();
             UnitPrice = new List<double>();
+            LineShipping = new List<double>();
             LineHandling = new List<double>();
             ExpectedShipDate = new List<DateTime>();
             GstHstExtended = new List<double>();
@@ -100,7 +102,7 @@ namespace Order_Manager.channel.sears
         /* second constructor that take all the parametoers */
         public SearsValues(string transactionId, int lineCount, string poNumber, double trxBalanceDue, List<double> lineBalanceDue, string vendorInvoiceNumber, List<int> merchantLineNumber, List<string> trxVendorSku,
                            List<string> trxMerchantSku, List<string> upc, List<int> trxQty, List<double> trxUnitCost, string packageDetailId, string serviceLevel1, Package package, DateTime orderDate, string paymentMethod, string custOrderNumber, DateTime custOrderDate, string packslipMessage,
-                           List<string> description, List<string> description2, List<double> unitPrice, List<double> lineHandling, List<DateTime> expectedShipDate, List<double> gstHstExtended, List<double> pstExtended, List<double> gstHstTotal, List<double> pstTotal, List<string> encodedPrice,
+                           List<string> description, List<string> description2, List<double> unitPrice, List<double> lineShipping, List<double> lineHandling, List<DateTime> expectedShipDate, List<double> gstHstExtended, List<double> pstExtended, List<double> gstHstTotal, List<double> pstTotal, List<string> encodedPrice,
                            List<string> receivingInstructions, Address billTo, Address recipient, Address shipTo, string partnerPersonPlaceId, string freightLane, string spur)
         {
             PartnerTrxId = "ashlinbpg";
@@ -129,6 +131,7 @@ namespace Order_Manager.channel.sears
             Description = description;
             Description2 = description2;
             UnitPrice = unitPrice;
+            LineShipping = lineShipping;
             LineHandling = lineHandling;
             ExpectedShipDate = expectedShipDate;
             GstHstExtended = gstHstExtended;

@@ -272,15 +272,15 @@ namespace Order_Manager.channel.sears
                             break;
                         case 'T':
                             tempTax[0] = value.GstHstExtended[i].ToString(CultureInfo.InvariantCulture);
-                            tempTax[1] = "";
+                            tempTax[1] = string.Empty;
                             break;
                         case 'P':
-                            tempTax[0] = "";
+                            tempTax[0] = string.Empty;
                             tempTax[1] = value.PstExtended[i].ToString(CultureInfo.InvariantCulture);
                             break;
                         default:
-                            tempTax[0] = "";
-                            tempTax[1] = "";
+                            tempTax[0] = string.Empty;
+                            tempTax[1] = string.Empty;
                             break;
                     }
                     text = new Phrase(tempTax[0], new Font(baseFont, 9));
@@ -310,15 +310,15 @@ namespace Order_Manager.channel.sears
                             break;
                         case 'T':
                             tempTax[0] = value.GstHstTotal[i].ToString(CultureInfo.InvariantCulture);
-                            tempTax[1] = "";
+                            tempTax[1] = string.Empty;
                             break;
                         case 'P':
-                            tempTax[0] = "";
+                            tempTax[0] = string.Empty;
                             tempTax[1] = value.PstTotal[i].ToString(CultureInfo.InvariantCulture);
                             break;
                         default:
-                            tempTax[0] = "";
-                            tempTax[1] = "";
+                            tempTax[0] = string.Empty;
+                            tempTax[1] = string.Empty;
                             break;
                     }
 
@@ -327,6 +327,9 @@ namespace Order_Manager.channel.sears
                     ct.Go();
                     text = new Phrase(value.LineHandling[i].ToString(CultureInfo.InvariantCulture), new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 252f, 513f, 293f, 528f, 0f, Element.ALIGN_LEFT);
+                    ct.Go();
+                    text = new Phrase(value.LineShipping[i].ToString(CultureInfo.InstalledUICulture), new Font(baseFont, 9));
+                    ct.SetSimpleColumn(text, 252f, 490f, 293f, 505f, 0f, Element.ALIGN_LEFT);
                     ct.Go();
                     text = new Phrase(tempTax[0], new Font(baseFont, 9));
                     ct.SetSimpleColumn(text, 252f, 478f, 293f, 493f, 0f, Element.ALIGN_LEFT);
@@ -378,7 +381,7 @@ namespace Order_Manager.channel.sears
                     ct.Go();
                     index = index + 5;
                     if (merchantSku.Length <= index)
-                        merchantSku = "";
+                        merchantSku = string.Empty;
                     else if (merchantSku[index] == ' ')
                     {
                         index++;
