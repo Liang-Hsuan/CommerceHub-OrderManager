@@ -698,7 +698,7 @@ namespace Order_Manager.mainForms
         private void ShowResult(SearsValues value)
         {
             // title bar set up
-            logoPicturebox.Image = Image.FromFile(@"..\..\image\sears.png");
+            logoPicturebox.Image = Properties.Resources.sears;
             topOrderNumberTextbox.Text = value.TransactionId;
 
             #region Order Summary
@@ -833,7 +833,7 @@ namespace Order_Manager.mainForms
         private void ShowResult(ShopCaValues value)
         {
             // title bar set up
-            logoPicturebox.Image = Image.FromFile(@"..\..\image\shopca.png");
+            logoPicturebox.Image = Properties.Resources.shopca;
             topOrderNumberTextbox.Text = value.OrderId;
 
             #region Order Summary
@@ -942,7 +942,7 @@ namespace Order_Manager.mainForms
         private void ShowResult(GiantTigerValues value)
         {
             // title bar set up
-            logoPicturebox.Image = Image.FromFile(@"..\..\image\giantTiger.png");
+            logoPicturebox.Image = Properties.Resources.giantTiger;
             topOrderNumberTextbox.Text = value.PoNumber;
 
             #region Order Summary
@@ -952,7 +952,7 @@ namespace Order_Manager.mainForms
             shipByDateTextbox.Text = DateTime.Today.ToString("MM/dd/yyyy");
 
             // unit price
-            unitPriceTotalTextbox.Text = value.UnitCost.Sum().ToString();
+            unitPriceTotalTextbox.Text = value.UnitCost.Sum().ToString(CultureInfo.InvariantCulture);
 
             // GST and HST
             gsthstTextbox.Text = "0.00";

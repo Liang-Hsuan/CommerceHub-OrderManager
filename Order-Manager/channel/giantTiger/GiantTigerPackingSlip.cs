@@ -37,7 +37,7 @@ namespace Order_Manager.channel.giantTiger
 
             #region Logo and Barcode Set Up
             // add giant tiger logo
-            Image logo = Image.GetInstance(@"..\..\image\giant tiger.jpg");
+            Image logo = Image.GetInstance(Properties.Resources.giantTigerPackSlip, System.Drawing.Imaging.ImageFormat.Png);
             logo.ScalePercent(20f);
             logo.SetAbsolutePosition(40f, doc.PageSize.Height - 100f);
             doc.Add(logo);

@@ -1,6 +1,7 @@
 ﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 
@@ -35,7 +36,7 @@ namespace Order_Manager.channel.shop.ca
 
             #region Logo and Lines Set Up
             // add shop.ca logo
-            Image logo = Image.GetInstance(@"..\..\image\shopCa.jpg");
+            Image logo = Image.GetInstance(Properties.Resources.shopcaPackSlip, ImageFormat.Png);
             logo.ScalePercent(15f);
             logo.SetAbsolutePosition(40f, doc.PageSize.Height - 60f);
             doc.Add(logo);
