@@ -637,7 +637,7 @@ namespace Order_Manager.channel.sears
                     ct.Go();
                     index = index + 5;
                     if (merchantSku.Length <= index)
-                        merchantSku = "";
+                        merchantSku = string.Empty;
                     else if (merchantSku[index] == ' ')
                     {
                         index++;

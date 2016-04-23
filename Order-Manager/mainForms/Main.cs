@@ -433,7 +433,7 @@ namespace Order_Manager.mainForms
                 ListViewItem item = new ListViewItem("Sears");
 
                 TimeSpan span = timeNow.Subtract(value.CustOrderDate);
-                item.SubItems.Add(span.Days + "d " + span.Hours + "h");
+                item.SubItems.Add(span.Days + "d " + span.Hours + 'h');
 
                 if (value.LineCount > 1)
                 {
@@ -469,7 +469,7 @@ namespace Order_Manager.mainForms
                 ListViewItem item = new ListViewItem("Shop.ca");
 
                 TimeSpan span = timeNow.Subtract(value.OrderCreateDate);
-                item.SubItems.Add(span.Days + "d " + span.Hours + "h");
+                item.SubItems.Add(span.Days + "d " + span.Hours + 'h');
 
                 if (value.OrderItemId.Count > 1)
                 {
@@ -505,7 +505,7 @@ namespace Order_Manager.mainForms
                 ListViewItem item = new ListViewItem("Giant Tiger");
 
                 TimeSpan span = timeNow.Subtract(value.OrderDate);
-                item.SubItems.Add(span.Days + "d " + span.Hours + "h");
+                item.SubItems.Add(span.Days + "d " + span.Hours + 'h');
 
                 if (value.VendorSku.Count > 1)
                 {

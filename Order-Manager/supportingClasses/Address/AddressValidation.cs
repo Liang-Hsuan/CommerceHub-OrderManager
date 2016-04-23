@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Web.Script.Serialization;
 
 namespace Order_Manager.supportingClasses.Address
 {
@@ -38,7 +37,7 @@ namespace Order_Manager.supportingClasses.Address
                 result = streamReader.ReadToEnd();
 
             // deserialize json to key value
-            var info = new JavaScriptSerializer().Deserialize<Dictionary<string, dynamic>>(result);
+            var info = new System.Web.Script.Serialization.JavaScriptSerializer().Deserialize<Dictionary<string, dynamic>>(result);
 
             // only has 1 result will be the correct value
             return info["results"].Count == 1;

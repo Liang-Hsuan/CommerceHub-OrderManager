@@ -50,7 +50,7 @@ namespace Order_Manager.supportingClasses.Shipment
 
             // create http post request
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-            request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(USER_ID + ":" + PASSWORD)));
+            request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(USER_ID + ':' + PASSWORD)));
             request.Method = "POST";
             request.ContentType = "application/vnd.cpc.shipment-v8+xml";
             request.Accept = "application/vnd.cpc.shipment-v8+xml";

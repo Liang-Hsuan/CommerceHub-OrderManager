@@ -390,7 +390,7 @@ namespace Order_Manager.channel.shop.ca
                     txt += "Cancelled\t" + DateTime.Today.ToString("yyyy-MM-dd") + "\t\t\t\t\t\t" + cancelList[i] + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n";
 
                     // update item to cancelled to database
-                    command.CommandText = "UPDATE ShopCa_Order_Item SET Cancelled = 'True' WHERE OrderItemId = \'" + value.OrderItemId[i] + "\'";
+                    command.CommandText = "UPDATE ShopCa_Order_Item SET Cancelled = 'True' WHERE OrderItemId = \'" + value.OrderItemId[i] + '\'';
                     command.ExecuteNonQuery();
                 }
                 else

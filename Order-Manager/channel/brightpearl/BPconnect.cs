@@ -435,8 +435,15 @@ namespace Order_Manager.channel.brightpearl
                     // get address id to get postal code
                     string address = info["response"][i]["postAddressIds"]["DEF"].ToString();
 
-                    // get postal code
-                    address = info["response"][0]["postalAddresses"][address]["postalCode"];
+                    try
+                    {
+                        // get postal code
+                        address = info["response"][0]["postalAddresses"][address]["postalCode"];
+                    }
+                    catch
+                    {
+                        return null;
+                    }
 
                     if (string.Equals(postalCode.Replace(" ", string.Empty), address.Replace(" ", string.Empty), StringComparison.CurrentCultureIgnoreCase))
                         return list[i];
