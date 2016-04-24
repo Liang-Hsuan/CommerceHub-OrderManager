@@ -183,8 +183,8 @@ namespace Order_Manager.mainForms
                 }
                 else
                 {
-                    item.SubItems[5].Text = "";
-                    item.SubItems[6].Text = "";
+                    item.SubItems[5].Text = string.Empty;
+                    item.SubItems[6].Text = string.Empty;
                 }
 
             }
@@ -197,7 +197,7 @@ namespace Order_Manager.mainForms
             }
             else
             {
-                listview.Columns[6].Text = "";
+                listview.Columns[6].Text = string.Empty;
                 reasonCombobox.Visible = false;
                 setReasonButton.Visible = false;
             }
@@ -514,8 +514,8 @@ namespace Order_Manager.mainForms
                     new Sears().PostVoid(new[] { searsValues.TransactionId });
 
                     // set tracking and identification to nothing
-                    searsValues.Package.IdentificationNumber = "";
-                    searsValues.Package.TrackingNumber = "";
+                    searsValues.Package.IdentificationNumber = string.Empty;
+                    searsValues.Package.TrackingNumber = string.Empty;
 
                     break;
                     #endregion
@@ -537,9 +537,9 @@ namespace Order_Manager.mainForms
                         new ShopCa().PostVoid(new[] { shopCaValues.OrderId });
 
                         // set tracking, self link, label link to nothing
-                        shopCaValues.Package.TrackingNumber = "";
-                        shopCaValues.Package.SelfLink = "";
-                        shopCaValues.Package.LabelLink = "";
+                        shopCaValues.Package.TrackingNumber = string.Empty;
+                        shopCaValues.Package.SelfLink = string.Empty;
+                        shopCaValues.Package.LabelLink = string.Empty;
                     }
                     break;
                 #endregion
@@ -561,9 +561,9 @@ namespace Order_Manager.mainForms
                         new GiantTiger().PostVoid(new[] { giantTigerValues.PoNumber });
 
                         // set tracking, self link, label link to nothing
-                        giantTigerValues.Package.TrackingNumber = "";
-                        giantTigerValues.Package.SelfLink = "";
-                        giantTigerValues.Package.LabelLink = "";
+                        giantTigerValues.Package.TrackingNumber = string.Empty;
+                        giantTigerValues.Package.SelfLink = string.Empty;
+                        giantTigerValues.Package.LabelLink = string.Empty;
                     }
                     break;
                     #endregion

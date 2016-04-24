@@ -67,11 +67,8 @@ namespace Order_Manager.channel.shop.ca
             IEnumerable<string> orderCheck = CheckOrderFile();
             GetOrder(newOrderDir, orderCheck);
 
-            // read all the text of the file in the local directory
-            Dictionary<string,string> dic = GetOrderFileText();
-
             // return the transaction that haved not been processed
-            dic = GetOrderId(dic);
+            Dictionary<string, string> dic = GetOrderId();
             dic = CheckOrder(dic);
 
             // get information for each unprocessed order and update the them to the database
@@ -296,36 +293,29 @@ namespace Order_Manager.channel.shop.ca
             return (from object item in list select item.ToString()).ToArray();
         }
 
-        /* method that get all the order in the file with the given dictionary <filePath, text> and return dictionary <orderId, filepath> */
-        private static Dictionary<string, string> GetOrderId(Dictionary<string, string> fileText)
-        {
-            // local field for storing data and xml processing
-            Dictionary<string, string> list = new Dictionary<string, string>();
-            XmlDocument doc = new XmlDocument();
-
-            // get all order id and its path
-            foreach (KeyValuePair<string, string> keyValue in fileText)
-            {
-                // load xml text
-                doc.LoadXml(keyValue.Value);
-
-                // get all order id in the file
-                foreach (XmlNode parent in doc.DocumentElement.SelectSingleNode("/shop_ca_feed"))
-                    list.Add(parent["order_id"].InnerText, keyValue.Key);
-            }
-
-            return list;
-        }
-
-        /* method that return all the text of order xml feed with dictionary <filePath, text> */
-        private Dictionary<string, string> GetOrderFileText()
+        /* method that return <orderId, filepath> */
+        private Dictionary<string, string> GetOrderId()
         {
             // get all the order file on local
             DirectoryInfo dirInfo = new DirectoryInfo(newOrderDir);
             FileInfo[] filesLocal = dirInfo.GetFiles("*.xml");       // getting all file that have been on local
 
-            // read all the text of the file in the local directory and add the path for the file
-            return filesLocal.ToDictionary(file => newOrderDir + "\\" + file, file => File.ReadAllText(newOrderDir + "\\" + file));
+            // local field for storing data and xml processing
+            Dictionary<string, string> list = new Dictionary<string, string>();
+            XmlDocument doc = new XmlDocument();
+
+            // get all order id and its path
+            foreach (FileInfo file in filesLocal)
+            {
+                // load xml text
+                doc.Load(file.FullName);
+
+                // get all order id in the file
+                foreach (XmlNode parent in doc.DocumentElement.SelectSingleNode("/shop_ca_feed"))
+                    list.Add(parent["order_id"].InnerText, file.FullName);
+            }
+
+            return list;
         }
         #endregion
 
