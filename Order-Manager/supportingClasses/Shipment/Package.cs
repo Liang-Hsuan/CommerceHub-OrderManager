@@ -143,8 +143,8 @@ namespace Order_Manager.supportingClasses.Shipment
             using (var conneciton = new System.Data.SqlClient.SqlConnection(Credentials.DesignCon))
             {
                 var command = new System.Data.SqlClient.SqlCommand("SELECT Weight_grams, Shippable_Height_cm, Shippable_Width_cm, Shippable_Depth_cm " +
-                                                    "FROM master_Design_Attributes design JOIN master_SKU_Attributes sku ON (design.Design_Service_Code = sku.Design_Service_Code) " +
-                                                    "WHERE SKU_Ashlin = \'" + sku + '\'', conneciton);
+                                                                   "FROM master_Design_Attributes design JOIN master_SKU_Attributes sku ON (design.Design_Service_Code = sku.Design_Service_Code) " +
+                                                                   "WHERE SKU_Ashlin = \'" + sku + '\'', conneciton);
                 conneciton.Open();
                 var reader = command.ExecuteReader();
                 reader.Read();

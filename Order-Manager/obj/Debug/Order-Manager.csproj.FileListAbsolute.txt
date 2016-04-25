@@ -79,3 +79,18 @@ C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Man
 C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\obj\Debug\Order_Manager.mainForms.ShipmentPage.resources
 C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\obj\Debug\Order_Manager.supportingClasses.ConfirmPanel.resources
 C:\Users\Intern1001\Desktop\W16_Intern\Visual Studio project\workplace\Order-Manager\Order-Manager\obj\Debug\Order-Manager.csproj.GenerateResource.Cache
+V:\Project\Real Projects\Order-Manager\Order-Manager\bin\Debug\Order-Manager.exe
+V:\Project\Real Projects\Order-Manager\Order-Manager\bin\Debug\Order-Manager.pdb
+V:\Project\Real Projects\Order-Manager\Order-Manager\bin\Debug\itextsharp.dll
+V:\Project\Real Projects\Order-Manager\Order-Manager\bin\Debug\Tamir.SharpSSH.dll
+V:\Project\Real Projects\Order-Manager\Order-Manager\bin\Debug\DiffieHellman.dll
+V:\Project\Real Projects\Order-Manager\Order-Manager\bin\Debug\Org.Mentalis.Security.dll
+V:\Project\Real Projects\Order-Manager\Order-Manager\bin\Debug\itextsharp.xml
+V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order-Manager.csprojResolveAssemblyReference.cache
+V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order_Manager.Login.resources
+V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order_Manager.mainForms.DetailPage.resources
+V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order_Manager.mainForms.Main.resources
+V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order_Manager.Properties.Resources.resources
+V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order_Manager.mainForms.ShipmentPage.resources
+V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order_Manager.supportingClasses.ConfirmPanel.resources
+V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order-Manager.csproj.GenerateResource.Cache

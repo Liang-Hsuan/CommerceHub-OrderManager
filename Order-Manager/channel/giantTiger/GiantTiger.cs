@@ -374,7 +374,7 @@ namespace Order_Manager.channel.giantTiger
                             break;
                     }
 
-                    cancel[cancelIndex] = new[] {value.PoNumber, value.HostSku[i], value.Quantity[i].ToString(), cancelCode};
+                    cancel[cancelIndex] = new[] {value.PoNumber, value.ClientItemId[i], value.Quantity[i].ToString(), cancelCode};
                     cancelIndex++;
 
                     // update item to cancelled to database
@@ -384,7 +384,7 @@ namespace Order_Manager.channel.giantTiger
                     continue;
                 }
 
-                ship[shipIndex] = new[] { value.PoNumber, value.HostSku[i], value.Quantity[i].ToString(), value.ShipMethod, value.Package.TrackingNumber, GetInvoiceNumber(), "", "" };
+                ship[shipIndex] = new[] { value.PoNumber, value.ClientItemId[i], value.Quantity[i].ToString(), value.ShipMethod, value.Package.TrackingNumber, GetInvoiceNumber(), "", "" };
                 shipIndex++;
 
                 // update item to shipped to database

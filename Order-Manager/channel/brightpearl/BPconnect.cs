@@ -127,7 +127,8 @@ namespace Order_Manager.channel.brightpearl
                 #endregion
 
                 // initialize BPvalues object -> no need total paid ( this is unit cost & no recipt )
-                BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSku[i], value.Description[i], value.TrxQty[i], value.TrxUnitCost[i], value.TrxUnitCost[i] * tax, 0);
+                double totalUnitCost = value.TrxUnitCost[i] * value.TrxQty[i];
+                BPvalues itemValue = new BPvalues(value.Recipient, null, DateTime.Today, 1, 7, value.TrxVendorSku[i], value.Description[i], value.TrxQty[i], totalUnitCost, totalUnitCost * tax, 0);
 
                 // post order row
                 string orderRowId = post.PostOrderRowRequest(orderId, itemValue);
@@ -188,7 +189,7 @@ namespace Order_Manager.channel.brightpearl
                 if (cancelList.Where(j => j == i).Any()) continue;
 
                 // initialize BPvalues object
-                BPvalues itemValue = new BPvalues(value.ShipTo, null, DateTime.Today, 15, 1, value.Sku[i], value.Title[i], value.Quantity[i], Convert.ToDouble(value.ExtendedItemPrice[i]), Convert.ToDouble(value.ItemTax[i]), 0);
+                BPvalues itemValue = new BPvalues(value.ShipTo, null, DateTime.Today, 15, 1, value.Sku[i], value.Title[i], value.Quantity[i], (double)value.ExtendedItemPrice[i], (double)value.ItemTax[i], 0);
 
                 // post order row
                 string orderRowId = post.PostOrderRowRequest(orderId, itemValue);
@@ -225,7 +226,7 @@ namespace Order_Manager.channel.brightpearl
             if (cancelList.Length >= value.VendorSku.Count)
                 return;
 
-            #region Posting Order to Shop.ca Account on BP
+            #region Posting Order to Giant Tiger Account on BP
             // initialize order BPvalues object
             BPvalues orderValue = new BPvalues(value.ShipTo, value.PoNumber, value.OrderDate, 12, 1, null, null, 0, 0, 0, 0);
 
@@ -301,7 +302,8 @@ namespace Order_Manager.channel.brightpearl
                 #endregion
 
                 // initialize BPvalues object -> no need total paid ( this is unit cost & no recipt )
-                BPvalues itemValue = new BPvalues(value.ShipTo, null, DateTime.Today, 12, 1, value.VendorSku[i], "Host SKU: " + value.HostSku[i], value.Quantity[i], value.UnitCost[i], value.UnitCost[i] * tax, 0);
+                double totalUnitCost = value.UnitCost[i] * value.Quantity[i];
+                BPvalues itemValue = new BPvalues(value.ShipTo, null, DateTime.Today, 12, 1, value.VendorSku[i], "Host SKU: " + value.HostSku[i], value.Quantity[i], totalUnitCost, totalUnitCost * tax, 0);
 
                 // post order row
                 string orderRowId = post.PostOrderRowRequest(orderId, itemValue);

@@ -171,9 +171,16 @@ namespace Order_Manager.mainForms
         /* the event for mark as cancel button click that mark the checked item to cancelled shipment */
         private void markCancelButton_Click(object sender, EventArgs e)
         {
-            int count = 0;
+            // check if the order has shipped or not -> if shipped, the user cannot change anything
+            if (trackingNumberTextbox.Text != "Not shipped" && trackingNumberTextbox.Text != "Error")
+            {
+                MessageBox.Show("You cannot change any order item cancellation after the order has shipped.\nPlease void the shipment first in order to make any changes!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             #region Listview and Buttons
+            int count = 0;
+
             foreach (ListViewItem item in listview.Items)
             {
                 if (item.Checked)
@@ -186,7 +193,6 @@ namespace Order_Manager.mainForms
                     item.SubItems[5].Text = string.Empty;
                     item.SubItems[6].Text = string.Empty;
                 }
-
             }
 
             if (count > 0)
@@ -303,13 +309,13 @@ namespace Order_Manager.mainForms
             switch (CHANNEL)
             {
                 case "Sears":
-                    searsValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
+                    searsValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), "", "", "", "");
                     break;
                 case "Shop.ca":
-                    shopCaValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
+                    shopCaValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), "", "", "", "");
                     break;
                 case "Giant Tiger":
-                    giantTigerValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), null, null, null, null);
+                    giantTigerValues.Package = new Package(weightKgUpdown.Value, lengthUpdown.Value, widthUpdown.Value, heightUpdown.Value, serviceCombobox.SelectedItem.ToString(), serviceCombobox.SelectedItem.ToString(), "", "", "", "");
                     break;
             }
 
@@ -708,7 +714,9 @@ namespace Order_Manager.mainForms
             shipByDateTextbox.Text = value.ExpectedShipDate[0].ToString("MM/dd/yyyy");
 
             // unit price
-            double price = value.UnitPrice.Sum();
+            double price = 0;
+            for (int i = 0; i < value.LineCount; i++)
+                price += value.UnitPrice[i] * value.TrxQty[i];
             unitPriceTotalTextbox.Text = price.ToString(CultureInfo.InvariantCulture);
 
             // GST and HST
@@ -952,7 +960,10 @@ namespace Order_Manager.mainForms
             shipByDateTextbox.Text = DateTime.Today.ToString("MM/dd/yyyy");
 
             // unit price
-            unitPriceTotalTextbox.Text = value.UnitCost.Sum().ToString(CultureInfo.InvariantCulture);
+            double cost = 0;
+            for (int i = 0; i < value.VendorSku.Count; i++)
+                cost += value.UnitCost[i] * value.Quantity[i];
+            unitPriceTotalTextbox.Text = cost.ToString(CultureInfo.InvariantCulture);
 
             // GST and HST
             gsthstTextbox.Text = "0.00";
@@ -964,7 +975,7 @@ namespace Order_Manager.mainForms
             otherFeeTextbox.Text = "0.00";
 
             // total 
-            totalOrderTextbox.Text = value.UnitCost.Sum().ToString(CultureInfo.InvariantCulture);
+            totalOrderTextbox.Text = cost.ToString(CultureInfo.InvariantCulture);
             #endregion
 
             #region Buyer / Recipient Info
@@ -1009,7 +1020,7 @@ namespace Order_Manager.mainForms
                 item.SubItems.Add("Host SKU: " + value.HostSku[i] + "  - Ashlin SKU: " + value.VendorSku[i]);
                 item.SubItems.Add("$ " + value.UnitCost[i]);
                 item.SubItems.Add(value.Quantity[i].ToString());
-                item.SubItems.Add("$ " + value.UnitCost[i]);
+                item.SubItems.Add("$ " + value.UnitCost[i] * value.Quantity[i]);
                 item.SubItems.Add("");
                 item.SubItems.Add("");
 

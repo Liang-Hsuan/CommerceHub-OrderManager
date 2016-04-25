@@ -275,7 +275,7 @@ namespace Order_Manager.channel.giantTiger
                 ct.Go();
 
                 // item
-                text = new Phrase(value.HostSku[i], new Font(baseFont, 10));
+                text = new Phrase(value.ClientItemId[i], new Font(baseFont, 10));
                 ct.SetSimpleColumn(text, 130f, height - 19f, 220f, height - 9f, 0f, Element.ALIGN_CENTER);
                 ct.Go();
 
@@ -313,7 +313,7 @@ namespace Order_Manager.channel.giantTiger
             draw.ClosePathFillStroke();
 
             // message in the box
-            text = new Phrase("Thank you for ordering from Giant Tiger!        Merci d'avoir place une commande chez Tigre Geant!", new Font(boldFont, 10f, Font.NORMAL, white));
+            text = new Phrase("Thank you for ordering from Giant Tiger!        Merci d’avoir placé une commande chez Tigre Géant!", new Font(boldFont, 10f, Font.NORMAL, white));
             ct.SetSimpleColumn(text, 40f, 224f, doc.PageSize.Width - 40f, 239f, 0f, Element.ALIGN_CENTER);
             ct.Go();
             #endregion
@@ -347,12 +347,11 @@ namespace Order_Manager.channel.giantTiger
             ct.Go();
 
             // message in the right box
-            text = new Phrase("Votre commande est incomplete ou vous avez des questions a son sujet?\n" +
-                              "Il se peut que vous receviez votre commande dans des envois distincts. Pour suivre l'etat de votre commande, s'il vous plait vous connecter a Mon Compte au tigregeant.com.\n\r" +
-                              "Want to Return or Exchange an Item?\n" +
-                              "Vous voulez retourner ou echanger un article?\nSi vous n'etes pas satisfait avec votre achat, veuillez communiquer avec notre service a la clientele au 1-844-99-GIANT (44268) " +
-                              "ou envoyer un courriel a aideachatenligne@tigregeant.com. Les echanges et les remboursements peuvent etre effectues a n'importe quel de nos magasins avec la presentation du courriel confirmant " +
-                              "l'expedition de votre commande. Pour consulter notre politique de retour. s'il vous plait visitez tigregeant.com/PolitiqueRetour.",
+            text = new Phrase("Votre commande est incomplète ou vous avez des questions à son sujet?\n" +
+                              "Il se peut que vous receviez votre commande dans des envois distincts. Pour suivre l'état de votre commande, s’il vous plaît vous connecter à Mon Compte au tigregeant.com.\n\r" +
+                              "Vous voulez retourner ou échanger un article?\nSi vous n'êtes pas satisfait avec votre achat, veuillez communiquer avec notre service à la clientèle au 1-844-99-GIANT (44268) " +
+                              "ou envoyer un courriel à aideachatenligne@tigregeant.com. Les échanges et les remboursements peuvent être effectués à n’importe quel de nos magasins avec la présentation du courriel confirmant " +
+                              "l'expédition de votre commande. Pour consulter notre politique de retour, s'il vous plaît visitez tigregeant.com/PolitiqueRetour.",
                               new Font(baseFont, 9f));
             ct.SetSimpleColumn(text, doc.PageSize.Width / 2 + 10f, 55f, doc.PageSize.Width - 50f, 225f, 10f, Element.ALIGN_LEFT);
             ct.Go();

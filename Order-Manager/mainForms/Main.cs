@@ -520,7 +520,10 @@ namespace Order_Manager.mainForms
 
                 item.SubItems.Add(value.PoNumber);
                 item.SubItems.Add(value.OrderDate.ToString("yyyy-MM-dd"));
-                item.SubItems.Add(value.UnitCost.Sum().ToString(CultureInfo.InvariantCulture));
+                double cost = 0;
+                for (int i = 0; i < value.VendorSku.Count; i++)
+                    cost += value.UnitCost[i] * value.Quantity[i];
+                item.SubItems.Add(cost.ToString(CultureInfo.InvariantCulture));
 
                 int total = value.Quantity.Sum();
                 item.SubItems.Add(total.ToString());
