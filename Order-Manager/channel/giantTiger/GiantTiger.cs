@@ -654,12 +654,12 @@ namespace Order_Manager.channel.giantTiger
 
             // create invoice number
             string invoice = "2001";
-            invoice += DateTime.Today.ToString("yyyyMMdd");
+            invoice += DateTime.Today.ToString("yyMMdd");
 
-            for (int i = 0; i < 3 - iterator.ToString().Length; i++)
+            for (int i = 0; i < 2 - iterator.ToString().Length; i++)
                 invoice += '0';
 
-            invoice += iterator.ToString();
+            invoice += iterator;
 
             // save iterator
             iterator++;
