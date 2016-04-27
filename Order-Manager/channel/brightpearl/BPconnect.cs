@@ -148,7 +148,7 @@ namespace Order_Manager.channel.brightpearl
                 Status = "Posting reservation request " + i;
                 if (!post.HasError) continue;
 
-                Status = "Error occur during reservation post " + i + "- Sears";
+                Status = "Error occur during reservation post " + i + " - Sears";
                 do
                 {
                     Thread.Sleep(5000);
@@ -196,7 +196,7 @@ namespace Order_Manager.channel.brightpearl
                 Status = "Getting order row ID";
                 if (post.HasError)
                 {
-                    Status = "Error occur during order row post " + i + "- Shop.ca";
+                    Status = "Error occur during order row post " + i + " - Shop.ca";
                     do
                     {
                         Thread.Sleep(5000);
@@ -209,7 +209,7 @@ namespace Order_Manager.channel.brightpearl
                 Status = "Posting reservation request " + i;
                 if (!post.HasError) continue;
 
-                Status = "Error occur during reservation post " + i + "- Shop.ca";
+                Status = "Error occur during reservation post " + i + " - Shop.ca";
                 do
                 {
                     Thread.Sleep(5000);
@@ -310,7 +310,7 @@ namespace Order_Manager.channel.brightpearl
                 Status = "Getting order row ID";
                 if (post.HasError)
                 {
-                    Status = "Error occur during order row post " + i + "- Giant Tiger";
+                    Status = "Error occur during order row post " + i + " - Giant Tiger";
                     do
                     {
                         Thread.Sleep(5000);
@@ -323,7 +323,7 @@ namespace Order_Manager.channel.brightpearl
                 Status = "Posting reservation request " + i;
                 if (!post.HasError) continue;
 
-                Status = "Error occur during reservation post " + i + "- Giant Tiger";
+                Status = "Error occur during reservation post " + i + " - Giant Tiger";
                 do
                 {
                     Thread.Sleep(5000);

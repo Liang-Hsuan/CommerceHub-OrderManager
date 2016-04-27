@@ -248,8 +248,6 @@ namespace Order_Manager.channel.giantTiger
         {
             foreach (string file in fileList)
             {
-                if (file == "." || file == "..") continue;
-
                 // change file to txt and save file to local
                 string fileNameCsv = file.Replace("txt", "csv");
                 ftp.Download(GET_DIR + '/' + file, filePath + "\\" + fileNameCsv);
