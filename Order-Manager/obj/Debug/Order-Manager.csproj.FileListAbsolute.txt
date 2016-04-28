@@ -94,3 +94,6 @@ V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order_Manager.Pro
 V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order_Manager.mainForms.ShipmentPage.resources
 V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order_Manager.supportingClasses.ConfirmPanel.resources
 V:\Project\Real Projects\Order-Manager\Order-Manager\obj\Debug\Order-Manager.csproj.GenerateResource.Cache
+Z:\Online\IT DEVELOPMENT\Order-Manager\Order-Manager\bin\Debug\Order-Manager.exe.config
+Z:\Online\IT DEVELOPMENT\Order-Manager\Order-Manager\obj\Debug\Order-Manager.exe
+Z:\Online\IT DEVELOPMENT\Order-Manager\Order-Manager\obj\Debug\Order-Manager.pdb
