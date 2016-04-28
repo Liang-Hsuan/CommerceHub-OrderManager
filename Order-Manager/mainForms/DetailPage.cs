@@ -577,7 +577,7 @@ namespace Order_Manager.mainForms
 
             // mark cancel as invisible, set tracking number text to not shipped, and enable create label button
             voidShipmentButton.Visible = false;
-            trackingNumberTextbox.Text = "Not Shipped";
+            trackingNumberTextbox.Text = "Not shipped";
             createLabelButton.Enabled = true;        
         }
 
