@@ -1,6 +1,5 @@
-﻿namespace Order_Manager.Properties {
-    using System;
-
+﻿namespace Order_Manager.Properties
+{
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

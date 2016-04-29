@@ -49,7 +49,7 @@ namespace Order_Manager.channel.shop.ca
             // get credentials for shop.ca sftp log on and initialize the field
             using (SqlConnection connection = new SqlConnection(Credentials.AscmCon))
             {
-                SqlCommand command = new SqlCommand("SELECT Field1_Value, Username, Password From ASCM_Credentials WHERE Source='Shop.ca - SFTP';", connection);
+                SqlCommand command = new SqlCommand("SELECT Field1_Value, Username, Password From ASCM_Credentials WHERE Source='Shop.ca - SFTP'", connection);
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 reader.Read();
