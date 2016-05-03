@@ -45,9 +45,9 @@ namespace Order_Manager
             // initialize connection string
             string[] connectionString =
             {
-                "Data Source=kpjvpp867r.database.windows.net; Initial Catalog=OrderHub;Integrated Security=False;User ID=" + userName + ";Password=" + password + ";Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;MultipleActiveResultSets=true;",
-                "Data Source=kpjvpp867r.database.windows.net;Initial Catalog=Design_Database;Integrated Security=False;User ID=" + userName + ";Password=" + password + ";Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;",
-                "Data Source=kpjvpp867r.database.windows.net;Initial Catalog=ChannelPartner_Database;Integrated Security=False;User ID=" + userName + ";Password=" + password + ";Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;"
+                "Data Source=server; Initial Catalog=OrderHub;Integrated Security=False;User ID=" + userName + ";Password=" + password + ";Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;MultipleActiveResultSets=true;",
+                "Data Source=server;Initial Catalog=Design_Database;Integrated Security=False;User ID=" + userName + ";Password=" + password + ";Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;",
+                "Data Source=server;Initial Catalog=ChannelPartner_Database;Integrated Security=False;User ID=" + userName + ";Password=" + password + ";Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;"
             };
 
             SqlConnection[] connection = { new SqlConnection(connectionString[0]), new SqlConnection(connectionString[1]), new SqlConnection(connectionString[2]) };
