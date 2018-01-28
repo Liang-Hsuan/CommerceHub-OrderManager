@@ -1,5 +1,5 @@
 # Order Manager #
-## A desktop application that can manage various shopping channels' orders | my 3rd C# application ##
+## A desktop application that can manage various shopping channels' orders ##
 
 **The main function of this application:**
 
@@ -24,8 +24,6 @@
 * iTextSharp (for packing slip generation) & TamirSSH (for SFTP server connection) & Ftp (my own open source class for FTP server connection)
 
 -------------
-
-
 
 **Note:**
 This application is a very flexible and modularized in order to handle more than one shopping channels' order, so adding a new shopping channel is pretty easy, and the code is very well documented.
